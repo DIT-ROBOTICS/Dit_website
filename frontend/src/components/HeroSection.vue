@@ -1,0 +1,368 @@
+<script setup>
+import { onMounted, onUnmounted, ref } from 'vue'
+import heroImageUrl from '@/assets/Hero_Image.png'
+import logoUrl from '@/assets/dit_logo.png'
+
+const heroContainer = ref(null)
+const progress = ref(0)
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max)
+}
+
+function updateHeroProgress() {
+  if (!heroContainer.value) {
+    return
+  }
+
+  const rect = heroContainer.value.getBoundingClientRect()
+
+  /*
+   * 外層總高度是 160vh，sticky Hero 是 100vh。
+   * 因此可用來動畫的距離約是 60vh。
+   */
+  const animationDistance = window.innerHeight * 0.6
+  const scrolledDistance = -rect.top
+
+  progress.value = clamp(
+    scrolledDistance / animationDistance,
+    0,
+    1,
+  )
+}
+
+onMounted(() => {
+  updateHeroProgress()
+
+  window.addEventListener(
+    'scroll',
+    updateHeroProgress,
+    { passive: true },
+  )
+
+  window.addEventListener(
+    'resize',
+    updateHeroProgress,
+  )
+})
+
+onUnmounted(() => {
+  window.removeEventListener(
+    'scroll',
+    updateHeroProgress,
+  )
+
+  window.removeEventListener(
+    'resize',
+    updateHeroProgress,
+  )
+})
+</script>
+
+<template>
+  <section
+    ref="heroContainer"
+    class="hero-scroll-space"
+  >
+    <div
+      class="hero"
+      :style="{ '--progress': progress }"
+    >
+      <img
+        class="hero-background"
+        :src="heroImageUrl"
+        alt="DIT 團隊封面照片"
+      >
+
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <p class="hero-eyebrow">
+          DIT ROBOTICS
+        </p>
+
+        <h1>Do, Improve, and Try</h1>
+
+        <p class="hero-description">
+          我們是一群以機器人、程式、機構與創意為核心的團隊，
+          不斷從挑戰中創造新的可能。
+        </p>
+
+        <a href="#team">
+          認識團隊
+        </a>
+      </div>
+
+      <div class="title-bar">
+        <img
+          :src="logoUrl"
+          alt="DIT Logo"
+        >
+
+        <strong>DIT Robotics</strong>
+
+        <nav>
+          <a href="#team">團隊</a>
+          <a href="#featured-robot">年度機器人</a>
+          <a href="#robots">歷年作品</a>
+          <a href="#advisors">指導教授</a>
+          <a href="#sponsors">贊助商</a>
+          <a href="#contact">聯絡</a>
+        </nav>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+.hero-scroll-space {
+  position: relative;
+  height: 160vh;
+}
+
+.hero {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  height:
+    calc(
+      100vh - var(--progress) * (100vh - 76px)
+    );
+
+  min-height: 76px;
+
+  overflow: hidden;
+  color: white;
+  background: #111;
+  box-shadow:
+    0 calc(var(--progress) * 8px)
+    calc(var(--progress) * 30px)
+    rgba(0, 0, 0, 0.18);
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left 70%;
+
+  opacity:
+    calc(
+      1 - var(--progress) * 0.82
+    );
+
+  transform:
+    scale(
+      calc(1 + var(--progress) * 0.08)
+    );
+
+  filter:
+    blur(
+      calc(var(--progress) * 5px)
+    );
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 8, 14, 0.7),
+      rgba(5, 8, 14, 0.25)
+    );
+
+  opacity:
+    calc(
+      1 - var(--progress) * 0.5
+    );
+}
+
+.hero-content {
+  position: absolute;
+  left: 8vw;
+  bottom: 11vh;
+  z-index: 2;
+
+  max-width: 70vw;
+
+  opacity:
+    calc(
+      1 - var(--progress) * 1.5
+    );
+
+  transform:
+    translateY(
+      calc(var(--progress) * -60px)
+    );
+
+  pointer-events:
+    calc(1 - var(--progress));
+}
+
+.hero-eyebrow {
+  margin: 0 0 18px;
+  font-size: 13px;
+  letter-spacing: 0.25em;
+}
+
+.hero-content h1 {
+  margin: 0;
+  font-size: clamp(48px, 7.5vw, 100px);
+  line-height: 1.04;
+  letter-spacing: -0.05em;
+}
+
+.hero-description {
+  max-width: 600px;
+  margin: 26px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.9;
+}
+
+.hero-content > a {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background: white;
+  color: #111;
+  text-decoration: none;
+}
+
+.title-bar {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+
+  height: 76px;
+  padding: 0 clamp(20px, 5vw, 72px);
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  opacity: var(--progress);
+
+  transform:
+    translateY(
+      calc((1 - var(--progress)) * -24px)
+    );
+
+  background:
+    rgba(10, 12, 17, 0.88);
+
+  backdrop-filter: blur(18px);
+}
+
+.title-bar img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.title-bar strong {
+  margin-right: auto;
+  font-size: 16px;
+}
+
+.title-bar nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.4vw, 32px);
+}
+
+.title-bar nav a {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.title-bar nav a:hover {
+  color: white;
+  transform: translateY(-1px);
+}
+
+.scroll-indicator {
+  position: absolute;
+  right: 45px;
+  bottom: 45px;
+  z-index: 3;
+
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  opacity:
+    calc(
+      1 - var(--progress) * 2
+    );
+
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+
+.scroll-indicator i {
+  width: 52px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.fixed-title-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+
+  height: 76px;
+  padding: 0 clamp(20px, 5vw, 72px);
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  color: white;
+  background: rgba(10, 12, 17, 0.88);
+  backdrop-filter: blur(18px);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-100%);
+
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease,
+    transform 0.25s ease;
+}
+
+.fixed-title-bar.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (max-width: 760px) {
+  .title-bar nav {
+    display: none;
+  }
+
+  .hero-content {
+    left: 24px;
+    right: 24px;
+    bottom: 80px;
+  }
+
+  .scroll-indicator {
+    display: none;
+  }
+}
+</style>
