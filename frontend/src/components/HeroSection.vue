@@ -3,32 +3,32 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import heroImageUrl from '@/assets/Hero_Image.png'
 import logoUrl from '@/assets/dit_logo.png'
 
+
 const heroContainer = ref(null)
-const progress = ref(0)
+// const progress = ref(0)
+const progress = defineModel('progress', {type: Number ,default: 0,})
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
 }
 
 function updateHeroProgress() {
-  if (!heroContainer.value) {
+  const element = heroContainer.value
+
+  if (!element) {
     return
   }
 
-  const rect = heroContainer.value.getBoundingClientRect()
+  const rect = element.getBoundingClientRect()
 
-  /*
-   * 外層總高度是 160vh，sticky Hero 是 100vh。
-   * 因此可用來動畫的距離約是 60vh。
-   */
-  const animationDistance = window.innerHeight * 0.6
-  const scrolledDistance = -rect.top
+  const animationDistance = element.offsetHeight-window.innerHeight
 
-  progress.value = clamp(
-    scrolledDistance / animationDistance,
-    0,
-    1,
-  )
+  if (animationDistance <= 0) {
+    progress.value = 0
+    return
+  }
+
+  progress.value = clamp( -rect.top / animationDistance, 0, 1)
 }
 
 onMounted(() => {
@@ -60,19 +60,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section
-    ref="heroContainer"
-    class="hero-scroll-space"
-  >
-    <div
-      class="hero"
-      :style="{ '--progress': progress }"
-    >
-      <img
-        class="hero-background"
-        :src="heroImageUrl"
-        alt="DIT 團隊封面照片"
-      >
+  <section ref="heroContainer" class="hero-scroll-space">
+    <div class="hero" :style="{ '--progress': progress }">
+      <img class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片">
 
       <div class="hero-overlay"></div>
 
@@ -93,11 +83,9 @@ onUnmounted(() => {
         </a>
       </div>
 
-      <div class="title-bar">
-        <img
-          :src="logoUrl"
-          alt="DIT Logo"
-        >
+    </div>
+    <div class="title-bar" :style="{ '--progress': progress }">
+        <img :src="logoUrl" alt="DIT Logo">
 
         <strong>DIT Robotics</strong>
 
@@ -110,14 +98,16 @@ onUnmounted(() => {
           <a href="#contact">聯絡</a>
         </nav>
       </div>
-    </div>
   </section>
 </template>
 
 <style scoped>
 .hero-scroll-space {
   position: relative;
-  height: 160vh;
+  height: calc(160vh - 76px);
+  /*calc( 100vh - var(--progress) * (100vh - 76px) );*/
+
+  min-height: 76px;
 }
 
 .hero {
@@ -125,10 +115,7 @@ onUnmounted(() => {
   top: 0;
   z-index: 20;
 
-  height:
-    calc(
-      100vh - var(--progress) * (100vh - 76px)
-    );
+  height: calc(100vh - var(--progress) * (100vh - 76px));
 
   min-height: 76px;
 
@@ -136,9 +123,7 @@ onUnmounted(() => {
   color: white;
   background: #111;
   box-shadow:
-    0 calc(var(--progress) * 8px)
-    calc(var(--progress) * 30px)
-    rgba(0, 0, 0, 0.18);
+    0 calc(var(--progress) * 8px) calc(var(--progress) * 30px) rgba(0, 0, 0, 0.18);
 }
 
 .hero-background {
@@ -151,19 +136,13 @@ onUnmounted(() => {
   object-position: left 70%;
 
   opacity:
-    calc(
-      1 - var(--progress) * 0.82
-    );
+    calc(1 - var(--progress) * 0.82);
 
   transform:
-    scale(
-      calc(1 + var(--progress) * 0.08)
-    );
+    scale(calc(1 + var(--progress) * 0.08));
 
   filter:
-    blur(
-      calc(var(--progress) * 5px)
-    );
+    blur(calc(var(--progress) * 5px));
 }
 
 .hero-overlay {
@@ -171,16 +150,12 @@ onUnmounted(() => {
   inset: 0;
 
   background:
-    linear-gradient(
-      90deg,
+    linear-gradient(90deg,
       rgba(5, 8, 14, 0.7),
-      rgba(5, 8, 14, 0.25)
-    );
+      rgba(5, 8, 14, 0.25));
 
   opacity:
-    calc(
-      1 - var(--progress) * 0.5
-    );
+    calc(1 - var(--progress) * 0.5);
 }
 
 .hero-content {
@@ -192,14 +167,10 @@ onUnmounted(() => {
   max-width: 70vw;
 
   opacity:
-    calc(
-      1 - var(--progress) * 1.5
-    );
+    calc(1 - var(--progress) * 1.5);
 
   transform:
-    translateY(
-      calc(var(--progress) * -60px)
-    );
+    translateY(calc(var(--progress) * -60px));
 
   pointer-events:
     calc(1 - var(--progress));
@@ -225,7 +196,7 @@ onUnmounted(() => {
   line-height: 1.9;
 }
 
-.hero-content > a {
+.hero-content>a {
   display: inline-block;
   margin-top: 30px;
   padding: 13px 22px;
@@ -236,9 +207,9 @@ onUnmounted(() => {
 }
 
 .title-bar {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 4;
+  z-index: 54;
 
   height: 76px;
   padding: 0 clamp(20px, 5vw, 72px);
@@ -249,10 +220,9 @@ onUnmounted(() => {
 
   opacity: var(--progress);
 
+  color: white;
   transform:
-    translateY(
-      calc((1 - var(--progress)) * -24px)
-    );
+    translateY(calc((1 - var(--progress)) * -24px));
 
   background:
     rgba(10, 12, 17, 0.88);
@@ -302,9 +272,7 @@ onUnmounted(() => {
   gap: 13px;
 
   opacity:
-    calc(
-      1 - var(--progress) * 2
-    );
+    calc(1 - var(--progress) * 2);
 
   font-size: 10px;
   letter-spacing: 0.2em;
@@ -348,6 +316,21 @@ onUnmounted(() => {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+.page-content {
+  position: relative;
+  z-index: 1;
+
+  min-height: 100vh;
+  background: #f5f5f3;
+}
+
+.team-section {
+  scroll-margin-top: 76px;
+
+  padding:
+    clamp(110px, 12vw, 180px) clamp(24px, 8vw, 120px);
 }
 
 @media (max-width: 760px) {
