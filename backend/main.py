@@ -33,19 +33,33 @@ async def get_team():
     }
 
 
-@app.get("/api/members")
-async def get_members():
+@app.get("/api/member_info/{member_type}")
+async def get_members(member_type: str):
+    info_path = {
+        "Leader" : "Leadership.json",
+        "Advisor" : "Advisors.json"
+    }
+    file_path = DATA_DIR / info_path.get(member_type)
+    if not file_path:
+        raise HTTPException(status_code=404, detail="Member info not found")
     with open(
-        DATA_DIR / "Leadership.json",
+        file_path,
         encoding="utf-8"
     ) as f:
 
         return json.load(f)
 
     
-@app.get("/api/Leader-image/{member_id}")
-async def get_member_image(member_id: int):
-    with open(DATA_DIR / "Leadership.json", encoding="utf-8") as f:
+@app.get("/api/member_images/{image_type}/{member_id}")
+async def get_member_image(image_type: str, member_id: int):
+    image_path = {
+        "Leader-image": "Leadership.json",
+        "advisor-image": "Advisors.json"
+    }
+    file_path = DATA_DIR / image_path.get(image_type)
+    if not file_path:
+        raise HTTPException(status_code=404, detail="Member info not found")
+    with open(file_path, encoding="utf-8") as f:
         members = json.load(f)
 
     member = next(

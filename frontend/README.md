@@ -22,13 +22,16 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 ## Project Setup
 
 ```sh
-npm install
+frontend -> npm install
 ```
 
 ### Compile and Hot-Reload for Development
 
 ```sh
-npm run dev
+frontend -> npm run dev
+frontend -> cloudflared tunnel --url http://localhost:5173
+backend -> python3 main.py
+
 ```
 
 ### Compile and Minify for Production

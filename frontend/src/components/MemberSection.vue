@@ -18,7 +18,7 @@ const errorMessage = ref('')
 
 async function loadMembers() {
   try {
-    const response = await fetch('/api/members')
+    const response = await fetch('/api/member_info/Leader')
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`)
