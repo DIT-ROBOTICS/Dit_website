@@ -1,6 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn,socket
+from pathlib import Path
+from fastapi.responses import FileResponse
+import json,uvicorn,socket
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+MEMBER_IMAGE_DIR = BASE_DIR / "static" / "members"
 
 
 app = FastAPI()
@@ -29,20 +35,34 @@ async def get_team():
 
 @app.get("/api/members")
 async def get_members():
-    return [
-        {
-            "id": 1,
-            "name": "Jason",
-            "role": "Frontend Developer",
-            "image": "/members/member-1.jpg",
-        },
-        {
-            "id": 2,
-            "name": "Alice",
-            "role": "Visual Designer",
-            "image": "/members/member-2.jpg",
-        },
-    ]
+    with open(
+        DATA_DIR / "Leadership.json",
+        encoding="utf-8"
+    ) as f:
+
+        return json.load(f)
+
+    
+@app.get("/api/Leader-image/{member_id}")
+async def get_member_image(member_id: int):
+    with open(DATA_DIR / "Leadership.json", encoding="utf-8") as f:
+        members = json.load(f)
+
+    member = next(
+        (member for member in members if member["id"] == member_id),
+        None
+    )
+
+    if member is None:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    image_path = BASE_DIR / member["image"]
+
+    if not image_path.is_file():
+        raise HTTPException(status_code=404, detail="Member image not found")
+
+    return FileResponse(image_path)
+
 
 def get_local_ip() -> str:
     """
@@ -60,7 +80,7 @@ def get_local_ip() -> str:
 
 
 if __name__ == "__main__":
-    print(f"ip:${get_local_ip()}")
+    print(f"ip:{get_local_ip()}")
     uvicorn.run(
         "main:app",
         host="0.0.0.0",  # 💡 關鍵防守：全面開放區域網路，讓手機連得進來

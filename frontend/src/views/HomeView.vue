@@ -8,6 +8,7 @@ import RobotArchiveSection from '@/components/RobotArchiveSection.vue'
 import AdvisorsSection from '@/components/AdvisorsSection.vue'
 import SponsorsSection from '@/components/SponsorsSection.vue'
 import ContactSection from '@/components/ContactSection.vue'
+import MemberSection from '@/components/MemberSection.vue'
 
 const heroProgress = ref(0)
 // provide('heroProgress', heroProgress)
@@ -18,11 +19,12 @@ const heroProgress = ref(0)
     <HeroSection v-model:progress="heroProgress"/>
 
     <div class="about-wrapper">
-      <AboutSection />
-      <TeamSection id="team" />
+      <AboutSection id="team"  />
+      <TeamSection />
       <EurobotSection id="Eurobot" />
       <RobotArchiveSection id="robots" />
       <AdvisorsSection id="advisors" />
+      <MemberSection id="members" />
       <SponsorsSection id="sponsors" />
       <ContactSection id="contact" />
     </div>

@@ -9,6 +9,12 @@ const startupFinished = ref(false)
 
 function finishStartup() {
   startupFinished.value = true
+  sessionStorage.setItem('startupFinished', true)
+}
+
+const startup = sessionStorage.getItem('startupFinished')
+if(startup){
+  startupFinished.value = true
 }
 </script>
 

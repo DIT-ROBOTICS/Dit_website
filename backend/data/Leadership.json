@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "name": "臣欲降",
+    "position": "隊長·相機組長",
+    "generation": 12,
+    "department": "Software",
+    "description": "負責團隊技術整合與規劃。",
+    "image": "static/member_image/臣欲降.png",
+
+    "skills": [
+      "ROS2",
+      "Python",
+      "OpenCV",
+      "Vue"
+    ],
+
+    "social": {
+      "github": "https://github.com/...",
+      "instagram": "..."
+    }
+  },
+
+  {
+    "id": 2,
+    "name": "濕皿制",
+    "position": "主程式組長·導航組長",
+    "generation": 13,
+    "department": "Mechanical",
+    "description": "...",
+
+    "image": "/static/members/alice.jpg",
+
+    "skills": [
+      "Fusion360",
+      "CAD",
+      "CNC"
+    ]
+  },
+
+  {
+    "id": 2,
+    "name": "紅起搖",
+    "position": "Mechanical Leader",
+    "generation": 13,
+    "department": "Mechanical",
+    "description": "...",
+
+    "image": "/static/members/alice.jpg",
+
+    "skills": [
+      "Fusion360",
+      "CAD",
+      "CNC"
+    ]
+  }
+]

@@ -99,6 +99,7 @@ onUnmounted(() => {
           <a href="#EurobotSection">年度機器人</a>
           <a href="#robots">歷年作品</a>
           <a href="#advisors">指導教授</a>
+          <a href="#members">團隊成員</a>
           <a href="#sponsors">贊助商</a>
           <a href="#contact">聯絡</a>
         </nav>
@@ -230,7 +231,7 @@ onUnmounted(() => {
     translateY(calc((1 - var(--progress)) * -24px));
 
   background:
-    rgba(10, 12, 17, 0.88);
+    rgba(10, 12, 17, 1);
 
   backdrop-filter: blur(18px);
 }
