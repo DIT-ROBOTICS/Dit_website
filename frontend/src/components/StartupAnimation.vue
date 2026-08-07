@@ -1,7 +1,11 @@
+<!--
+網頁的啟動動畫
+-->
+
+
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import logoUrl from '@/assets/dit_logo.png'
-import robotImageUrl from '@/assets/dit_logo.png'
 
 const emit = defineEmits(['finished'])
 

@@ -50,20 +50,17 @@ def get_local_ip() -> str:
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # 💡 核心防守魔法：這裡並不會真的發送封包，只是藉由嘗試連線 
-        # 逼作業系統的大腦吐出目前正在工作中的網卡物理 IP
         s.connect(('8.8.8.8', 80))
         local_ip = s.getsockname()[0]
     except Exception:
-        # 萬一完全沒連網，就給回本地迴圈地址
         local_ip = '127.0.0.1'
     finally:
         s.close()
     return local_ip
 
-print(f"ip:${get_local_ip()}")
 
 if __name__ == "__main__":
+    print(f"ip:${get_local_ip()}")
     uvicorn.run(
         "main:app",
         host="0.0.0.0",  # 💡 關鍵防守：全面開放區域網路，讓手機連得進來

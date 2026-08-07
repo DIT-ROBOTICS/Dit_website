@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import HeroSection from '@/components/HeroSection.vue'
 import AboutSection from '@/components/AboutSection.vue'  
 import TeamSection from '@/components/TeamSection.vue'
-import FeaturedRobotSection from '@/components/FeaturedRobotSection.vue'
+import EurobotSection from '@/components/EurobotSection.vue'
 import RobotArchiveSection from '@/components/RobotArchiveSection.vue'
 import AdvisorsSection from '@/components/AdvisorsSection.vue'
 import SponsorsSection from '@/components/SponsorsSection.vue'
@@ -20,7 +20,7 @@ const heroProgress = ref(0)
     <div class="about-wrapper">
       <AboutSection />
       <TeamSection id="team" />
-      <FeaturedRobotSection id="featured-robot" />
+      <EurobotSection id="Eurobot" />
       <RobotArchiveSection id="robots" />
       <AdvisorsSection id="advisors" />
       <SponsorsSection id="sponsors" />

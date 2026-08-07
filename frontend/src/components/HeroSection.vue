@@ -1,3 +1,8 @@
+<!--
+網站最上面的封面：
+帥就對了
+-->
+
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import heroImageUrl from '@/assets/Hero_Image.png'
@@ -91,7 +96,7 @@ onUnmounted(() => {
 
         <nav>
           <a href="#team">團隊</a>
-          <a href="#featured-robot">年度機器人</a>
+          <a href="#EurobotSection">年度機器人</a>
           <a href="#robots">歷年作品</a>
           <a href="#advisors">指導教授</a>
           <a href="#sponsors">贊助商</a>

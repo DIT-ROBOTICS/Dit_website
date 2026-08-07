@@ -1,3 +1,9 @@
+<!--
+網頁小助手：
+看有沒有機會加入ai來帶領訪客導覽整個網頁和介紹我們團隊
+-->
+
+
 <script setup>
 import { ref } from 'vue'
 import robotImageUrl from '@/assets/dit_logo.png'
