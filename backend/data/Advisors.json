@@ -5,6 +5,7 @@
             "position": "Faculty Advisor",
             "department": "Department of Mechanical Engineering",
             "description": "長期指導團隊於機器人設計、系統整合與競賽策略。",
+            "image": "",
             "research": [
                 "Robotics",
                 "Control",
@@ -17,6 +18,7 @@
             "position": "Faculty Advisor",
             "department": "Department of Electrical Engineering",
             "description": "協助團隊於電控、嵌入式系統與硬體架構上的技術發展。",
+            "image": "",
             "research": [
                 "Embedded Systems",
                 "Electronics",
@@ -29,6 +31,7 @@
             "position": "Faculty Advisor",
             "department": "Department of Computer Science",
             "description": "指導自主導航、電腦視覺與軟體系統架構。",
+            "image": "",
             "research": [
                 "Computer Vision",
                 "AI",

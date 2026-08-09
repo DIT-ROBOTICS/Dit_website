@@ -78,6 +78,17 @@ async def get_member_image(image_type: str, member_id: int):
     return FileResponse(image_path)
 
 
+@app.get("/api/other_images/{image_type}/{path:path}")
+async def get_other_image(image_type: str, path: str):
+    image_path = {
+        "competition": "static/Competition_image/",
+    }
+    file_path = BASE_DIR / image_path.get(image_type) / path
+    if not file_path.is_file():
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(file_path)
+
+
 def get_local_ip() -> str:
     """
     獲取當前電腦在局域網（Wi-Fi）中的 IP 地址

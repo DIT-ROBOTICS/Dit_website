@@ -14,7 +14,7 @@ export default defineConfig({
 
   server: {
     allowedHosts: [
-      'smell-alphabetical-arab-course.trycloudflare.com',
+      '.trycloudflare.com',
     ],
     proxy: {
       '/api': {

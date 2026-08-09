@@ -19,17 +19,10 @@ if(startup){
 </script>
 
 <template>
-  <StartupAnimation
-    v-if="!startupFinished"
-    @finished="finishStartup"
-  />
+  <StartupAnimation v-if="!startupFinished" @finished="finishStartup" />
 
-  <div
-    class="website"
-    :class="{ visible: startupFinished }"
-  >
+  <div class="website" :class="{ visible: startupFinished }" >
     <HomeView />
-
     <FloatingRobot v-if="startupFinished" />
   </div>
 </template>

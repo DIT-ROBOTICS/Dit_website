@@ -54,7 +54,7 @@ onMounted(loadMembers)
       <div>
         <p class="eyebrow">CURRENT LEADERS</p>
 
-        <h2>2026 14th幹部團隊</h2>
+        <h2>15th幹部團隊</h2>
       </div>
 
       <p class="section-description">一群來自不同領域的人， 共同讓每一台機器從想法走到賽場。</p>
@@ -70,7 +70,7 @@ onMounted(loadMembers)
       <div class="member-scroll">
         <article v-for="member in members" :key="member.id" class="member-card" @click="openMember(member)" >
           <div class="member-photo">
-            <img :src="`/api/Leader-image/${member.id}`" :alt="member.name" />
+            <img :src="`/api/member_images/Leader-image/${member.id}`" :alt="member.name" />
 
             <div class="photo-overlay"></div>
           </div>
@@ -109,7 +109,7 @@ onMounted(loadMembers)
               <p>EXPLORE THE TEAM</p>
 
               <h3>
-                查看完整<br />
+                查看完整<br/>
                 團隊成員
               </h3>
             </div>
@@ -193,24 +193,19 @@ onMounted(loadMembers)
   margin: 0 auto;
   overflow-x: auto;
   padding-inline: 10vw;
+  -ms-overflow-style: none;
 }
 
 .member-scroll {
   display: flex;
   gap: 26px;
-  overflow-y: visible;
   padding: 10px 0 34px;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  overscroll-behavior-inline: contain;
   scrollbar-width: none;
-
-    /* IE、舊 Edge */
-
-  -ms-overflow-style: none;
 }
 
-.member-scroll::-webkit-scrollbar {
+.member-scroll-wrapper::-webkit-scrollbar {
   display: none;
 }
 
