@@ -1,0 +1,257 @@
+
+.members-section {
+    position: relative;
+    padding: 120px 0 100px;
+    overflow: hidden;
+    background: #585858;
+    color: rgb(223, 223, 223);
+}
+
+.section-heading {
+    max-width: 1400px;
+    margin: 0 auto 64px;
+    padding: 0 8vw;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+    gap: 60px;
+    align-items: end;
+}
+
+.eyebrow {
+    margin: 0 0 14px;
+    color: rgba(214, 214, 214, 0.45);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .24em;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: clamp(42px, 6vw, 78px);
+    line-height: 1.05;
+    letter-spacing: -.04em;
+}
+
+.section-description {
+    margin: 0;
+    color: rgba(255, 255, 255, .56);
+    font-size: 16px;
+    line-height: 1.9;
+}
+
+.state-message {
+    padding: 70px 8vw;
+    color: rgba(255, 255, 255, .5);
+}
+
+.state-message.error {
+    color: #ff8d8d;
+}
+
+
+
+.member-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.member-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.member-scroll {
+    display: flex;
+    width: max-content;
+    gap: 28px;
+    padding: 12px 8vw 38px;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+}
+
+
+.people-card {
+    flex: 0 0 clamp(290px, 28vw, 380px);
+    width: clamp(290px, 28vw, 380px);
+    min-width: 0;
+    scroll-snap-align: start;
+    overflow: hidden;
+    border: 1px solid #444;
+    border-radius: 28px;
+    background: var(--Card-Theme);
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+
+    transition: transform .35s cubic-bezier(.2, .7, .2, 1), border-color .35s ease, box-shadow .35s ease;
+}
+
+.people-card:hover {
+    transform: translateY(-10px);
+    border-color: #333;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, .28);
+}
+
+.people-photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--Card-Theme);
+}
+
+.people-photo img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    filter: saturate(.9);
+    transition: transform .7s cubic-bezier(.2, .7, .2, 1), filter .35s ease;
+}
+
+.people-card:hover .people-photo img {
+    transform: scale(1.055);
+    filter: saturate(1);
+}
+
+.photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, .42), transparent 45%);
+}
+
+.people-index {
+    position: absolute;
+    right: 18px;
+    bottom: 16px;
+    color: #777;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .16em;
+}
+
+.people-info {
+    padding: 27px 27px 30px;
+
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.people-position {
+    margin: 0 0 9px;
+    color: #777;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .17em;
+    text-transform: uppercase;
+}
+
+.people-info h3 {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.15;
+    letter-spacing: -.025em;
+}
+
+.people-department {
+    margin: 8px 0 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.people-description {
+    margin: 17px 0 0;
+    color: #777;
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+.skills-tags {
+    margin-top: auto;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-self: flex-start;
+    gap: 7px;
+}
+
+.skills-tags span {
+    padding: 7px 10px;
+    border: 1px solid #444;
+    border-radius: 999px;
+    color: #777;
+    background: #aaaaaa1d;
+    font-size: 11px;
+}
+
+.profile-link {
+    padding-top: 24px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    background: transparent;
+    color: var(--Text-Theme);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.profile-link span {
+    display: inline-block;
+    transition: transform .2s ease;
+}
+
+.profile-link:hover span {
+    transform: translate(3px, -3px);
+}
+
+
+@media (max-width: 900px) {
+    .members-section {
+        padding: 90px 0 75px;
+    }
+
+    .section-heading {
+        padding: 0 24px;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-bottom: 45px;
+    }
+
+    .member-scroll {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .people-card {
+        flex-basis: min(82vw, 350px);
+    }
+}
+
+@media (max-width: 520px) {
+    .section-heading {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .member-scroll {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .section-heading h2 {
+        font-size: 42px;
+    }
+
+    .people-card {
+        border-radius: 22px;
+    }
+
+    .people-info {
+        padding: 22px;
+    }
+}

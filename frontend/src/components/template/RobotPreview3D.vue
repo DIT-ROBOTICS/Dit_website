@@ -147,7 +147,7 @@ function addLights() {
 ======================================== */
 
 function loadModel() {
-    return
+    // return
     const loader =
         new GLTFLoader()
 

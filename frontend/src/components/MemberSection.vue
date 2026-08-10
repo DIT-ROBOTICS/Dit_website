@@ -9,6 +9,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import MemberCard from '@/components/template/MemberCard.vue'
 
 const router = useRouter()
 
@@ -68,40 +69,9 @@ onMounted(loadMembers)
 
     <div v-else class="member-scroll-wrapper">
       <div class="member-scroll">
-        <article v-for="member in members" :key="member.id" class="member-card" @click="openMember(member)">
-          <div class="member-photo">
-            <img :src="`/api/member_images/Leader-image/${member.id}`" :alt="member.name" />
+        <MemberCard v-for="member in members" :key="member.id" :info="member" color="white" type="Leader" @click="openMember(member)" />
 
-            <div class="photo-overlay"></div>
-          </div>
-
-          <div class="member-info">
-            <p class="member-position">
-              {{ member.position }}
-            </p>
-
-            <h3>
-              {{ member.name }}
-            </h3>
-
-            <p v-if="member.description" class="member-description">
-              {{ member.description }}
-            </p>
-
-            <div v-if="member.skills?.length" class="skills">
-              <span v-for="skill in member.skills" :key="skill">
-                {{ skill }}
-              </span>
-            </div>
-
-            <button class="profile-link" type="button" @click.stop="openMember(member)">
-              View Profile
-              <span>↗</span>
-            </button>
-          </div>
-        </article>
-
-        <article class="member-card view-all-card" @click="openFullTeam">
+        <article class="people-card view-all-card" @click="openFullTeam">
           <div class="view-all-content">
             <div class="view-all-arrow">→</div>
 
@@ -122,239 +92,20 @@ onMounted(loadMembers)
   </section>
 </template>
 
+<style scoped src="@/assets/styles/member-scroller.css"></style>
 <style scoped>
 .members-section {
-  position: relative;
-  padding: 120px 0 100px;
-  overflow: hidden;
   background: #f5f5f3;
   color: #141414;
 }
 
-/* =========================
-   Heading
-========================= */
-
-.section-heading {
-  max-width: 1400px;
-  margin: 0 auto 64px;
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1fr) minmax(260px, 420px);
-  gap: 60px;
-  align-items: end;
-}
 
 .eyebrow {
-  margin: 0 0 14px;
   color: #777;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.24em;
-}
-
-.section-heading h2 {
-  margin: 0;
-  font-size: clamp(42px, 6vw, 78px);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
 }
 
 .section-description {
-  margin: 0;
   color: #777;
-  font-size: 16px;
-  line-height: 1.9;
-}
-
-/* =========================
-   Loading / Error
-========================= */
-
-.state-message {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 70px 0;
-  color: #777;
-  font-size: 16px;
-}
-
-.state-message.error {
-  color: #bb2d2d;
-}
-
-/* =========================
-   Horizontal Scroll
-========================= */
-
-.member-scroll-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.member-scroll {
-  display: flex;
-  width: max-content;
-  gap: 26px;
-  padding: 12px 8vw 38px;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-}
-
-.member-scroll-wrapper::-webkit-scrollbar {
-  display: none;
-}
-
-
-/* =========================
-   Member Card
-========================= */
-
-.member-card {
-  flex: 0 0 clamp(280px, 27vw, 360px);
-  scroll-snap-align: start;
-  border-radius: 28px;
-  overflow: hidden;
-  background: #fff;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  transition:
-    transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
-    box-shadow 0.35s ease;
-}
-
-.member-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-}
-
-/* =========================
-   Photo
-========================= */
-
-.member-photo {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  background: #e7e7e7;
-}
-
-.member-photo img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-    filter: saturate(.9);
-  transition: transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-.member-card:hover .member-photo img {
-  transform: scale(1.06);
-    filter: saturate(1);
-}
-
-.photo-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.28), transparent 42%);
-}
-
-.member-number {
-  position: absolute;
-  right: 18px;
-  bottom: 16px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-}
-
-/* =========================
-   Member Info
-========================= */
-
-.member-info {
-  padding: 26px 26px 28px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.member-position {
-  margin: 0 0 8px;
-  color: #777;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.member-info h3 {
-  margin: 0;
-  font-size: 29px;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-}
-
-.member-description {
-  margin: 14px 0 0;
-  color: #777;
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-/* =========================
-   Skills
-========================= */
-
-.skills {
-  /* width: 300px; */
-  margin-top: auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-self: flex-start;
-  gap: 7px;
-}
-
-.skills span {
-  padding: 7px 10px;
-  border: 1px solid #dddddd;
-  border-radius: 999px;
-  color: #555;
-  background: #fafafa;
-  font-size: 11px;
-}
-
-/* =========================
-   Profile Button
-========================= */
-
-.profile-link {
-  margin-top: 24px;
-  padding: 0;
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-    align-self: flex-start;
-  background: transparent;
-  color: #111;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.profile-link span {
-  display: inline-block;
-  transition: transform 0.2s ease;
-}
-
-.profile-link:hover span {
-  transform: translate(3px, -3px);
 }
 
 /* =========================
@@ -442,46 +193,4 @@ onMounted(loadMembers)
   background: #bbb;
 }
 
-/* =========================
-   Responsive
-========================= */
-
-@media (max-width: 900px) {
-  .members-section {
-    padding: 90px 24px 75px;
-  }
-
-  .section-heading {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    margin-bottom: 45px;
-  }
-
-  .section-description {
-    max-width: 540px;
-  }
-
-  .member-card {
-    flex-basis: min(82vw, 330px);
-  }
-}
-
-@media (max-width: 520px) {
-  .members-section {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-
-  .section-heading h2 {
-    font-size: 42px;
-  }
-
-  .member-card {
-    border-radius: 22px;
-  }
-
-  .member-info {
-    padding: 22px;
-  }
-}
 </style>
