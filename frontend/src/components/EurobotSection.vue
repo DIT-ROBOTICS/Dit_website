@@ -16,8 +16,11 @@
 <script setup>
 import { ref } from 'vue'
 
-import robot1Photo from '@/assets/Hero_Image.png'
-import robot2Photo from '@/assets/Hero_Image.png'
+import RobotPreview3D from '@/components/template/RobotPreview3D.vue'
+import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
+
+import blackRobotModel from '@/assets/Eurobot2026黑機.glb?url'
+import whiteRobotModel from '@/assets/Eurobot2026白機.glb?url'
 
 const achievementPhoto = '/api/other_images/competition/background.png'
 
@@ -26,9 +29,12 @@ const robots = [
         id: 1,
         name: '黑機',
         subtitle: 'DIT ROBOTICS',
-        image: robot1Photo,
+
+        model: blackRobotModel,
+
         description:
             '負責主要得分任務，整合導航、物件辨識、機構控制與自動路徑規劃。',
+
         technologies: [
             '四面手臂',
             'Computer Vision',
@@ -37,13 +43,17 @@ const robots = [
             'CAN Bus'
         ]
     },
+
     {
         id: 2,
         name: '白機',
         subtitle: 'NTHU DIT',
-        image: robot2Photo,
+
+        model: whiteRobotModel,
+
         description:
             '負責協同任務與場地互動，透過定位系統與主機器人交換即時狀態。',
+
         technologies: [
             '三面手臂',
             'LiDAR',
@@ -74,7 +84,7 @@ function openDetails(robot) {
 <template>
     <section id="featured-robot" class="robot-year-section">
         <div class="sticky-background">
-            <img :src="achievementPhoto" alt="DIT Robotics 2026 Team" class="background-image" >
+            <img :src="achievementPhoto" alt="DIT Robotics 2026 Team" class="background-image">
             <div class="background-overlay"></div>
         </div>
 
@@ -139,19 +149,14 @@ function openDetails(robot) {
                 <div class="robots-grid">
                     <article v-for="(robot, index) in robots" :key="robot.id" class="robot-card">
                         <div class="robot-image-container" @click="openRobot3D(robot)">
-                            <img :src="robot.image" :alt="robot.name">
+                            <RobotPreview3D :model="robot.model" />
                             <div class="image-overlay">
                                 <div class="view-3d">
-                                    <span class="view-icon">
-                                        360°
-                                    </span>
-                                    <span>
-                                        VIEW IN 3D
-                                    </span>
+                                    <span class="view-icon"> 360° </span>
+                                    <span>INTERACTIVE VIEW</span>
                                 </div>
                             </div>
                         </div>
-
                         <div class="robot-info">
                             <div class="robot-title">
                                 <div>
@@ -231,41 +236,26 @@ function openDetails(robot) {
 
         <Transition name="modal">
 
-            <div
-                v-if="selectedRobot"
-                class="robot-modal"
-                @click.self="closeRobot3D"
-            >
+            <div v-if="selectedRobot" class="robot-modal" @click.self="closeRobot3D">
 
                 <div class="modal-container">
 
-                    <button
-                        class="close-button"
-                        @click="closeRobot3D"
-                    >
+                    <button class="close-button" @click="closeRobot3D">
                         ×
                     </button>
 
-                    <div class="viewer-placeholder">
+                    <div class="viewer">
+                        <RobotViewer3D :model="selectedRobot.model" />
+                        <div class="viewer-info">
+                            <p>INTERACTIVE 3D VIEWER</p>
 
-                        <p>
-                            INTERACTIVE 3D VIEWER
-                        </p>
+                            <h2>{{ selectedRobot.name }}</h2>
 
-                        <h2>
-                            {{ selectedRobot.name }}
-                        </h2>
-
-                        <span>
-                            之後這裡可以放 Three.js / model-viewer
-                        </span>
-
+                            <span>DRAG TO ROTATE · SCROLL TO ZOOM</span>
+                        </div>
                     </div>
-
                 </div>
-
             </div>
-
         </Transition>
 
     </section>
@@ -316,11 +306,9 @@ function openDetails(robot) {
     inset: 0;
 
     background:
-        linear-gradient(
-            to bottom,
+        linear-gradient(to bottom,
             rgba(0, 0, 0, 0.18),
-            rgba(0, 0, 0, 0.4)
-        );
+            rgba(0, 0, 0, 0.4));
 }
 
 
@@ -357,9 +345,7 @@ function openDetails(robot) {
     justify-content: flex-end;
 
     padding:
-        clamp(110px, 12vh, 160px)
-        clamp(30px, 7vw, 120px)
-        clamp(60px, 8vh, 100px);
+        clamp(110px, 12vh, 160px) clamp(30px, 7vw, 120px) clamp(60px, 8vh, 100px);
 }
 
 .achievement-content {
@@ -489,18 +475,14 @@ function openDetails(robot) {
     min-height: 100vh;
 
     padding:
-        140px
-        clamp(24px, 6vw, 100px)
-        70px;
+        140px clamp(24px, 6vw, 100px) 70px;
 
     background:
-        linear-gradient(
-            to bottom,
+        linear-gradient(to bottom,
             rgba(5, 5, 5, 0.0),
             rgba(5, 5, 5, 0.3) 50%,
             rgba(5, 5, 5, 0.7) 100%,
-            #050505 90%
-        );
+            #050505 90%);
 }
 
 .section-heading {
@@ -520,7 +502,7 @@ function openDetails(robot) {
     line-height: 1;
 }
 
-.section-heading > p:last-child {
+.section-heading>p:last-child {
     max-width: 560px;
 
     margin: 0;
@@ -557,29 +539,16 @@ function openDetails(robot) {
 .robot-image-container {
     position: relative;
 
+    width: 80%;
     aspect-ratio: 4 / 5;
+
+    margin: 0 auto;
 
     overflow: hidden;
 
     cursor: pointer;
 
-    background: #111;
-}
-
-.robot-image-container img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    transition:
-        transform 0.8s
-        cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.robot-image-container:hover img {
-    transform:
-        scale(1.045);
+    background: transparent;
 }
 
 .image-overlay {
@@ -592,6 +561,7 @@ function openDetails(robot) {
     align-items: center;
 
     justify-content: center;
+    border-radius: 10px;
 
     background:
         rgba(0, 0, 0, 0);
@@ -602,7 +572,11 @@ function openDetails(robot) {
 
 .robot-image-container:hover .image-overlay {
     background:
-        rgba(0, 0, 0, 0.38);
+        radial-gradient(
+            circle at 50% 45%,
+            #24242472,
+            #ffffff00 70%
+        );
 }
 
 .view-3d {
@@ -643,8 +617,7 @@ function openDetails(robot) {
     place-items: center;
 
     border:
-        1px solid
-        rgba(255, 255, 255, 0.6);
+        1px solid rgba(255, 255, 255, 0.6);
 
     border-radius: 50%;
 
@@ -724,12 +697,10 @@ function openDetails(robot) {
 
 .technologies span {
     padding:
-        8px
-        12px;
+        8px 12px;
 
     border:
-        1px solid
-        rgba(255, 255, 255, 0.18);
+        1px solid rgba(255, 255, 255, 0.18);
 
     border-radius: 999px;
 
@@ -763,12 +734,10 @@ function openDetails(robot) {
     border: none;
 
     border-top:
-        1px solid
-        rgba(255, 255, 255, 0.18);
+        1px solid rgba(255, 255, 255, 0.18);
 
     border-bottom:
-        1px solid
-        rgba(255, 255, 255, 0.18);
+        1px solid rgba(255, 255, 255, 0.18);
 
     background: transparent;
 
@@ -823,8 +792,7 @@ function openDetails(robot) {
 
     background: rgba(5, 5, 5, 1);
     border:
-        1px solid
-        rgba(255, 255, 255, 1);
+        1px solid rgba(255, 255, 255, 1);
 }
 
 .simulation-card h2 {
@@ -838,7 +806,7 @@ function openDetails(robot) {
     letter-spacing: -0.06em;
 }
 
-.simulation-card > p:not(.eyebrow) {
+.simulation-card>p:not(.eyebrow) {
     max-width: 500px;
 
     margin-top: 30px;
@@ -859,8 +827,7 @@ function openDetails(robot) {
     gap: 40px;
 
     padding:
-        18px
-        24px;
+        18px 24px;
 
     border: 1px solid white;
 
@@ -925,8 +892,7 @@ function openDetails(robot) {
     background: #0a0a0a;
 
     border:
-        1px solid
-        rgba(255, 255, 255, 0.15);
+        1px solid rgba(255, 255, 255, 0.15);
 }
 
 .close-button {
@@ -942,8 +908,7 @@ function openDetails(robot) {
     height: 44px;
 
     border:
-        1px solid
-        rgba(255, 255, 255, 0.25);
+        1px solid rgba(255, 255, 255, 0.25);
 
     border-radius: 50%;
 
@@ -982,8 +947,7 @@ function openDetails(robot) {
 
 .viewer-placeholder h2 {
     margin:
-        10px
-        0;
+        10px 0;
 
     font-size:
         clamp(50px, 8vw, 120px);
@@ -1012,7 +976,53 @@ function openDetails(robot) {
     opacity: 0;
 }
 
+/* ========================================
+   viewer
+======================================== */
+.viewer {
+    position: relative;
 
+    width: 100%;
+    height: 100%;
+}
+
+.viewer-info {
+    position: absolute;
+
+    left: 35px;
+    bottom: 30px;
+
+    z-index: 2;
+
+    pointer-events: none;
+}
+
+.viewer-info p {
+    margin: 0 0 8px;
+
+    font-size: 10px;
+
+    letter-spacing: 0.24em;
+
+    opacity: 0.45;
+}
+
+.viewer-info h2 {
+    margin: 0 0 8px;
+
+    font-size: 38px;
+
+    letter-spacing: -0.04em;
+}
+
+.viewer-info span {
+    font-size: 9px;
+
+    letter-spacing: 0.16em;
+
+    color:
+        rgba(255, 255, 255, 0.4);
+}
 /* ========================================
    RWD
 ======================================== */

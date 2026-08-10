@@ -68,7 +68,7 @@ onMounted(loadMembers)
 
     <div v-else class="member-scroll-wrapper">
       <div class="member-scroll">
-        <article v-for="member in members" :key="member.id" class="member-card" @click="openMember(member)" >
+        <article v-for="member in members" :key="member.id" class="member-card" @click="openMember(member)">
           <div class="member-photo">
             <img :src="`/api/member_images/Leader-image/${member.id}`" :alt="member.name" />
 
@@ -109,7 +109,7 @@ onMounted(loadMembers)
               <p>EXPLORE THE TEAM</p>
 
               <h3>
-                查看完整<br/>
+                查看完整<br />
                 團隊成員
               </h3>
             </div>
@@ -126,7 +126,7 @@ onMounted(loadMembers)
 .members-section {
   position: relative;
   padding: 120px 0 100px;
-  overflow: visible;
+  overflow: hidden;
   background: #f5f5f3;
   color: #141414;
 }
@@ -140,8 +140,7 @@ onMounted(loadMembers)
   margin: 0 auto 64px;
   display: grid;
   grid-template-columns:
-    minmax(0, 1fr)
-    minmax(260px, 420px);
+    minmax(0, 1fr) minmax(260px, 420px);
   gap: 60px;
   align-items: end;
 }
@@ -189,20 +188,19 @@ onMounted(loadMembers)
 ========================= */
 
 .member-scroll-wrapper {
-  max-width: 100vw;
-  margin: 0 auto;
+  width: 100%;
   overflow-x: auto;
-  padding-inline: 10vw;
   -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .member-scroll {
   display: flex;
+  width: max-content;
   gap: 26px;
-  padding: 10px 0 34px;
+  padding: 12px 8vw 38px;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  scrollbar-width: none;
 }
 
 .member-scroll-wrapper::-webkit-scrollbar {
@@ -221,6 +219,8 @@ onMounted(loadMembers)
   overflow: hidden;
   background: #fff;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
   transition:
     transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
     box-shadow 0.35s ease;
@@ -247,11 +247,13 @@ onMounted(loadMembers)
   height: 100%;
   display: block;
   object-fit: cover;
+    filter: saturate(.9);
   transition: transform 0.65s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .member-card:hover .member-photo img {
   transform: scale(1.06);
+    filter: saturate(1);
 }
 
 .photo-overlay {
@@ -276,6 +278,9 @@ onMounted(loadMembers)
 
 .member-info {
   padding: 26px 26px 28px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .member-position {
@@ -306,9 +311,11 @@ onMounted(loadMembers)
 ========================= */
 
 .skills {
-  margin-top: 19px;
+  /* width: 300px; */
+  margin-top: auto;
   display: flex;
   flex-wrap: wrap;
+  align-self: flex-start;
   gap: 7px;
 }
 
@@ -332,6 +339,7 @@ onMounted(loadMembers)
   display: inline-flex;
   align-items: center;
   gap: 8px;
+    align-self: flex-start;
   background: transparent;
   color: #111;
   font: inherit;
@@ -355,14 +363,12 @@ onMounted(loadMembers)
 
 .view-all-card {
   min-height: 530px;
-  display: flex;
   color: white;
   background: #111318;
-  margin-right: 10vw;
 }
 
 .view-all-card:hover {
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .view-all-content {
