@@ -32,6 +32,18 @@ async def get_team():
         ),
     }
 
+@app.get("/api/Links")
+async def get_links():
+    file_path = DATA_DIR / "Linktree.json"
+    if not file_path:
+        raise HTTPException(status_code=404, detail="Links not found")
+    with open(
+        file_path,
+        encoding="utf-8"
+    ) as f:
+
+        return json.load(f)
+
 
 @app.get("/api/member_info/{member_type}")
 async def get_members(member_type: str):

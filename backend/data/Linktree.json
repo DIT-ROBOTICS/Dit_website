@@ -1,0 +1,56 @@
+{
+    "contacts": [
+        {
+            "label": "EMAIL",
+            "value": "Contact DIT Robotics",
+            "href": "mailto:ditrobotics@gapp.nthu.edu.tw"
+        },
+        {
+            "label": "INSTAGRAM",
+            "value": "DIT Instagram",
+            "href": "https://www.instagram.com/dit_robotics?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+        },
+        {
+            "label": "FACEBOOK",
+            "value": "DIT Facebook fanpage",
+            "href": "https://www.facebook.com/DIT.robotics"
+        },
+        {
+            "label": "LOCATION",
+            "value": "新竹市光復路二段101號工程一館R314, Hsinchu, Taiwan, 30013",
+            "href": "https://maps.app.goo.gl/NjDSJpvXVrQkrghR6"
+        }
+    ],
+    "linkGroups": [
+        {
+            "title": "YOUTUBE",
+            "links": [
+                {
+                    "label": "2025 Eurobot 紀錄片 @SeanChangX",
+                    "href": "https://youtu.be/DmRyadEjFsI"
+                },
+                {
+                    "label": "2026 DIT Robotics 團隊片",
+                    "href": "https://youtu.be/Dh_jmZ1kZ28"
+                },
+                {
+                    "label": "DIT official YouTube channel",
+                    "href": "https://youtube.com/@ditrobotics"
+                }
+            ]
+        },
+        {
+            "title": "CAMPS",
+            "links": [
+                {
+                    "label": "7/8 - 7/10 DIT機器人夢想營 報名表單",
+                    "href": "https://forms.gle/jCShxEipxZMa4WfZ8"
+                },
+                {
+                    "label": "智慧機械科學工作坊",
+                    "href": "https://www.ncir.niar.org.tw/Activity/Smart_Machinery_Science_Workshop"
+                }
+            ]
+        }
+    ]
+}

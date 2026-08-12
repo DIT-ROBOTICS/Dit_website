@@ -73,15 +73,15 @@ onUnmounted(() => {
 
       <div class="hero-content">
         <p class="hero-eyebrow">
-          DIT ROBOTICS
+          We Do Improve and Try
         </p>
 
-        <h1>Do, Improve, and Try</h1>
+        <h1>We are <span style="-webkit-text-stroke: 15px #6A7ACD;paint-order: stroke fill;">DIT Robotics</span></h1>
 
-        <p class="hero-description">
-          我們是一群以機器人、程式、機構與創意為核心的團隊，
-          不斷從挑戰中創造新的可能。
-        </p>
+        <div class="hero-description">
+          我們來自清華大學，一群勇於追逐夢想，實現理想的大學生<br>
+          邀請你看看我們的故事吧 <img src="@/assets/image/Canva_Arrow.png" alt="arrow" style="width: 5vw; height: 10px;">
+        </div>
 
         <a href="#team">
           認識團隊
@@ -167,7 +167,7 @@ onUnmounted(() => {
 .hero-content {
   position: absolute;
   left: 8vw;
-  bottom: 11vh;
+  bottom: 9vh;
   z-index: 2;
 
   max-width: 70vw;
@@ -184,22 +184,24 @@ onUnmounted(() => {
 
 .hero-eyebrow {
   margin: 0 0 18px;
-  font-size: 13px;
-  letter-spacing: 0.25em;
+  font-size: 3vw;
+  font-weight: 900;
 }
 
 .hero-content h1 {
   margin: 0;
-  font-size: clamp(48px, 7.5vw, 100px);
-  line-height: 1.04;
+  font-size: 5vw;
+  line-height: 1;
   letter-spacing: -0.05em;
 }
 
 .hero-description {
+  white-space: nowrap;
   max-width: 600px;
   margin: 26px 0 0;
   color: rgba(255, 255, 255, 0.72);
   line-height: 1.9;
+  font-size: 1.3vw;
 }
 
 .hero-content>a {
@@ -337,6 +339,30 @@ onUnmounted(() => {
 
   padding:
     clamp(110px, 12vw, 180px) clamp(24px, 8vw, 120px);
+}
+
+.arrow-line {
+  position: relative;
+  width: 140px;
+  height: 2px;
+  background: white;
+
+  transform: rotate(-2deg);
+}
+
+.arrow-line::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+
+  width: 18px;
+  height: 18px;
+
+  border-top: 2px solid white;
+  border-right: 2px solid white;
+
+  transform: translateY(-50%) rotate(45deg);
 }
 
 @media (max-width: 760px) {

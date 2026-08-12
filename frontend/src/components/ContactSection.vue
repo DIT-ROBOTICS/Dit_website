@@ -4,9 +4,523 @@
 如果可以的話考慮加個贊助連結
 -->
 
+<script setup>
+import { onMounted, ref } from 'vue'
+const contacts = ref([])
+const linkGroups = ref([])
+const errorMessage = ref('')
+async function loadlinks() {
+    try {
+        const response = await fetch('/api/Links')
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`)
+        }
+
+        const jsonfile = await response.json()
+        contacts.value = jsonfile.contacts
+        linkGroups.value = jsonfile.linkGroups
+    } catch (error) {
+        console.error(error)
+        errorMessage.value = '連結資料載入失敗'
+    } finally {
+        // loading.value = false
+    }
+}
+
+const currentYear = new Date().getFullYear()
+
+function backToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    })
+}
+onMounted(loadlinks)
+</script>
+
 <template>
-------------------------<br>
-    網站最底下的資訊區：
-可能有我們的ig fb之類的，和聯絡電話跟地址
-如果可以的話考慮加個贊助連結<br><br><br><br>
+    <section id="contact" class="contact-section">
+        <div class="contact-main">
+            <div class="contact-heading">
+                <p class="eyebrow">GET IN TOUCH</p>
+
+                <h2>
+                    HAVE AN IDEA?<br>
+                    LET'S BUILD IT.
+                </h2>
+
+                <p class="contact-description">
+                    無論是技術交流、競賽合作、贊助或加入團隊，
+                    都歡迎與 DIT Robotics 聯絡。
+                </p>
+
+                <a class="contact-button"
+                    href="https://www.zeczec.com/projects/dit-robotics-2026Eurobobt?r=d245513786893">
+                    SUPPORT US
+                    <span>↗</span>
+                </a>
+            </div>
+
+            <div class="contact-list">
+
+                <div v-if="errorMessage" class="contact-error">
+                    <p class="contact-error-title">
+                        CONNECTION ERROR
+                    </p>
+
+                    <p class="contact-error-message">
+                        {{ errorMessage }}
+                    </p>
+
+                    <button class="retry-button" type="button" @click="loadlinks">
+                        RETRY
+                        <span>↻</span>
+                    </button>
+                </div>
+
+                <template v-else>
+                    <a v-for="contact in contacts" :key="contact.label" :href="contact.href" class="contact-item">
+                        <div>
+                            <p class="contact-label">
+                                {{ contact.label }}
+                            </p>
+
+                            <p class="contact-value">
+                                {{ contact.value }}
+                            </p>
+                        </div>
+
+                        <span class="contact-arrow">↗</span>
+                    </a>
+
+                    <div class="more-links">
+                        <p class="more-links-title">MORE LINKS</p>
+
+                        <div class="link-groups">
+                            <div v-for="group in linkGroups" :key="group.title" class="link-group">
+                                <p class="link-group-title">
+                                    {{ group.title }}
+                                </p>
+
+                                <a v-for="link in group.links" :key="link.label" :href="link.href" class="small-link">
+                                    {{ link.label }}
+                                    <span>↗</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+            </div>
+        </div>
+
+        <footer class="contact-footer">
+            <div class="brand">
+                <span class="brand-mark">DIT</span>
+
+                <div>
+                    <p>DIT ROBOTICS</p>
+                    <span>Do · Improve · Try</span>
+                </div>
+            </div>
+
+            <p class="copyright">
+                © {{ currentYear }} DIT Robotics. All rights reserved.
+            </p>
+
+            <a class="back-top" href="#" @click.prevent="backToTop()">
+                BACK TO TOP ↑
+            </a>
+        </footer>
+    </section>
 </template>
+
+<style scoped>
+.contact-section {
+    position: relative;
+    background: #0a0a0a;
+    color: white;
+    padding: 140px 7vw 40px;
+    overflow: hidden;
+}
+
+/* 背景裝飾 */
+.contact-section::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    right: -220px;
+    top: -200px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+}
+
+.contact-section::after {
+    content: '';
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    right: -80px;
+    top: -70px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.contact-main {
+    position: relative;
+    z-index: 1;
+
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 100px;
+
+    max-width: 1500px;
+    margin: 0 auto 140px;
+}
+
+.eyebrow {
+    margin: 0 0 24px;
+
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.contact-heading h2 {
+    margin: 0;
+
+    font-size: clamp(48px, 6vw, 100px);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    font-weight: 700;
+}
+
+.contact-description {
+    max-width: 520px;
+    margin: 36px 0 0;
+
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 16px;
+    line-height: 1.9;
+}
+
+.contact-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 70px;
+
+    margin-top: 46px;
+    padding: 18px 22px;
+
+    min-width: 220px;
+
+    color: #0a0a0a;
+    background: white;
+
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+
+    text-decoration: none;
+
+    transition:
+        background 0.3s ease,
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+.contact-button:hover {
+    background: transparent;
+    color: white;
+
+    outline: 1px solid rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
+}
+
+/* 右側聯絡資料 */
+
+.contact-list {
+    align-self: end;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 28px 4px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+
+    color: white;
+    text-decoration: none;
+
+    transition:
+        padding 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.contact-item:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.contact-item:hover {
+    padding-left: 14px;
+    padding-right: 14px;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.contact-label {
+    margin: 0 0 9px;
+
+    color: rgba(255, 255, 255, 0.4);
+
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+}
+
+.contact-value {
+    margin: 0;
+
+    font-size: clamp(16px, 1.5vw, 22px);
+    letter-spacing: -0.02em;
+}
+
+.contact-arrow {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 20px;
+
+    transition:
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.contact-item:hover .contact-arrow {
+    color: white;
+    transform: translate(3px, -3px);
+}
+
+/* footer */
+
+.contact-footer {
+    position: relative;
+    z-index: 1;
+
+    max-width: 1500px;
+    margin: 0 auto;
+
+    padding-top: 34px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 30px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 46px;
+    height: 46px;
+
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.brand p {
+    margin: 0 0 4px;
+
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.brand div span {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 11px;
+}
+
+.copyright {
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 11px;
+}
+
+.back-top {
+    justify-self: end;
+
+    color: rgba(255, 255, 255, 0.55);
+
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+
+    text-decoration: none;
+
+    transition: color 0.25s ease;
+}
+
+.back-top:hover {
+    color: white;
+}
+
+/* RWD */
+
+@media (max-width: 900px) {
+    .contact-section {
+        padding: 100px 24px 30px;
+    }
+
+    .contact-main {
+        grid-template-columns: 1fr;
+        gap: 80px;
+        margin-bottom: 100px;
+    }
+
+    .contact-heading h2 {
+        font-size: clamp(50px, 13vw, 80px);
+    }
+
+    .contact-list {
+        width: 100%;
+    }
+
+    .contact-footer {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .copyright {
+        order: 3;
+    }
+
+    .back-top {
+        justify-self: start;
+    }
+}
+
+@media (max-width: 520px) {
+    .contact-section {
+        padding-top: 80px;
+    }
+
+    .contact-heading h2 {
+        font-size: 46px;
+    }
+
+    .contact-description {
+        font-size: 14px;
+    }
+
+    .contact-button {
+        width: 100%;
+    }
+
+    .contact-item {
+        padding: 22px 2px;
+    }
+}
+
+.more-links {
+    margin-top: 48px;
+}
+
+.more-links-title {
+    margin: 0 0 26px;
+
+    color: rgba(255, 255, 255, 0.32);
+
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+}
+
+.link-groups {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+}
+
+.link-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.link-group-title {
+    margin: 0 0 16px;
+
+    color: rgba(255, 255, 255, 0.7);
+
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+}
+
+.small-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    margin: 5px 0;
+
+    color: rgba(255, 255, 255, 0.38);
+
+    font-size: 12px;
+    line-height: 1.6;
+
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.small-link span {
+    opacity: 0;
+
+    font-size: 10px;
+
+    transform: translate(-3px, 2px);
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+.small-link:hover {
+    color: white;
+    transform: translateX(3px);
+}
+
+.small-link:hover span {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+@media (max-width: 600px) {
+    .link-groups {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 28px 20px;
+    }
+}
+</style>

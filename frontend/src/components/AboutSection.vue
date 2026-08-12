@@ -3,32 +3,39 @@
 
 -->
 
-
 <script setup>
 import teamPhoto from '@/assets/Hero_Image.png'
 
 const departments = [
     {
-        title: 'Team',
-        subtitle: '團隊歷史',
-        icon: '⚙️'
+        title: '準備比賽',
+        icon: '⚡',
+        link: ''
     },
     {
-        title: 'Competition',
-        subtitle: '競賽歷史',
-        icon: '💻'
+        title: '舉辦展覽',
+        icon: '📌',
+        link: ''
     },
     {
-        title: 'technology',
-        subtitle: '技術路線',
-        icon: '⚡'
+        title: '暑期營隊',
+        icon: '🔧',
+        link: ''
     },
     {
-        title: 'Future',
-        subtitle: '未來規劃',
-        icon: '🛰'
+        title: '技術傳承',
+        icon: '💻',
+        link: ''
     }
 ]
+
+function goToLink(item) {
+    if (item.link) {
+        window.open(item.link, '_blank')
+    } else if (item.html) {
+        window.open(item.html, '_blank')
+    }
+}
 </script>
 
 <template>
@@ -36,40 +43,42 @@ const departments = [
 
         <div class="title">
 
-            <p>WHO WE ARE</p>
+            <p>DIT 將我們聚集在此，讓我們有了逐夢的動力</p>
 
-            <h2>
-                我們打造的不只是機器人，
-                <br>
-                更是一群能一起完成夢想的人。
-            </h2>
+            <h2>我們打造的不僅是機器人，更是一群能一起追夢的人</h2>
 
         </div>
 
-        <div class="photo">
-            <img :src="teamPhoto" alt="">
+        <div class="photo-stack">
+            <img :src="teamPhoto" class="photo photo-left" alt="">
+            <img :src="teamPhoto" class="photo photo-center" alt="">
+            <img :src="teamPhoto" class="photo photo-right" alt="">
         </div>
 
         <div class="description">
             <p>
-                DIT Robotics 成立於 2012 年，
-                持續投入 Eurobot 國際機器人競賽，
-                團隊涵蓋機構、電控、軟體與策略，
-                讓每一位隊員都能真正參與一台機器人的誕生。
+                成立於2013年，DIT由來自清大各系的大學生所組成，致力於發展機器人機械
+                、電控及機器人作業系統（ROS）的相關技術。
+                我們團隊以比賽為導向的學習，在動手挑戰與解決實際問題的過程中，持續精進其技術實力。
             </p>
         </div>
+        <h2 class="daily-title">不只競賽，請收看我們的日常</h2>
 
         <div class="department-grid">
-            <div v-for="item in departments" :key="item.title" class="department-card">
-                <div class="icon">
-                    {{ item.icon }}
+            <div v-for="item in departments" :key="item.title" class="department-card" @click="goToLink(item)">
+                <svg class="card-border" viewBox="0 0 600 180" preserveAspectRatio="none">
+                    <rect x="3" y="3" width="594" height="174" rx="38" ry="38" />
+                </svg>
+
+                <div class="department-content">
+                    <span class="icon">
+                        {{ item.icon }}
+                    </span>
+
+                    <h3>
+                        {{ item.title }}
+                    </h3>
                 </div>
-                <h3>
-                    {{ item.title }}
-                </h3>
-                <span>
-                    {{ item.subtitle }}
-                </span>
             </div>
         </div>
     </section>
@@ -82,88 +91,227 @@ const departments = [
 }
 
 .title {
-    max-width: 900px;
+    max-width: 90vw;
     margin: auto;
     text-align: center;
 }
 
 .title p {
-    letter-spacing: .3em;
-    font-size: 13px;
-    color: #888;
+    letter-spacing: .2em;
+    font-size: 2vw;
+    color: #000000;
     margin-bottom: 18px;
+    font-weight: 500;
 }
 
 .title h2 {
-    font-size: clamp(42px, 5vw, 72px);
+    font-size: clamp(42px, 3vw, 72px);
     line-height: 1.15;
     font-weight: 700;
     margin: 0;
 }
 
-.photo {
-    margin-top: 90px;
-    display: flex;
-    justify-content: center;
+/* 照片區域 */
+.photo-stack {
+    position: relative;
+    width: min(1500px, 100%);
+    height: 600px;
+    margin: 60px auto 0;
 }
 
-.photo img {
-    width: min(1200px, 100%);
+/* 所有照片共用 */
+.photo {
+    position: absolute;
+    width: 40%;
+    height: 400px;
+    object-fit: cover;
     border-radius: 30px;
-    box-shadow:
-        0 40px 80px rgba(0, 0, 0, .12);
+}
+
+/* 左邊 */
+.photo-left {
+    left: 0;
+    top: 30px;
+    transform: rotate(-5deg);
+    z-index: 1;
+}
+
+/* 中間 */
+.photo-center {
+    left: 50%;
+    top: 180px;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+/* 右邊 */
+.photo-right {
+    right: 0;
+    top: 30px;
+    transform: rotate(6deg);
+    z-index: 3;
 }
 
 .description {
     max-width: 900px;
     margin: 70px auto;
     text-align: center;
-    font-size: 20px;
+    font-size: 25px;
     line-height: 2;
     color: #555;
 }
 
+.daily-title {
+    margin-top: 70px;
+    margin-bottom: 80px;
+
+    text-align: center;
+    letter-spacing: .15em;
+    font-size: clamp(26px, 2.5vw, 42px);
+    font-weight: 900;
+}
+
+
+/* 2 × 2 */
 .department-grid {
+    width: min(1300px, 90%);
+    margin: 0 auto;
+
     display: grid;
-    grid-template-columns:
-        repeat(4, 1fr);
-    gap: 25px;
+    grid-template-columns: repeat(2, 1fr);
+
+    column-gap: 180px;
+    row-gap: 100px;
 }
 
+
+/* 卡片 */
 .department-card {
-    padding: 35px;
-    border-radius: 24px;
-    background: white;
-    transition: .35s;
+    position: relative;
+
+    aspect-ratio: 2.8/1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #fafafa;
+
+    border-radius: 38px;
+
     cursor: pointer;
+
+    isolation: isolate;
 }
 
-.department-card:hover {
-    transform: translateY(-8px);
-    box-shadow:
-        0 25px 60px rgba(0, 0, 0, .12);
+
+/* 右下藍色底 */
+.department-card::after {
+    content: "";
+
+    position: absolute;
+
+    top: 18px;
+    left: 18px;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: 38px;
+
+    background: #7183d8;
+
+    z-index: -2;
+
+    transition: .25s;
 }
 
-.icon {
+
+/* 白色本體，把藍色底遮住 */
+.department-card::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border-radius: 38px;
+
+    background: #fafafa;
+
+    z-index: -1;
+}
+
+
+/* SVG 虛線邊框 */
+.card-border {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: visible;
+
+    pointer-events: none;
+}
+
+.card-border rect {
+    fill: none;
+
+    stroke: #7183d8;
+    stroke-width: 7px;
+
+    /*
+        50px 藍線
+        8px 空白
+    */
+    stroke-dasharray: 42 7;
+
+    stroke-linecap: butt;
+}
+
+
+/* 中央內容 */
+.department-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    white-space: nowrap;
+}
+
+.department-content .icon {
     font-size: 42px;
-    margin-bottom: 18px;
-}
-
-.department-card h3 {
     margin: 0;
-    font-size: 24px;
 }
 
-.department-card span {
-    display: block;
-    margin-top: 8px;
-    color: #777;
+.department-content h3 {
+    margin: 0;
+
+    font-size: clamp(28px, 2.5vw, 46px);
+    font-weight: 900;
+
+    letter-spacing: .12em;
+
+    color: #111;
 }
 
-@media(max-width:900px) {
+
+/* hover */
+.department-card:hover {
+    transform: translate(-4px, -4px);
+}
+
+.department-card:hover::after {
+    transform: translate(4px, 4px);
+}
+
+/* @media(max-width:900px) {
     .department-grid {
         grid-template-columns:
             repeat(2, 1fr);
     }
-}
+} */
 </style>

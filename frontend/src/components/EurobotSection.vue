@@ -23,6 +23,8 @@ import blackRobotModel from '@/assets/Eurobot2026黑機.glb?url'
 import whiteRobotModel from '@/assets/Eurobot2026白機.glb?url'
 
 const achievementPhoto = '/api/other_images/competition/background.png'
+const blackRobotPhoto = '/api/other_images/competition/2026/Eurobot/Eurobot2026黑機.png'
+const whiteRobotPhoto = '/api/other_images/competition/2026/Eurobot/Eurobot2026白機.png'
 
 const robots = [
     {
@@ -31,16 +33,19 @@ const robots = [
         subtitle: 'DIT ROBOTICS',
 
         model: blackRobotModel,
+        image: blackRobotPhoto,
 
         description:
-            '負責主要得分任務，整合導航、物件辨識、機構控制與自動路徑規劃。',
+            '以鈑金底盤作為主要承重結構，兼顧剛性、重量分布與高速移動穩定性；搭配模組化任務機構與 3D 列印零件，提升組裝、維修與快速更換效率。',
 
         technologies: [
             '四面手臂',
-            'Computer Vision',
-            'Path Planning',
+            'CNC',
+            'PCB',
             'STM32',
-            'CAN Bus'
+            '3D列印',
+            'Lidar',
+            '無限鏡'
         ]
     },
 
@@ -50,16 +55,18 @@ const robots = [
         subtitle: 'NTHU DIT',
 
         model: whiteRobotModel,
+        image: whiteRobotPhoto,
 
         description:
-            '負責協同任務與場地互動，透過定位系統與主機器人交換即時狀態。',
+            '採用與黑機相近的模組化底盤架構，整合鈑金結構、PCB 與定位系統；並透過 PLA+、TPU 等材料，在輕量化、緩衝與維修便利性之間取得平衡。',
 
         technologies: [
             '三面手臂',
-            'LiDAR',
-            'Motion Control',
-            'Embedded System',
-            'Robot Communication'
+            'CNC',
+            'PCB',
+            'STM32',
+            '3D列印',
+            'Lidar',
         ]
     }
 ]
@@ -149,7 +156,8 @@ function openDetails(robot) {
                 <div class="robots-grid">
                     <article v-for="(robot, index) in robots" :key="robot.id" class="robot-card">
                         <div class="robot-image-container" @click="openRobot3D(robot)">
-                            <RobotPreview3D :model="robot.model" />
+                            <!-- <RobotPreview3D :model="robot.model" /> -->
+                            <img :src="robot.image" :alt="robot.name">
                             <div class="image-overlay">
                                 <div class="view-3d">
                                     <span class="view-icon"> 360° </span>
@@ -549,6 +557,24 @@ function openDetails(robot) {
     cursor: pointer;
 
     background: transparent;
+    transform: scale(1);
+}
+
+.robot-image-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    transition:
+        transform 0.8s
+        cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.robot-image-container:hover{ 
+    
+    transform: scale(1.045);
+    transition:  transform 0.3s ease-in-out;
 }
 
 .image-overlay {
