@@ -11,7 +11,7 @@ import logoUrl from '@/assets/dit_logo.png'
 
 const heroContainer = ref(null)
 // const progress = ref(0)
-const progress = defineModel('progress', {type: Number ,default: 0,})
+const progress = defineModel('progress', { type: Number, default: 0, })
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
@@ -26,14 +26,14 @@ function updateHeroProgress() {
 
   const rect = element.getBoundingClientRect()
 
-  const animationDistance = element.offsetHeight-window.innerHeight
+  const animationDistance = element.offsetHeight - window.innerHeight
 
   if (animationDistance <= 0) {
     progress.value = 0
     return
   }
 
-  progress.value = clamp( -rect.top / animationDistance, 0, 1)
+  progress.value = clamp(-rect.top / animationDistance, 0, 1)
 }
 
 onMounted(() => {
@@ -90,24 +90,26 @@ onUnmounted(() => {
 
     </div>
     <div class="title-bar" :style="{ '--progress': progress }">
-        <img :src="logoUrl" alt="DIT Logo">
+      <img :src="logoUrl" alt="DIT Logo">
 
-        <strong>DIT Robotics</strong>
+      <strong>DIT Robotics</strong>
 
-        <nav>
-          <a href="#team">團隊</a>
-          <a href="#EurobotSection">Eurobot</a>
-          <a href="#robots">年度機器人</a>
-          <a href="#advisors">指導教授</a>
-          <a href="#members">團隊成員</a>
-          <a href="#sponsors">贊助商</a>
-          <a href="#contact">聯絡</a>
-        </nav>
-      </div>
+      <nav>
+        <a href="#team">團隊</a>
+        <a href="#EurobotSection">Eurobot</a>
+        <a href="#robots">年度機器人</a>
+        <a href="#advisors">指導教授</a>
+        <a href="#members">團隊成員</a>
+        <a href="#sponsors">贊助商</a>
+        <a href="#contact">聯絡</a>
+      </nav>
+    </div>
   </section>
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&display=swap');
+
 .hero-scroll-space {
   position: relative;
   height: calc(160vh - 76px);
@@ -186,13 +188,16 @@ onUnmounted(() => {
   margin: 0 0 18px;
   font-size: 3vw;
   font-weight: 900;
+  word-spacing: 0.2em;
+  font-family: 'League Spartan', sans-serif;
 }
 
 .hero-content h1 {
   margin: 0;
   font-size: 5vw;
   line-height: 1;
-  letter-spacing: -0.05em;
+  letter-spacing: 0.04em;
+  font-family: 'League Spartan', sans-serif;
 }
 
 .hero-description {

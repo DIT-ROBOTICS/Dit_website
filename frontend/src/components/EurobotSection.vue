@@ -99,42 +99,21 @@ function openDetails(robot) {
         <div class="robot-year-content">
             <section class="achievement-panel">
                 <div class="achievement-content">
-                    <p class="eyebrow">
-                        EUROBOT 2026
+
+                    <p class="achievement-year">
+                        Eurobot 2026
                     </p>
 
-                    <h2>
-                        THIS YEAR,<br>WE MADE IT.
+                    <h2 class="achievement-title">
+                        <span>THIS YEAR</span>
+                        <span>We Made IT</span>
                     </h2>
 
-                    <p class="achievement-description">
-                        從設計、製造、程式到正式站上競賽場地，
-                        這是 DIT Robotics 在 2026 年留下的成果。
-                    </p>
-
-                    <div class="achievement-stats">
-                        <div class="stat">
-                            <strong>2026</strong>
-                            <span>EUROBOT</span>
-                        </div>
-                        <div class="stat">
-                            <strong>2</strong>
-                            <span>ROBOTS</span>
-                        </div>
-                        <div class="stat">
-                            <strong>Top 1</strong>
-                            <span>積分賽</span>
-                        </div>
-                        <div class="stat">
-                            <strong>Top 2</strong>
-                            <span>對抗賽</span>
-                        </div>
+                    <div class="achievement-awards">
+                        <p>World TOP 2</p>
+                        <p>Team Choice Award</p>
                     </div>
-                </div>
 
-                <div class="scroll-hint">
-                    <span>DISCOVER OUR ROBOTS</span>
-                    <div class="scroll-line"></div>
                 </div>
             </section>
 
@@ -143,13 +122,10 @@ function openDetails(robot) {
 
             <section class="robots-showcase">
                 <div class="section-heading">
-                    <p class="eyebrow">
-                        OUR MACHINES
-                    </p>
-                    <h2>為競賽而生的兩台機器</h2>
+                    <h2>Two Robots for Eurobot</h2>
                     <p>
-                        從機構、電子到軟體，
-                        每一個系統都是團隊共同完成的成果。
+                        <span style="color:#ffac70">NTHU DIT</span>
+                        <span style="color:#e58989">DIT Robotics</span>
                     </p>
                 </div>
 
@@ -271,6 +247,7 @@ function openDetails(robot) {
 
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&display=swap');
 .robot-year-section {
     position: relative;
     background: #050505;
@@ -346,94 +323,117 @@ function openDetails(robot) {
 
     min-height: 100vh;
 
+    margin-top: 170px;
+
     display: flex;
-
-    flex-direction: column;
-
-    justify-content: flex-end;
+    align-items: right;
 
     padding:
-        clamp(110px, 12vh, 160px) clamp(30px, 7vw, 120px) clamp(60px, 8vh, 100px);
+        clamp(90px, 10vh, 140px) clamp(40px, 10vw, 120px);
 }
 
+
+/*
+    文字放在右半邊
+*/
 .achievement-content {
-    max-width: 100%;
+    width: min(620px, 46vw);
+    font-family: 'League Spartan', sans-serif;
+    margin-left: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    transform: translateY(-1vh);
 }
 
-.eyebrow {
-    margin: 0 0 20px;
 
-    font-size: 13px;
+/* Eurobot 2026 */
+.achievement-year {
+    margin: 0 0 34px;
+
+    font-size:
+        clamp(20px, 2.5vw, 34px);
+
     font-weight: 700;
 
-    letter-spacing: 0.28em;
+    letter-spacing: -0.02em;
 
-    opacity: 0.72;
+    color: white;
 }
 
-.achievement-content h2 {
+
+/* THIS YEAR / We Made IT */
+.achievement-title {
+    margin: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    font-size:
+        clamp(54px, 5.6vw, 96px);
+
+    line-height: 0.98;
+
+    letter-spacing: 0.05em;
+
+    font-weight: 800;
+
+    color: white;
+}
+
+.achievement-title span {
+    display: block;
+}
+
+
+/*
+    第二行稍微往左，
+    模仿 Canva 裡 We Made IT 的位置
+*/
+.achievement-title span:last-child {
+    margin-left: -0.5em;
+
+    margin-top: 8px;
+}
+
+
+/* 戰績 */
+.achievement-awards {
+    margin-top: 38px;
+    align-self: flex-end;
+    text-align: right;
+}
+
+.achievement-awards p {
     margin: 0;
 
     font-size:
-        clamp(58px, 9vw, 150px);
+        clamp(27px, 2.8vw, 47px);
 
-    line-height: 0.85;
-
-    letter-spacing: -0.055em;
-
-    font-weight: 800;
-}
-
-.achievement-description {
-    max-width: 620px;
-
-    margin-top: 34px;
-
-    font-size:
-        clamp(16px, 1.3vw, 21px);
-
-    line-height: 1.8;
-
-    color:
-        rgba(255, 255, 255, 0.8);
-}
-
-
-/* ========================================
-   Statistics
-======================================== */
-
-.achievement-stats {
-    display: flex;
-
-    gap: 60px;
-
-    margin-top: 54px;
-}
-
-.stat {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 8px;
-}
-
-.stat strong {
-    font-size:
-        clamp(26px, 3vw, 46px);
+    line-height: 1;
 
     font-weight: 700;
+
+    letter-spacing: 0.025em;
+
+    color: white;
+
+    /*
+        白字 + 紅色外框
+    */
+    -webkit-text-stroke:
+        clamp(3px, 0.44vw, 20px) #c75b5b;
+    paint-order: stroke fill;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.stat span {
-    font-size: 11px;
-
-    letter-spacing: 0.2em;
-
-    opacity: 0.55;
+.achievement-awards p+p {
+    margin-top: 5px;
 }
-
 
 /* ========================================
    Scroll hint
@@ -481,9 +481,10 @@ function openDetails(robot) {
     position: relative;
 
     min-height: 100vh;
-
+    align-items: center;
+    text-align: center;
     padding:
-        140px clamp(24px, 6vw, 100px) 70px;
+        0px clamp(24px, 6vw, 100px) 70px;
 
     background:
         linear-gradient(to bottom,
@@ -494,31 +495,32 @@ function openDetails(robot) {
 }
 
 .section-heading {
-    max-width: 800px;
-
     margin-bottom: 80px;
+    font-family: 'League Spartan', sans-serif;
 }
 
 .section-heading h2 {
     margin: 0 0 22px;
-
+    text-align: center;
     font-size:
-        clamp(38px, 5vw, 72px);
+        clamp(38px, 6vw, 100px);
 
-    letter-spacing: -0.045em;
-
+    letter-spacing: 0.05em;
     line-height: 1;
 }
 
-.section-heading>p:last-child {
-    max-width: 560px;
-
+.section-heading p {
+    text-align: center;
+    text-shadow: -3.5px 3.5px white;
+    font-weight: 600;
+    font-size:
+        clamp(19px, 4vw, 70px);
     margin: 0;
-
     line-height: 1.7;
+}
 
-    color:
-        rgba(255, 255, 255, 0.6);
+.section-heading p span + span {
+    margin-left: 10vw;
 }
 
 
@@ -567,14 +569,13 @@ function openDetails(robot) {
     object-fit: contain;
 
     transition:
-        transform 0.8s
-        cubic-bezier(0.16, 1, 0.3, 1);
+        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.robot-image-container:hover{ 
-    
+.robot-image-container:hover {
+
     transform: scale(1.045);
-    transition:  transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out;
 }
 
 .image-overlay {
@@ -598,11 +599,9 @@ function openDetails(robot) {
 
 .robot-image-container:hover .image-overlay {
     background:
-        radial-gradient(
-            circle at 50% 45%,
+        radial-gradient(circle at 50% 45%,
             #24242472,
-            #ffffff00 70%
-        );
+            #ffffff00 70%);
 }
 
 .view-3d {
@@ -1049,6 +1048,7 @@ function openDetails(robot) {
     color:
         rgba(255, 255, 255, 0.4);
 }
+
 /* ========================================
    RWD
 ======================================== */
@@ -1056,13 +1056,52 @@ function openDetails(robot) {
 @media (max-width: 850px) {
 
     .achievement-panel {
-        padding-left: 24px;
+        align-items: flex-end;
 
-        padding-right: 24px;
+        padding:
+            110px 24px 70px;
     }
 
-    .achievement-stats {
-        gap: 28px;
+    .achievement-content {
+        width: 100%;
+
+        margin-left: 0;
+
+        transform: none;
+    }
+
+    .achievement-year {
+        margin-bottom: 22px;
+
+        font-size: 20px;
+    }
+
+    .achievement-title {
+        font-size:
+            clamp(48px, 14vw, 72px);
+    }
+
+    .achievement-title span:last-child {
+        margin-left: 0;
+
+        margin-top: 4px;
+    }
+
+    .achievement-awards {
+        align-self: flex-start;
+
+        margin-top: 30px;
+
+        text-align: left;
+    }
+
+    .achievement-awards p {
+        font-size:
+            clamp(25px, 8vw, 38px);
+    }
+
+    .background-image {
+        object-position: 40% center;
     }
 
     .robots-grid {
