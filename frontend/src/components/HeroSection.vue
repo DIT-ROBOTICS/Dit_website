@@ -97,9 +97,9 @@ onUnmounted(() => {
       <nav>
         <a href="#team">團隊</a>
         <a href="#EurobotSection">Eurobot</a>
-        <a href="#robots">年度機器人</a>
+        <a href="#robotArchive">歷年機器人</a>
+        <a href="#competitions">其他競賽</a>
         <a href="#advisors">指導教授</a>
-        <a href="#members">團隊成員</a>
         <a href="#sponsors">贊助商</a>
         <a href="#contact">聯絡</a>
       </nav>

@@ -47,7 +47,7 @@ onMounted(loadlinks)
 
                 <h2>
                     HAVE AN IDEA?<br>
-                    LET'S BUILD IT.
+                    LET'S DIT.
                 </h2>
 
                 <p class="contact-description">
@@ -129,7 +129,7 @@ onMounted(loadlinks)
                 © {{ currentYear }} DIT Robotics. All rights reserved.
             </p>
 
-            <a class="back-top" href="#" @click.prevent="backToTop()">
+            <a class="back-top" href="#" @click="backToTop()">
                 BACK TO TOP ↑
             </a>
         </footer>

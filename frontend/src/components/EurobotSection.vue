@@ -27,8 +27,29 @@ const blackRobotPhoto = '/api/other_images/competition/2026/Eurobot/Eurobot2026�
 const whiteRobotPhoto = '/api/other_images/competition/2026/Eurobot/Eurobot2026白機.png'
 
 const robots = [
+
     {
         id: 1,
+        name: '白機',
+        subtitle: 'NTHU DIT',
+
+        model: whiteRobotModel,
+        image: whiteRobotPhoto,
+
+        description:
+            '採用與黑機相近的模組化底盤架構，整合鈑金結構、PCB 與定位系統；並透過 PLA+、TPU 等材料，在輕量化、緩衝與維修便利性之間取得平衡。',
+
+        technologies: [
+            '三面手臂',
+            'CNC',
+            'PCB',
+            'STM32',
+            '3D列印',
+            'Lidar',
+        ]
+    },
+    {
+        id: 2,
         name: '黑機',
         subtitle: 'DIT ROBOTICS',
 
@@ -46,27 +67,6 @@ const robots = [
             '3D列印',
             'Lidar',
             '無限鏡'
-        ]
-    },
-
-    {
-        id: 2,
-        name: '白機',
-        subtitle: 'NTHU DIT',
-
-        model: whiteRobotModel,
-        image: whiteRobotPhoto,
-
-        description:
-            '採用與黑機相近的模組化底盤架構，整合鈑金結構、PCB 與定位系統；並透過 PLA+、TPU 等材料，在輕量化、緩衝與維修便利性之間取得平衡。',
-
-        technologies: [
-            '三面手臂',
-            'CNC',
-            'PCB',
-            'STM32',
-            '3D列印',
-            'Lidar',
         ]
     }
 ]
@@ -141,35 +141,10 @@ function openDetails(robot) {
                                 </div>
                             </div>
                         </div>
-                        <div class="robot-info">
-                            <div class="robot-title">
-                                <div>
-                                    <p>{{ robot.subtitle }}</p>
-
-                                    <h3>{{ robot.name }}</h3>
-                                </div>
-                            </div>
-
-                            <p class="robot-description">
-                                {{ robot.description }}
-                            </p>
-
-                            <div class="technologies">
-                                <span v-for="technology in robot.technologies" :key="technology">
-                                    {{ technology }}
-                                </span>
-                            </div>
-
-                            <button class="detail-button" @click="openDetails(robot)">
-                                <span>
-                                    VIEW TECHNICAL DETAILS
-                                </span>
-
-                                <span class="arrow">
-                                    →
-                                </span>
-                            </button>
-                        </div>
+                        <button class="detail-button" @click="openDetails(robot)">
+                            <span>See more </span>
+                            <img src="@/assets/image/Canva_Arrow.png" alt="arrow" style="width: 4vw; height: 15px;">
+                        </button>
                     </article>
                 </div>
             </section>
@@ -661,119 +636,26 @@ function openDetails(robot) {
     letter-spacing: 0.15em;
 }
 
-
-/* ========================================
-   Robot information
-======================================== */
-
-.robot-info {
-    padding-top: 30px;
-}
-
-.robot-title p {
-    margin: 0 0 7px;
-
-    font-size: 11px;
-
-    letter-spacing: 0.2em;
-
-    color:
-        rgba(255, 255, 255, 0.5);
-
-    text-transform: uppercase;
-}
-
-.robot-title h3 {
-    margin: 0;
-
-    font-size:
-        clamp(34px, 3vw, 52px);
-
-    letter-spacing: -0.04em;
-}
-
-.robot-description {
-    max-width: 600px;
-
-    margin-top: 20px;
-
-    font-size: 15px;
-
-    line-height: 1.8;
-
-    color:
-        rgba(255, 255, 255, 0.62);
-}
-
-
-/* ========================================
-   Technology tags
-======================================== */
-
-.technologies {
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-
-    margin-top: 25px;
-}
-
-.technologies span {
-    padding:
-        8px 12px;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.18);
-
-    border-radius: 999px;
-
-    font-size: 10px;
-
-    letter-spacing: 0.08em;
-
-    color:
-        rgba(255, 255, 255, 0.68);
-}
-
-
 /* ========================================
    Detail button
 ======================================== */
 
 .detail-button {
+    font-family: 'League Spartan', sans-serif;
     width: 100%;
-
     margin-top: 30px;
-
     padding:
         18px 0;
-
-    display: flex;
-
+    /* display: flex; */
     align-items: center;
-
-    justify-content: space-between;
-
+    /* justify-content: space-between; */
     border: none;
-
-    border-top:
-        1px solid rgba(255, 255, 255, 0.18);
-
-    border-bottom:
-        1px solid rgba(255, 255, 255, 0.18);
-
     background: transparent;
-
     color: white;
-
     cursor: pointer;
-
-    font-size: 11px;
-
-    letter-spacing: 0.15em;
-
+    font-size: 2vw;
+    word-spacing: 0.3em;
+    font-weight: 900;
     transition:
         padding 0.3s ease;
 }
@@ -782,10 +664,6 @@ function openDetails(robot) {
     padding-left: 12px;
 
     padding-right: 12px;
-}
-
-.arrow {
-    font-size: 20px;
 }
 
 

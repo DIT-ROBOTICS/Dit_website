@@ -60,7 +60,7 @@ onUnmounted(() => {
       </div>
       <Transition name="welcome">
         <p v-if="showWelcome" class="welcome-text">
-          WELL COME TO DIT ROBOTICS
+          WELCOME TO DIT ROBOTICS
         </p>
       </Transition>
     </div>
