@@ -1,8 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from fastapi.responses import FileResponse
-import json,uvicorn,socket
+from fastapi.responses import FileResponse, StreamingResponse
+import json,uvicorn,socket,re
+from PIL import Image
+from io import BytesIO
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -20,6 +22,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+def natural_sort_key(path):
+    return [
+        int(part) if part.isdigit() else part.lower()
+        for part in re.split(r'(\d+)', path.name)
+    ]
 
 
 @app.get("/api/team")
@@ -41,7 +51,6 @@ async def get_links():
         file_path,
         encoding="utf-8"
     ) as f:
-
         return json.load(f)
 
 
@@ -63,7 +72,7 @@ async def get_members(member_type: str):
 
     
 @app.get("/api/member_images/{image_type}/{member_id}")
-async def get_member_image(image_type: str, member_id: int):
+async def get_member_image(image_type: str, member_id: int,full: bool = Query(False)):
     image_path = {
         "Leader-image": "Leadership.json",
         "advisor-image": "Advisors.json"
@@ -87,18 +96,54 @@ async def get_member_image(image_type: str, member_id: int):
     if not image_path.is_file():
         raise HTTPException(status_code=404, detail="Member image not found")
 
-    return FileResponse(image_path)
+    if full:
+        return FileResponse(image_path)
+    img = Image.open(image_path)
+    img.thumbnail((1600, 1600))
+    buffer = BytesIO()
+    img.save(buffer, format="WEBP", quality=80)
+    buffer.seek(0)
+    return StreamingResponse(buffer,media_type="image/webp")
 
 
 @app.get("/api/other_images/{image_type}/{path:path}")
-async def get_other_image(image_type: str, path: str):
+async def get_other_image(image_type: str, path: str,full: bool = Query(False)):
     image_path = {
         "competition": "static/Competition_image/",
+        "aboutPageImages": "static/AboutPhoto/"
     }
     file_path = BASE_DIR / image_path.get(image_type) / path
+    if not file_path:
+        raise HTTPException(status_code=404, detail="Folder not found")
     if not file_path.is_file():
         raise HTTPException(status_code=404, detail="Image not found")
-    return FileResponse(file_path)
+    if full:
+        return FileResponse(file_path)
+    img = Image.open(file_path)
+    img.thumbnail((1600, 1600))
+    buffer = BytesIO()
+    img.save(buffer, format="WEBP", quality=80)
+    buffer.seek(0)
+    return StreamingResponse(buffer,media_type="image/webp")
+
+
+
+@app.get("/api/aboutPageImages")
+async def get_aboutPageImages():
+    folder_path = BASE_DIR / "static" / "AboutPhoto"
+    images = sorted(
+                    [
+                        file
+                        for file in folder_path.iterdir()
+                        if file.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+                    ],
+                    key=natural_sort_key
+                )
+    if not folder_path.is_dir():
+        raise HTTPException(status_code=404, detail="Image not found")
+    l = [ f"/api/other_images/aboutPageImages/{file.name}"  for file in images ]
+    print(f"l:{l}")
+    return l
 
 
 def get_local_ip() -> str:

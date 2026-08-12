@@ -2,9 +2,28 @@
 團隊的介紹：
 
 -->
-
 <script setup>
-import teamPhoto from '@/assets/Hero_Image.png'
+import { onMounted, ref } from 'vue'
+
+const images = ref([])
+
+async function loadImages() {
+    try {
+        const response = await fetch('/api/aboutPageImages')
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`)
+        }
+
+        images.value = await response.json()
+
+        console.log(images.value)
+    } catch (error) {
+        console.error('圖片載入失敗：', error)
+    }
+}
+
+onMounted(loadImages)
 
 const departments = [
     {
@@ -36,6 +55,55 @@ function goToLink(item) {
         window.open(item.html, '_blank')
     }
 }
+
+function getPhotoStyle(index, total) {
+    if (total === 1) {
+        return {
+            left: '50%',
+            top: '20px',
+            transform: 'translateX(-50%) rotate(0deg)',
+            zIndex: 1
+        }
+    }
+
+    // -1 ~ 1
+    const normalized = (index / (total - 1)) * 2 - 1
+
+    // 左 → 負角度
+    // 右 → 正角度
+    const rotation = normalized * 6
+
+    // 水平方向散開
+    //
+    // 最左約 18%
+    // 中間約 50%
+    // 最右約 82%
+    const x = 50 + normalized * 32
+
+    /*
+      做成 U 型：
+  
+      左右照片比較高
+      中間照片比較低
+  
+      normalized:
+      -1      0      1
+       ↑      ↓      ↑
+    */
+    const y =
+        30 +
+        (1 - Math.abs(normalized)) * 110
+
+    return {
+        left: `${x}%`,
+        top: `${y}px`,
+        transform: `
+      translateX(-50%)
+      rotate(${rotation}deg)
+    `,
+        index
+    }
+}
 </script>
 
 <template>
@@ -50,9 +118,8 @@ function goToLink(item) {
         </div>
 
         <div class="photo-stack">
-            <img :src="teamPhoto" class="photo photo-left" alt="">
-            <img :src="teamPhoto" class="photo photo-center" alt="">
-            <img :src="teamPhoto" class="photo photo-right" alt="">
+            <img v-for="(image, index) in images" :src="image" :style="getPhotoStyle(index, images.length)"
+                class="photo" alt="">
         </div>
 
         <div class="description">
@@ -114,42 +181,37 @@ function goToLink(item) {
 /* 照片區域 */
 .photo-stack {
     position: relative;
-    width: min(1500px, 100%);
-    height: 600px;
-    margin: 60px auto 0;
+
+    width: min(1400px, 95%);
+
+    height: 520px;
+
+    margin: 50px auto 0;
 }
 
-/* 所有照片共用 */
 .photo {
     position: absolute;
-    width: 40%;
-    height: 400px;
-    object-fit: cover;
-    border-radius: 30px;
-}
 
-/* 左邊 */
-.photo-left {
-    left: 0;
-    top: 30px;
-    transform: rotate(-5deg);
-    z-index: 1;
-}
+    /*
+      不固定 height，
+      保留照片原本比例
+    */
+    width: clamp(240px, 34vw, 480px);
 
-/* 中間 */
-.photo-center {
-    left: 50%;
-    top: 180px;
-    transform: translateX(-50%);
-    z-index: 2;
-}
+    height: auto;
 
-/* 右邊 */
-.photo-right {
-    right: 0;
-    top: 30px;
-    transform: rotate(6deg);
-    z-index: 3;
+    display: block;
+
+    border-radius: 28px;
+
+    object-fit: contain;
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.08);
+
+    transition:
+        transform 0.35s ease,
+        filter 0.35s ease;
 }
 
 .description {
