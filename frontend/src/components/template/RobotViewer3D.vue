@@ -19,6 +19,13 @@ const props = defineProps({
     model: {
         type: String,
         required: true
+    },
+    pos:{
+        type: String,
+        required:true,
+        validator(value) {
+            return ['left', 'right'].includes(value)
+        }
     }
 })
 
@@ -39,16 +46,13 @@ function init() {
         new THREE.PerspectiveCamera(
             40,
             container.value.clientWidth /
-                container.value.clientHeight,
+            container.value.clientHeight,
             0.1,
             1000
         )
 
-    camera.position.set(
-        4,
-        3,
-        5
-    )
+    const dx = props.pos === "left" ? -1 : 1
+    camera.position.set(4*dx,2,4)
 
     renderer =
         new THREE.WebGLRenderer({
@@ -187,7 +191,7 @@ function centerModel(model) {
             model
         )
 
-    const center =
+    let center =
         box.getCenter(
             new THREE.Vector3()
         )
@@ -198,6 +202,7 @@ function centerModel(model) {
         )
 
     model.position.sub(center)
+    model.position.y += -1.3
 
     const maxDimension =
         Math.max(
@@ -273,10 +278,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div
-        ref="container"
-        class="robot-viewer"
-    ></div>
+    <div ref="container" class="robot-viewer"></div>
 </template>
 
 <style scoped>
@@ -285,14 +287,16 @@ onUnmounted(() => {
     height: 100%;
 
     background:
-        radial-gradient(
-            circle at center,
-            #202020,
-            #050505 70%
-        );
+        radial-gradient(circle at center,
+            #464646,
+            #2c2c2c 70%);
 
+    border: 5px solid #c6c6c6;
+    border-radius: 5px;
+    overflow: hidden;
     cursor: grab;
 }
+
 
 .robot-viewer:active {
     cursor: grabbing;

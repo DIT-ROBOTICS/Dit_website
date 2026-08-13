@@ -42,9 +42,13 @@ async def get_team():
         ),
     }
 
-@app.get("/api/Links")
-async def get_links():
-    file_path = DATA_DIR / "Linktree.json"
+@app.get("/api/jsonData/{title}")
+async def get_links(title: str):
+    file_name = {
+        "Links": "Linktree.json",
+        "AboutData": "AboutSectionData.json"
+    }
+    file_path = DATA_DIR / file_name.get(title)
     if not file_path:
         raise HTTPException(status_code=404, detail="Links not found")
     with open(

@@ -31,8 +31,9 @@ const robots = [
     {
         id: 1,
         name: '白機',
-        subtitle: 'NTHU DIT',
-
+        team: 'NTHU DIT',
+        themeColor: '#ffac70',
+        pos:'left',
         model: whiteRobotModel,
         image: whiteRobotPhoto,
 
@@ -51,8 +52,9 @@ const robots = [
     {
         id: 2,
         name: '黑機',
-        subtitle: 'DIT ROBOTICS',
-
+        team: 'DIT Robotics',
+        themeColor: '#e58989',
+        pos:'right',
         model: blackRobotModel,
         image: blackRobotPhoto,
 
@@ -75,10 +77,12 @@ const selectedRobot = ref(null)
 
 function openRobot3D(robot) {
     selectedRobot.value = robot
+    document.body.style.overflow = 'hidden'
 }
 
 function closeRobot3D() {
     selectedRobot.value = null
+    document.body.style.overflow = ''
 }
 
 function openDetails(robot) {
@@ -123,14 +127,13 @@ function openDetails(robot) {
             <section class="robots-showcase">
                 <div class="section-heading">
                     <h2>Two Robots for Eurobot</h2>
-                    <p>
-                        <span style="color:#ffac70">NTHU DIT</span>
-                        <span style="color:#e58989">DIT Robotics</span>
+                    <p class="shadowText">
+                        <span v-for="robot in robots" :style="{ color: robot.themeColor }">{{ robot.team }}</span>
                     </p>
                 </div>
 
                 <div class="robots-grid">
-                    <article v-for="(robot, index) in robots" :key="robot.id" class="robot-card">
+                    <article v-for="robot in robots" :key="robot.id" class="robot-card">
                         <div class="robot-image-container" @click="openRobot3D(robot)">
                             <!-- <RobotPreview3D :model="robot.model" /> -->
                             <img :src="robot.image" :alt="robot.name">
@@ -204,13 +207,9 @@ function openDetails(robot) {
                     </button>
 
                     <div class="viewer">
-                        <RobotViewer3D :model="selectedRobot.model" />
-                        <div class="viewer-info">
-                            <p>INTERACTIVE 3D VIEWER</p>
-
-                            <h2>{{ selectedRobot.name }}</h2>
-
-                            <span>DRAG TO ROTATE · SCROLL TO ZOOM</span>
+                        <RobotViewer3D :model="selectedRobot.model" :pos="selectedRobot.pos"/>
+                        <div class="viewer-info" :style="{'--pos':selectedRobot.pos}">
+                            <h2 class="shadowText" :style="{ color: selectedRobot.themeColor }">{{ selectedRobot.team }}</h2>
                         </div>
                     </div>
                 </div>
@@ -298,7 +297,7 @@ function openDetails(robot) {
 
     min-height: 100vh;
 
-    margin-top: 170px;
+    margin-top: 400px;
 
     display: flex;
     align-items: right;
@@ -486,7 +485,6 @@ function openDetails(robot) {
 
 .section-heading p {
     text-align: center;
-    text-shadow: -3.5px 3.5px white;
     font-weight: 600;
     font-size:
         clamp(19px, 4vw, 70px);
@@ -496,6 +494,10 @@ function openDetails(robot) {
 
 .section-heading p span + span {
     margin-left: 10vw;
+}
+
+.shadowText {
+    text-shadow: -3.5px 3.5px white;
 }
 
 
@@ -535,6 +537,7 @@ function openDetails(robot) {
 
     background: transparent;
     transform: scale(1);
+    transition: transform 0.3s ease;
 }
 
 .robot-image-container img {
@@ -550,7 +553,7 @@ function openDetails(robot) {
 .robot-image-container:hover {
 
     transform: scale(1.045);
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s ease;
 }
 
 .image-overlay {
@@ -581,23 +584,14 @@ function openDetails(robot) {
 
 .view-3d {
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     gap: 10px;
-
     opacity: 0;
+    transform: translateY(12px);
 
-    transform:
-        translateY(12px);
-
-    transition:
-        0.35s ease;
-
+    transition: 0.35s ease;
     font-size: 11px;
-
     letter-spacing: 0.2em;
 }
 
@@ -611,28 +605,18 @@ function openDetails(robot) {
 .view-icon {
     width: 68px;
     height: 68px;
-
     display: grid;
-
     place-items: center;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.6);
-
+    border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 50%;
-
     font-size: 13px;
 }
 
 .robot-number {
     position: absolute;
-
     right: 20px;
-
     bottom: 16px;
-
     font-size: 14px;
-
     letter-spacing: 0.15em;
 }
 
@@ -642,7 +626,8 @@ function openDetails(robot) {
 
 .detail-button {
     font-family: 'League Spartan', sans-serif;
-    width: 100%;
+    width: content;
+    margin: auto;
     margin-top: 30px;
     padding:
         18px 0;
@@ -656,14 +641,13 @@ function openDetails(robot) {
     font-size: 2vw;
     word-spacing: 0.3em;
     font-weight: 900;
-    transition:
-        padding 0.3s ease;
+    transform: scale(1);
+    transition: transform 0.3s ease;
 }
 
 .detail-button:hover {
-    padding-left: 12px;
-
-    padding-right: 12px;
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
 }
 
 
@@ -765,6 +749,7 @@ function openDetails(robot) {
     position: fixed;
 
     inset: 0;
+    
 
     z-index: 1000;
 
@@ -774,10 +759,10 @@ function openDetails(robot) {
 
     justify-content: center;
 
-    padding: 40px;
-
+    padding: 120px 40px 40px;
+/* 
     background:
-        rgba(0, 0, 0, 0.8);
+        rgba(0, 0, 0, 0.8); */
 
     backdrop-filter:
         blur(14px);
@@ -796,14 +781,16 @@ function openDetails(robot) {
 
     border:
         1px solid rgba(255, 255, 255, 0.15);
+
+    z-index: 100;
 }
 
 .close-button {
     position: absolute;
 
-    top: 20px;
+    top: 0px;
 
-    right: 22px;
+    right: 0px;
 
     z-index: 4;
 
@@ -816,13 +803,14 @@ function openDetails(robot) {
     border-radius: 50%;
 
     background:
-        rgba(0, 0, 0, 0.4);
+        rgb(51, 51, 51);
 
     color: white;
 
     font-size: 28px;
 
     cursor: pointer;
+    transform: translateX(50%) translateY(-50%);
 }
 
 .viewer-placeholder {
@@ -892,40 +880,22 @@ function openDetails(robot) {
 .viewer-info {
     position: absolute;
 
-    left: 35px;
-    bottom: 30px;
+    left: 5%;
+    top: 5%;
+    width: 90%;
+
+    text-align: var(--pos);
 
     z-index: 2;
 
     pointer-events: none;
 }
-
-.viewer-info p {
-    margin: 0 0 8px;
-
-    font-size: 10px;
-
-    letter-spacing: 0.24em;
-
-    opacity: 0.45;
-}
-
 .viewer-info h2 {
     margin: 0 0 8px;
-
-    font-size: 38px;
-
+    font-size: 60px;
     letter-spacing: -0.04em;
 }
 
-.viewer-info span {
-    font-size: 9px;
-
-    letter-spacing: 0.16em;
-
-    color:
-        rgba(255, 255, 255, 0.4);
-}
 
 /* ========================================
    RWD

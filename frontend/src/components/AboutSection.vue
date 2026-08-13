@@ -6,6 +6,9 @@
 import { onMounted, ref } from 'vue'
 
 const images = ref([])
+const loadData = ref({})
+const MoreDetail = ref([])
+const ThemeColor = ref("")
 
 async function loadImages() {
     try {
@@ -23,30 +26,28 @@ async function loadImages() {
     }
 }
 
-onMounted(loadImages)
+async function loadAboutData() {
+    try {
+        const response = await fetch('/api/jsonData/AboutData')
 
-const departments = [
-    {
-        title: '準備比賽',
-        icon: '⚡',
-        link: ''
-    },
-    {
-        title: '舉辦展覽',
-        icon: '📌',
-        link: ''
-    },
-    {
-        title: '暑期營隊',
-        icon: '🔧',
-        link: ''
-    },
-    {
-        title: '技術傳承',
-        icon: '💻',
-        link: ''
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`)
+        }
+
+        const jsonfile = await response.json()
+        loadData.value = jsonfile
+        MoreDetail.value = jsonfile.MoreDetail
+        ThemeColor.value = jsonfile.ThemeColor
+    } catch (error) {
+        console.error(error)
+        // errorMessage.value = '資料載入失敗'
+    } finally {
+        // loading.value = false
     }
-]
+}
+
+onMounted(loadImages)
+onMounted(loadAboutData)
 
 function goToLink(item) {
     if (item.link) {
@@ -90,9 +91,7 @@ function getPhotoStyle(index, total) {
       -1      0      1
        ↑      ↓      ↑
     */
-    const y =
-        30 +
-        (1 - Math.abs(normalized)) * 110
+    const y = 30 + (1 - Math.abs(normalized)) * 110
 
     return {
         left: `${x}%`,
@@ -111,9 +110,9 @@ function getPhotoStyle(index, total) {
 
         <div class="title">
 
-            <p>DIT 將我們聚集在此，讓我們有了逐夢的動力</p>
+            <p>{{ loadData.SmallTitle }}</p>
 
-            <h2>我們打造的不僅是機器人，更是一群能一起追夢的人</h2>
+            <h2>{{ loadData.MainTitle }}</h2>
 
         </div>
 
@@ -123,16 +122,12 @@ function getPhotoStyle(index, total) {
         </div>
 
         <div class="description">
-            <p>
-                成立於2013年，DIT由來自清大各系的大學生所組成，致力於發展機器人機械
-                、電控及機器人作業系統（ROS）的相關技術。
-                我們團隊以比賽為導向的學習，在動手挑戰與解決實際問題的過程中，持續精進其技術實力。
-            </p>
+            <p>{{ loadData.description }}</p>
         </div>
-        <h2 class="daily-title">不只競賽，請收看我們的日常</h2>
+        <h2 class="daily-title">{{ loadData.daily_title }}</h2>
 
-        <div class="department-grid">
-            <div v-for="item in departments" :key="item.title" class="department-card" @click="goToLink(item)">
+        <div class="department-grid" :style="{'--button-color':ThemeColor}">
+            <div v-for="item in MoreDetail" :key="item.title" class="department-card" @click="goToLink(item)">
                 <svg class="card-border" viewBox="0 0 600 180" preserveAspectRatio="none">
                     <rect x="3" y="3" width="594" height="174" rx="38" ry="38" />
                 </svg>
@@ -152,9 +147,40 @@ function getPhotoStyle(index, total) {
 </template>
 
 <style scoped>
+
 .about-section {
+    position: relative;
+
     padding: 120px 8vw;
+
     background: #fafafa;
+
+    z-index: 1;
+}
+
+.about-section::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: -249px;
+
+    width: 100%;
+    height: 250px;
+
+    background: linear-gradient(
+        to bottom,
+        #fafafa 0%,
+        #fafafa 10%,
+        rgba(250, 250, 250, 0.8) 40%,
+        rgba(250, 250, 250, 0.4) 70%,
+        rgba(250, 250, 250, 0) 100%
+    );
+
+    pointer-events: none;
+
+    z-index: 10;
 }
 
 .title {
@@ -264,6 +290,8 @@ function getPhotoStyle(index, total) {
     cursor: pointer;
 
     isolation: isolate;
+    transform: scale(1);
+    transition: transform .25s ease;
 }
 
 
@@ -281,7 +309,7 @@ function getPhotoStyle(index, total) {
 
     border-radius: 38px;
 
-    background: #7183d8;
+    background: var(--button-color);
 
     z-index: -2;
 
@@ -320,7 +348,7 @@ function getPhotoStyle(index, total) {
 .card-border rect {
     fill: none;
 
-    stroke: #7183d8;
+    stroke: var(--button-color);
     stroke-width: 7px;
 
     /*
@@ -363,12 +391,10 @@ function getPhotoStyle(index, total) {
 
 /* hover */
 .department-card:hover {
-    transform: translate(-4px, -4px);
+    transform: scale(1.05);
+    transition: transform .25s ease;
 }
 
-.department-card:hover::after {
-    transform: translate(4px, 4px);
-}
 
 /* @media(max-width:900px) {
     .department-grid {

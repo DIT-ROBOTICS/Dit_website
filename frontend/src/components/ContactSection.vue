@@ -11,7 +11,7 @@ const linkGroups = ref([])
 const errorMessage = ref('')
 async function loadlinks() {
     try {
-        const response = await fetch('/api/Links')
+        const response = await fetch('/api/jsonData/Links')
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`)
@@ -46,8 +46,8 @@ onMounted(loadlinks)
                 <p class="eyebrow">GET IN TOUCH</p>
 
                 <h2>
-                    HAVE AN IDEA?<br>
-                    LET'S DIT.
+                    HAVE AN IDEA?<br><br>
+                    LET'S DIT
                 </h2>
 
                 <p class="contact-description">
