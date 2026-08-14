@@ -14,66 +14,30 @@
 
 
 <script setup>
-import { ref } from 'vue'
-
-import RobotPreview3D from '@/components/template/RobotPreview3D.vue'
+import { ref,onMounted } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 
-import blackRobotModel from '@/assets/Eurobot2026黑機.glb?url'
-import whiteRobotModel from '@/assets/Eurobot2026白機.glb?url'
-
-const achievementPhoto = '/api/other_images/competition/background.png'
-const blackRobotPhoto = '/api/other_images/competition/2026/Eurobot/Eurobot2026黑機.png'
-const whiteRobotPhoto = '/api/other_images/competition/2026/Eurobot/Eurobot2026白機.png'
-
-const robots = [
-
-    {
-        id: 1,
-        name: '白機',
-        team: 'NTHU DIT',
-        themeColor: '#ffac70',
-        pos:'left',
-        model: whiteRobotModel,
-        image: whiteRobotPhoto,
-
-        description:
-            '採用與黑機相近的模組化底盤架構，整合鈑金結構、PCB 與定位系統；並透過 PLA+、TPU 等材料，在輕量化、緩衝與維修便利性之間取得平衡。',
-
-        technologies: [
-            '三面手臂',
-            'CNC',
-            'PCB',
-            'STM32',
-            '3D列印',
-            'Lidar',
-        ]
-    },
-    {
-        id: 2,
-        name: '黑機',
-        team: 'DIT Robotics',
-        themeColor: '#e58989',
-        pos:'right',
-        model: blackRobotModel,
-        image: blackRobotPhoto,
-
-        description:
-            '以鈑金底盤作為主要承重結構，兼顧剛性、重量分布與高速移動穩定性；搭配模組化任務機構與 3D 列印零件，提升組裝、維修與快速更換效率。',
-
-        technologies: [
-            '四面手臂',
-            'CNC',
-            'PCB',
-            'STM32',
-            '3D列印',
-            'Lidar',
-            '無限鏡'
-        ]
-    }
-]
-
+const FullJson = ref({})
+const robots = ref([])
+const achievementPhoto = ref("")
 const selectedRobot = ref(null)
+
+async function loadThisYearEurobotData() {
+  try {
+    const response = await fetch('/api/Eurobot')
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    FullJson.value = await response.json()
+    robots.value = FullJson.value.Robot_Data
+    achievementPhoto.value = FullJson.value.Background
+  } catch (error) {
+    console.error(error)
+  } finally {
+  }
+}
 
 function openRobot3D(robot) {
     selectedRobot.value = robot
@@ -90,6 +54,16 @@ function openDetails(robot) {
     // router.push(`/robots/2026/${robot.id}`)
     console.log('open details:', robot)
 }
+
+function RobotsAmount(){
+    let a = robots.value.length
+    let title = [
+        "","Our Robot","Two Robots","Three Robots"
+    ]
+    return title[a]
+}
+
+onMounted(loadThisYearEurobotData)
 </script>
 
 <template>
@@ -105,17 +79,15 @@ function openDetails(robot) {
                 <div class="achievement-content">
 
                     <p class="achievement-year">
-                        Eurobot 2026
+                        Eurobot {{FullJson.Year}}
                     </p>
 
                     <h2 class="achievement-title">
-                        <span>THIS YEAR</span>
-                        <span>We Made IT</span>
+                        <span v-for="text in FullJson.BigTitle">{{ text }}</span>
                     </h2>
 
-                    <div class="achievement-awards">
-                        <p>World TOP 2</p>
-                        <p>Team Choice Award</p>
+                    <div class="achievement-awards" :style="{'--text-color':FullJson.awardsColor}">
+                        <p v-for="text in FullJson.awards">{{ text }}</p>
                     </div>
 
                 </div>
@@ -126,9 +98,9 @@ function openDetails(robot) {
 
             <section class="robots-showcase">
                 <div class="section-heading">
-                    <h2>Two Robots for Eurobot</h2>
+                    <h2>{{ RobotsAmount() }} for Eurobot</h2>
                     <p class="shadowText">
-                        <span v-for="robot in robots" :style="{ color: robot.themeColor }">{{ robot.team }}</span>
+                        <span v-for="robot in robots" :style="{ color: robot.ThemeColor }">{{ robot.ShowOutName }}</span>
                     </p>
                 </div>
 
@@ -136,7 +108,7 @@ function openDetails(robot) {
                     <article v-for="robot in robots" :key="robot.id" class="robot-card">
                         <div class="robot-image-container" @click="openRobot3D(robot)">
                             <!-- <RobotPreview3D :model="robot.model" /> -->
-                            <img :src="robot.image" :alt="robot.name">
+                            <img :src="robot.imagePath" :alt="robot.name">
                             <div class="image-overlay">
                                 <div class="view-3d">
                                     <span class="view-icon"> 360° </span>
@@ -207,9 +179,9 @@ function openDetails(robot) {
                     </button>
 
                     <div class="viewer">
-                        <RobotViewer3D :model="selectedRobot.model" :pos="selectedRobot.pos"/>
-                        <div class="viewer-info" :style="{'--pos':selectedRobot.pos}">
-                            <h2 class="shadowText" :style="{ color: selectedRobot.themeColor }">{{ selectedRobot.team }}</h2>
+                        <RobotViewer3D :model="selectedRobot.glbPath" :background="selectedRobot.View3DBackground" :pos="selectedRobot.View3Dpos"/>
+                        <div class="viewer-info" :style="{'--pos':selectedRobot.View3Dpos}">
+                            <h2 class="shadowText" :style="{ color: selectedRobot.ThemeColor }">{{ selectedRobot.ShowOutName }}</h2>
                         </div>
                     </div>
                 </div>
@@ -399,7 +371,7 @@ function openDetails(robot) {
         白字 + 紅色外框
     */
     -webkit-text-stroke:
-        clamp(3px, 0.44vw, 20px) #c75b5b;
+        clamp(3px, 0.44vw, 20px) var(--text-color);
     paint-order: stroke fill;
     text-shadow:
         0 2px 4px rgba(0, 0, 0, 0.4);
@@ -454,7 +426,7 @@ function openDetails(robot) {
 .robots-showcase {
     position: relative;
 
-    min-height: 100vh;
+    min-height: 80vh;
     align-items: center;
     text-align: center;
     padding:
@@ -469,7 +441,7 @@ function openDetails(robot) {
 }
 
 .section-heading {
-    margin-bottom: 80px;
+    /* margin-bottom: 80px; */
     font-family: 'League Spartan', sans-serif;
 }
 
@@ -516,7 +488,9 @@ function openDetails(robot) {
 
     max-width: 1500px;
 
-    margin: 0 auto;
+    margin: -50px auto;
+
+    /* top:-15%; */
 }
 
 .robot-card {
@@ -527,7 +501,6 @@ function openDetails(robot) {
     position: relative;
 
     width: 80%;
-    aspect-ratio: 4 / 5;
 
     margin: 0 auto;
 
@@ -628,9 +601,8 @@ function openDetails(robot) {
     font-family: 'League Spartan', sans-serif;
     width: content;
     margin: auto;
-    margin-top: 30px;
     padding:
-        18px 0;
+        0 0 18px;
     /* display: flex; */
     align-items: center;
     /* justify-content: space-between; */
@@ -666,7 +638,7 @@ function openDetails(robot) {
 
     justify-content: center;
 
-    padding: 100px 30px;
+    padding: 50px 30px;
 
     background: rgba(5, 5, 5, 0.7);
 }

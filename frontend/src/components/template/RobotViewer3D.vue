@@ -19,6 +19,10 @@ const props = defineProps({
     model: {
         type: String,
         required: true
+    },    
+    background: {
+        type: String,
+        required: true
     },
     pos:{
         type: String,
@@ -30,6 +34,7 @@ const props = defineProps({
 })
 
 const container = ref(null)
+const background_api = ref(props.background)
 
 let scene
 let camera
@@ -278,27 +283,53 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div ref="container" class="robot-viewer"></div>
+    <div ref="container" class="robot-viewer">
+        <div class="viewer-background" :style="{'--background-api':`url(${background_api})`}"></div>
+        <div class="viewer-overlay"></div>
+    </div>
 </template>
 
 <style scoped>
-.robot-viewer {
-    width: 100%;
-    height: 100%;
-
-    background:
-        radial-gradient(circle at center,
-            #464646,
-            #2c2c2c 70%);
-
-    border: 5px solid #c6c6c6;
-    border-radius: 5px;
-    overflow: hidden;
-    cursor: grab;
+.robot-viewer{
+    position:relative;
+    width:100%;
+    height:100%;
+    border:5px solid #c6c6c6;
+    border-radius:5px;
+    overflow:hidden;
+    cursor:grab;
 }
 
+.viewer-background{
+    position:absolute;
+    inset:0;
+    background-image:var(--background-api);
+    background-position:center;
+    background-size:cover;
+    background-repeat:no-repeat;
+    z-index:0;
+}
 
-.robot-viewer:active {
-    cursor: grabbing;
+.viewer-overlay{
+    position:absolute;
+    inset:0;
+    background:
+        radial-gradient(
+            circle at center,
+            transparent 20%,
+            rgba(20,20,20,0.25) 55%,
+            rgba(15,15,15,0.75) 100%
+        );
+    z-index:2;
+    pointer-events:none;
+}
+
+.robot-viewer:active{
+    cursor:grabbing;
+}
+
+.robot-viewer :deep(canvas){
+    position:relative;
+    z-index:1;
 }
 </style>

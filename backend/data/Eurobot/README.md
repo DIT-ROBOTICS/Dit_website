@@ -1,0 +1,9 @@
+這裡是儲存歷年的團隊機器資料
+
+檔案名稱不限，但要注記在vue裡面的json檔裡
+
+json的格式有嚴格規定
+
+json檔案的名稱一率為main_data.json
+
+ArchiveBackground:儲存歷年機器section的背景圖片

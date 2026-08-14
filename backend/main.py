@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from fastapi.responses import FileResponse, StreamingResponse
-import json,uvicorn,socket,re
-from PIL import Image
-from io import BytesIO
+from fastapi.responses import FileResponse
+import uvicorn,socket
+import PyAPI.EurobotAPI as Eurobot
+import PyAPI.GetItemAPI as GIAPI
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -24,130 +24,57 @@ app.add_middleware(
 )
 
 
-
-def natural_sort_key(path):
-    return [
-        int(part) if part.isdigit() else part.lower()
-        for part in re.split(r'(\d+)', path.name)
-    ]
-
-
-@app.get("/api/team")
-async def get_team():
-    return {
-        "name": "PME TEAM",
-        "slogan": "Create · Explore · Connect",
-        "description": (
-            "我們是一群喜歡設計、程式與創意實驗的夥伴。"
-        ),
-    }
-
 @app.get("/api/jsonData/{title}")
-async def get_links(title: str):
-    file_name = {
-        "Links": "Linktree.json",
-        "AboutData": "AboutSectionData.json"
-    }
-    file_path = DATA_DIR / file_name.get(title)
-    if not file_path:
-        raise HTTPException(status_code=404, detail="Links not found")
-    with open(
-        file_path,
-        encoding="utf-8"
-    ) as f:
-        return json.load(f)
+async def json_data_api(title:str):
+    return GIAPI.get_json_data(title)
 
 
 @app.get("/api/member_info/{member_type}")
-async def get_members(member_type: str):
-    info_path = {
-        "Leader" : "Leadership.json",
-        "Advisor" : "Advisors.json"
-    }
-    file_path = DATA_DIR / info_path.get(member_type)
-    if not file_path:
-        raise HTTPException(status_code=404, detail="Member info not found")
-    with open(
-        file_path,
-        encoding="utf-8"
-    ) as f:
+async def member_info_api(member_type:str):
+    return GIAPI.get_member_data(member_type)
 
-        return json.load(f)
 
-    
 @app.get("/api/member_images/{image_type}/{member_id}")
-async def get_member_image(image_type: str, member_id: int,full: bool = Query(False)):
-    image_path = {
-        "Leader-image": "Leadership.json",
-        "advisor-image": "Advisors.json"
-    }
-    file_path = DATA_DIR / image_path.get(image_type)
-    if not file_path:
-        raise HTTPException(status_code=404, detail="Member info not found")
-    with open(file_path, encoding="utf-8") as f:
-        members = json.load(f)
-
-    member = next(
-        (member for member in members if member["id"] == member_id),
-        None
-    )
-
-    if member is None:
-        raise HTTPException(status_code=404, detail="Member not found")
-
-    image_path = BASE_DIR / member["image"]
-
-    if not image_path.is_file():
-        raise HTTPException(status_code=404, detail="Member image not found")
-
-    if full:
-        return FileResponse(image_path)
-    img = Image.open(image_path)
-    img.thumbnail((1600, 1600))
-    buffer = BytesIO()
-    img.save(buffer, format="WEBP", quality=80)
-    buffer.seek(0)
-    return StreamingResponse(buffer,media_type="image/webp")
+async def member_image_api(
+    image_type:str,
+    member_id:int,
+    full:bool=Query(False)
+):
+    image_path=GIAPI.get_member_image_path(image_type,member_id)
+    return GIAPI.create_image_response(image_path,full)
 
 
 @app.get("/api/other_images/{image_type}/{path:path}")
-async def get_other_image(image_type: str, path: str,full: bool = Query(False)):
-    image_path = {
-        "competition": "static/Competition_image/",
-        "aboutPageImages": "static/AboutPhoto/"
-    }
-    file_path = BASE_DIR / image_path.get(image_type) / path
-    if not file_path:
-        raise HTTPException(status_code=404, detail="Folder not found")
-    if not file_path.is_file():
-        raise HTTPException(status_code=404, detail="Image not found")
-    if full:
-        return FileResponse(file_path)
-    img = Image.open(file_path)
-    img.thumbnail((1600, 1600))
-    buffer = BytesIO()
-    img.save(buffer, format="WEBP", quality=80)
-    buffer.seek(0)
-    return StreamingResponse(buffer,media_type="image/webp")
-
+async def other_image_api(
+    image_type:str,
+    path:str,
+    full:bool=Query(False)
+):
+    image_path=GIAPI.get_other_image_path(image_type,path)
+    return GIAPI.create_image_response(image_path,full)
 
 
 @app.get("/api/aboutPageImages")
-async def get_aboutPageImages():
-    folder_path = BASE_DIR / "static" / "AboutPhoto"
-    images = sorted(
-                    [
-                        file
-                        for file in folder_path.iterdir()
-                        if file.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".gif"}
-                    ],
-                    key=natural_sort_key
-                )
-    if not folder_path.is_dir():
-        raise HTTPException(status_code=404, detail="Image not found")
-    l = [ f"/api/other_images/aboutPageImages/{file.name}"  for file in images ]
-    print(f"l:{l}")
-    return l
+async def about_page_images_api():
+    return GIAPI.get_about_page_images()
+
+
+@app.get("/api/Eurobot")
+async def get_latest_eurobot():
+    return Eurobot.load_eurobot(Eurobot.get_latest_year())
+
+@app.get("/api/Eurobot/{year}")
+async def get_eurobot(year:int):
+    return Eurobot.load_eurobot(year)
+
+@app.get("/api/Eurobot/{year}/file/{filename}")
+async def get_eurobot_file(year:int,filename:str):
+    file_path=Eurobot.EUROBOT_DIR/str(year)/filename
+    if not file_path.is_file():
+        raise HTTPException(status_code=404,detail="File not found")
+    return FileResponse(file_path)
+    
+
 
 
 def get_local_ip() -> str:
