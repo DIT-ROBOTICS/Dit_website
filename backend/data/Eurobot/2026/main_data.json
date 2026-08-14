@@ -4,6 +4,7 @@
   "BigTitle": ["THIS YEAR","We Made IT"],
   "awards": ["World TOP 2","Team Choice Award"],
   "awardsColor": "#c75b5b",
+  "description": "這裡放一些當年比賽的描述",
   "Robot_Data": [
     {
       "id": 1,

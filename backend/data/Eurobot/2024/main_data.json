@@ -1,0 +1,66 @@
+{
+  "Year":2024,
+  "Background": "2026competition.jpg",
+  "BigTitle": ["THIS YEAR","We Made IT"],
+  "awards": ["World TOP 2","Team Choice Award"],
+  "awardsColor": "#c75b5b",
+  "description": "這裡放一些當年比賽的描述",
+  "Robot_Data": [
+    {
+      "id": 1,
+      "name": "白機",
+      "ShowOutName": "NTHU DIT",
+      "ThemeColor": "#ffac70",
+      "View3Dpos": "left",
+      "glbPath": "Eurobot2026白機.glb",
+      "imagePath": "Eurobot2026白機.png",
+      "View3DBackground": "白機3DViewer.png",
+      "SeeMoreImagePath": "",
+      "description":[
+        {
+          "pointX":0.1, "pointY":0.1,
+          "title":"Lidar",
+          "content":""
+        },
+        {
+          "pointX":0.1, "pointY":0.1,
+          "title":"Lidar",
+          "content":""
+        },
+        {
+          "pointX":0.1, "pointY":0.1,
+          "title":"Lidar",
+          "content":""
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "黑機",
+      "ShowOutName": "DIT Robotics",
+      "ThemeColor": "#e58989",
+      "View3Dpos": "right",
+      "glbPath": "Eurobot2026黑機.glb",
+      "imagePath": "Eurobot2026黑機.png",
+      "View3DBackground": "黑機3DViewer.png",
+      "SeeMoreImagePath": "",
+      "description":[
+        {
+          "pointX":0.1, "pointY":0.1,
+          "title":"Lidar",
+          "content":""
+        },
+        {
+          "pointX":0.1, "pointY":0.1,
+          "title":"Lidar",
+          "content":""
+        },
+        {
+          "pointX":0.1, "pointY":0.1,
+          "title":"Lidar",
+          "content":""
+        }
+      ]
+    }
+  ]
+}

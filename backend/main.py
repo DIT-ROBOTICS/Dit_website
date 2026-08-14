@@ -63,6 +63,18 @@ async def about_page_images_api():
 async def get_latest_eurobot():
     return Eurobot.load_eurobot(Eurobot.get_latest_year())
 
+@app.get("/api/Eurobot/History")
+async def get_eurobot_history():
+    return Eurobot.get_all_eurobot_api()
+
+@app.get("/api/Eurobot/History/Background")
+async def get_eurobot_history():
+    folder=Eurobot.EUROBOT_DIR/"ArchiveBackground"
+    first_file=next((f for f in folder.iterdir() if f.is_file()),None)
+    if not first_file.is_file():
+        raise HTTPException(status_code=404,detail="File not found")
+    return FileResponse(first_file)
+
 @app.get("/api/Eurobot/{year}")
 async def get_eurobot(year:int):
     return Eurobot.load_eurobot(year)

@@ -15,117 +15,38 @@ import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import blackRobot2026 from '@/assets/Eurobot2026黑機.glb?url'
 import whiteRobot2026 from '@/assets/Eurobot2026白機.glb?url'
 
-const BackgroundImage = ref("/api/other_images/competition/background.png")
-const robotHistory = ref([
-    {
-        year: 2026,
-        competition: 'EUROBOT 2026',
-        title: 'Two Robots, One Goal.',
-        description: '2026 年，我們以兩台不同定位的機器共同完成 Eurobot 賽場任務，在機構、控制、定位與策略上持續挑戰更高的完成度。',
-        achievements: ['World TOP 2', 'Team Choice Award'],
-        background: '/api/other_images/competition/background.png',
-        themeColor: '#ef907e',
-        robots: [
-            {
-                id: '2026-white',
-                name: '白機',
-                team: 'NTHU DIT',
-                image: '/api/other_images/competition/2026/Eurobot/Eurobot2026白機.png',
-                model: whiteRobot2026,
-                pos: 'left',
-                description: '三面手臂設計，兼顧快速任務執行、模組化維修與定位穩定性。'
-            },
-            {
-                id: '2026-black',
-                name: '黑機',
-                team: 'DIT Robotics',
-                image: '/api/other_images/competition/2026/Eurobot/Eurobot2026黑機.png',
-                model: blackRobot2026,
-                pos: 'right',
-                description: '四面手臂架構，整合高速移動、任務機構、定位與無限鏡視覺設計。'
-            }
-        ]
-    },
-    {
-        year: 2025,
-        competition: 'EUROBOT 2025',
-        title: 'Built to Go Further.',
-        description: '延續前一代機器的經驗，我們重新調整底盤、模組配置與任務結構，在有限空間中追求更高的可靠性。',
-        achievements: ['Eurobot Taiwan'],
-        background: '/api/other_images/competition/background.png',
-        themeColor: '#e78172',
-        robots: [
-            {
-                id: '2025-white',
-                name: '白機',
-                team: 'NTHU DIT',
-                image: '/api/other_images/competition/2025/Eurobot/Eurobot2025白機.png',
-                model: null,
-                pos: 'left',
-                description: '以快速執行任務與穩定移動為核心所設計的年度機器。'
-            },
-            {
-                id: '2025-black',
-                name: '黑機',
-                team: 'DIT Robotics',
-                image: '/api/other_images/competition/2025/Eurobot/Eurobot2025黑機.png',
-                model: null,
-                pos: 'right',
-                description: '針對 Eurobot 任務重新設計機構配置與控制流程。'
-            }
-        ]
-    },
-    {
-        year: 2024,
-        competition: 'EUROBOT 2024',
-        title: 'Learning Through Every Iteration.',
-        description: '每一代機器都是下一代設計的基礎。從機構失敗、控制誤差到比賽現場的臨場問題，都成為團隊持續改進的重要經驗。',
-        achievements: ['Eurobot Taiwan'],
-        background: '/api/other_images/competition/background.png',
-        themeColor: '#d77667',
-        robots: [
-            {
-                id: '2024-main',
-                name: '2024 Robot',
-                team: 'DIT Robotics',
-                image: '/api/other_images/competition/2024/Eurobot/robot.png',
-                model: null,
-                pos: 'left',
-                description: 'Eurobot 2024 年度參賽機器。'
-            }
-        ]
-    },
-    {
-        year: 2023,
-        competition: 'EUROBOT 2023',
-        title: 'Where Ideas Became Machines.',
-        description: '持續累積製造、電控與程式經驗，讓越來越多想法真正成為能夠在賽場上運作的機器。',
-        achievements: [],
-        background: '/api/other_images/competition/background.png',
-        themeColor: '#c6685e',
-        robots: [
-            {
-                id: '2023-main',
-                name: '2023 Robot',
-                team: 'DIT Robotics',
-                image: '/api/other_images/competition/2023/Eurobot/robot.png',
-                model: null,
-                pos: 'left',
-                description: 'DIT Robotics 2023 年度機器。'
-            }
-        ]
-    }
-])
+const BackgroundImage = ref("/api/Eurobot/History/Background")
+const robotHistory = ref([])
 
 const trackElement = ref(null)
 const activeIndex = ref(0)
 const selectedRobot = ref(null)
 
-function openRobot(robot) {
-    if (!robot.model) {
-        console.log('這台機器目前沒有 GLB：', robot.name)
-        return
+async function loadHistoryEurobotData(){
+    try{
+        const response = await fetch('/api/Eurobot/History')
+
+        if(!response.ok){
+            throw new Error(`HTTP ${response.status}`)
+        }
+
+        const resj = await response.json()
+        robotHistory.value = []
+
+        for(const item of resj){
+            const response = await fetch(item)
+            if(!response.ok){
+                throw new Error(`HTTP ${response.status}`)
+            }
+            robotHistory.value.push(await response.json())
+        }
+        robotHistory.value.sort((a,b)=>b.Year-a.Year)
+    }catch(error){
+        console.error(error)
     }
+}
+
+function openRobot(robot) {
     selectedRobot.value = robot
     document.body.style.overflow = 'hidden'
 }
@@ -168,6 +89,7 @@ function updateActiveYear() {
 }
 
 onMounted(async () => {
+    await loadHistoryEurobotData()
     await nextTick()
     updateActiveYear()
 })
@@ -186,10 +108,10 @@ onUnmounted(() => {
             <header class="archive-header">
                 <div>
                     <p class="archive-eyebrow">OUR JOURNEY</p>
-                    <h2>
-                        ROBOT
-                        <span>ARCHIVE</span>
-                    </h2>
+                    <div class="archive-main">
+                        <h2 class="archive-title">年度機器</h2>
+                        <h2 class="archive-outline">ARCHIVE</h2>
+                    </div>
                 </div>
 
                 <div class="archive-instruction">
@@ -206,42 +128,42 @@ onUnmounted(() => {
                     <div class="year-overlay"></div>
 
                     <div class="background-year">
-                        {{ item.year }}
+                        {{ item.Year }}
                     </div>
 
                     <div class="year-info">
-                        <p class="competition" :style="{ color: item.themeColor }">
-                            {{ item.competition }}
+                        <p class="competition" :style="{ color: item.awardsColor }">
+                            Eurobot {{ item.Year }}
                         </p>
 
-                        <h3>{{ item.title }}</h3>
+                        <h3><span v-for="value in item.BigTitle">{{ value }}<br></span></h3>
 
                         <p class="year-description">
                             {{ item.description }}
                         </p>
 
-                        <div v-if="item.achievements.length" class="achievements">
-                            <span v-for="achievement in item.achievements" :key="achievement">
+                        <div v-if="item.awards.length" class="achievements">
+                            <span v-for="achievement in item.awards" :key="achievement">
                                 {{ achievement }}
                             </span>
                         </div>
                     </div>
 
-                    <div class="robots-area" :class="{ single: item.robots.length === 1 }">
-                        <button v-for="robot in item.robots" :key="robot.id" class="robot-card"
-                            :class="{ clickable: robot.model }" type="button" @click="openRobot(robot)">
+                    <div class="robots-area" :class="{ single: item.Robot_Data.length === 1 }">
+                        <button v-for="robot in item.Robot_Data" :key="robot.id" class="robot-card"
+                            :class="{ clickable: robot.glbPath }" type="button" @click="openRobot(robot)">
                             <div class="robot-image-wrapper">
-                                <img :src="robot.image" :alt="robot.name">
+                                <img :src="robot.imagePath" :alt="robot.name">
 
-                                <div v-if="robot.model" class="view-3d">
+                                <div v-if="robot.glbPath" class="view-3d">
                                     VIEW 3D
                                 </div>
                             </div>
 
                             <div class="robot-meta">
                                 <div>
-                                    <p>{{ robot.team }}</p>
-                                    <h4>{{ robot.name }}</h4>
+                                    <p>{{ robot.name }}</p>
+                                    <h4 :style="{color:robot.ThemeColor}">{{ robot.ShowOutName }}</h4>
                                 </div>
 
                                 <span v-if="robot.model" class="robot-arrow">
@@ -259,25 +181,12 @@ onUnmounted(() => {
                 <button v-for="(item, index) in robotHistory" :key="item.year" class="timeline-point"
                     :class="{ active: activeIndex === index }" type="button" @click="scrollToYear(index)">
                     <span class="timeline-dot"></span>
-                    <span class="timeline-year">{{ item.year }}</span>
+                    <span class="timeline-year">{{ item.Year }}</span>
                 </button>
             </div>
         </div>
-
         <Transition name="modal">
-            <div v-if="selectedRobot" class="robot-modal" @click.self="closeRobot">
-                <button class="close-button" type="button" @click="closeRobot">
-                    ×
-                </button>
-
-                <RobotViewer3D :model="selectedRobot.model" :pos="selectedRobot.pos" />
-
-                <div class="viewer-info">
-                    <p>{{ selectedRobot.team }}</p>
-                    <h3>{{ selectedRobot.name }}</h3>
-                    <span>DRAG TO ROTATE · SCROLL TO ZOOM</span>
-                </div>
-            </div>
+            <RobotViewer3D v-if="selectedRobot" :robot="selectedRobot" :closeRobot3D="closeRobot"/>
         </Transition>
     </section>
 </template>
@@ -321,44 +230,31 @@ onUnmounted(() => {
     width: 100%;
     z-index: 2;
     margin-top: -100vh;
-    padding: 20% 0 15%;
+    padding: 10vw 0 10vw;
 }
 
 .archive-header {
     position: relative;
     z-index: 20;
     width: 100%;
-    padding: 0 5vw 40px;
-    display: flex;
+    padding: 40px 5vw 0 8vw;
+    display:grid;
+    grid-template-columns:4fr 1fr;
     justify-content: space-between;
     align-items: flex-start;
     pointer-events: none;
 }
 
 .archive-eyebrow {
-    margin: 0 0 5px;
+    margin: 0 10px 5px;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: .35em;
     opacity: .55;
 }
 
-.archive-header h2 {
-    margin: 0;
-    font-size: clamp(38px, 4.2vw, 72px);
-    line-height: .85;
-    font-weight: 900;
-    letter-spacing: -.045em;
-}
-
-.archive-header h2 span {
-    display: block;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(255, 255, 255, .65);
-}
-
 .archive-instruction {
-    margin-top: 6%;
+    margin-top: 20%;
     display: flex;
     align-items: center;
     gap: 20px;
@@ -390,6 +286,41 @@ onUnmounted(() => {
 
 .archive-track::-webkit-scrollbar {
     display: none;
+}
+
+.archive-main{
+    position:relative;
+    z-index:20;
+    width:100%;
+    min-height:135px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    pointer-events:none;
+}
+
+.archive-title,
+.archive-outline{
+    margin:0;
+    line-height:1;
+}
+
+.archive-title{
+    justify-self:start;
+    font-size:clamp(42px,4vw,68px);
+    font-weight:900;
+    letter-spacing:.04em;
+    color:#fff;
+}
+
+.archive-outline{
+    justify-self:start;
+    font-size:clamp(42px,4.8vw,78px);
+    font-weight:700;
+    letter-spacing:.05em;
+    -webkit-text-stroke: 7px rgba(255,255,255,.9);
+    paint-order: stroke fill;
+    color:#1e1e1e;
+    /* -webkit-text-stroke:2px rgba(255,255,255,.9); */
 }
 
 .year-page {
@@ -454,7 +385,7 @@ onUnmounted(() => {
     line-height: .7;
     font-weight: 900;
     letter-spacing: -.08em;
-    color: rgba(255, 255, 255, .035);
+    color: rgba(255, 255, 255, .2);
     user-select: none;
     pointer-events: none;
 }
@@ -693,61 +624,6 @@ onUnmounted(() => {
     opacity: 1;
 }
 
-.robot-modal {
-    position: fixed;
-    z-index: 99999;
-    inset: 0;
-    background: rgba(10, 10, 12, .45);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 70px 40px 40px;
-}
-
-.close-button {
-    position: absolute;
-    z-index: 5;
-    top: 30px;
-    right: 35px;
-    width: 52px;
-    height: 52px;
-    border: 1px solid rgba(255, 255, 255, .3);
-    border-radius: 50%;
-    background: rgba(255, 255, 255, .07);
-    color: white;
-    font-size: 30px;
-    font-weight: 200;
-    cursor: pointer;
-}
-
-.viewer-info {
-    position: absolute;
-    left: 5vw;
-    bottom: 5vh;
-}
-
-.viewer-info p {
-    margin: 0 0 5px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .18em;
-    opacity: .5;
-}
-
-.viewer-info h3 {
-    margin: 0 0 8px;
-    font-size: clamp(35px, 5vw, 70px);
-    line-height: 1;
-    font-weight: 850;
-}
-
-.viewer-info span {
-    font-size: 9px;
-    letter-spacing: .16em;
-    opacity: .45;
-}
 
 .modal-enter-active,
 .modal-leave-active {
@@ -881,21 +757,6 @@ onUnmounted(() => {
         display: none;
     }
 
-    .robot-modal {
-        padding: 70px 10px 20px;
-    }
-
-    .close-button {
-        top: 18px;
-        right: 18px;
-        width: 45px;
-        height: 45px;
-    }
-
-    .viewer-info {
-        left: 25px;
-        bottom: 30px;
-    }
 }
 
 @media(max-width:520px) {

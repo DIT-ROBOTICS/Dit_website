@@ -15,6 +15,21 @@ def get_latest_year():
     ]
     return max(years)
 
+def get_all_eurobot_api():
+    years=[
+            int(item.name)
+            for item in EUROBOT_DIR.iterdir()
+            if item.is_dir() and item.name.isdigit()
+        ]
+    years.sort()
+    api = [
+                f"/api/Eurobot/{y}"
+                for y in years
+            ]
+    return api[:-1]
+    
+
+
 def load_eurobot(year:int):
     folder=EUROBOT_DIR/str(year)
     json_path=folder/"main_data.json"

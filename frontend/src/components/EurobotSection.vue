@@ -169,23 +169,7 @@ onMounted(loadThisYearEurobotData)
         <!-- ===== 3D Viewer 彈窗 ===== -->
 
         <Transition name="modal">
-
-            <div v-if="selectedRobot" class="robot-modal" @click.self="closeRobot3D">
-
-                <div class="modal-container">
-
-                    <button class="close-button" @click="closeRobot3D">
-                        ×
-                    </button>
-
-                    <div class="viewer">
-                        <RobotViewer3D :model="selectedRobot.glbPath" :background="selectedRobot.View3DBackground" :pos="selectedRobot.View3Dpos"/>
-                        <div class="viewer-info" :style="{'--pos':selectedRobot.View3Dpos}">
-                            <h2 class="shadowText" :style="{ color: selectedRobot.ThemeColor }">{{ selectedRobot.ShowOutName }}</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <RobotViewer3D v-if="selectedRobot" :robot="selectedRobot" :closeRobot3D="closeRobot3D"/>
         </Transition>
 
     </section>
@@ -714,117 +698,6 @@ onMounted(loadThisYearEurobotData)
 
 
 /* ========================================
-   3D modal
-======================================== */
-
-.robot-modal {
-    position: fixed;
-
-    inset: 0;
-    
-
-    z-index: 1000;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 120px 40px 40px;
-/* 
-    background:
-        rgba(0, 0, 0, 0.8); */
-
-    backdrop-filter:
-        blur(14px);
-}
-
-.modal-container {
-    position: relative;
-
-    width:
-        min(1200px, 100%);
-
-    height:
-        min(780px, 85vh);
-
-    background: #0a0a0a;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.15);
-
-    z-index: 100;
-}
-
-.close-button {
-    position: absolute;
-
-    top: 0px;
-
-    right: 0px;
-
-    z-index: 4;
-
-    width: 44px;
-    height: 44px;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.25);
-
-    border-radius: 50%;
-
-    background:
-        rgb(51, 51, 51);
-
-    color: white;
-
-    font-size: 28px;
-
-    cursor: pointer;
-    transform: translateX(50%) translateY(-50%);
-}
-
-.viewer-placeholder {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    text-align: center;
-}
-
-.viewer-placeholder p {
-    font-size: 11px;
-
-    letter-spacing: 0.25em;
-
-    opacity: 0.5;
-}
-
-.viewer-placeholder h2 {
-    margin:
-        10px 0;
-
-    font-size:
-        clamp(50px, 8vw, 120px);
-
-    letter-spacing: -0.06em;
-}
-
-.viewer-placeholder span {
-    color:
-        rgba(255, 255, 255, 0.45);
-}
-
-
-/* ========================================
    Modal animation
 ======================================== */
 
@@ -838,36 +711,6 @@ onMounted(loadThisYearEurobotData)
 .modal-leave-to {
     opacity: 0;
 }
-
-/* ========================================
-   viewer
-======================================== */
-.viewer {
-    position: relative;
-
-    width: 100%;
-    height: 100%;
-}
-
-.viewer-info {
-    position: absolute;
-
-    left: 5%;
-    top: 5%;
-    width: 90%;
-
-    text-align: var(--pos);
-
-    z-index: 2;
-
-    pointer-events: none;
-}
-.viewer-info h2 {
-    margin: 0 0 8px;
-    font-size: 60px;
-    letter-spacing: -0.04em;
-}
-
 
 /* ========================================
    RWD

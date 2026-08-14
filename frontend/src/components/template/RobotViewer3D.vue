@@ -16,25 +16,19 @@ import {
 } from 'three/addons/controls/OrbitControls.js'
 
 const props = defineProps({
-    model: {
-        type: String,
-        required: true
-    },    
-    background: {
-        type: String,
+    robot: {
+        type: Object,
         required: true
     },
-    pos:{
-        type: String,
-        required:true,
-        validator(value) {
-            return ['left', 'right'].includes(value)
-        }
+    closeRobot3D:{
+        type: Function,
+        required: true
     }
 })
 
 const container = ref(null)
-const background_api = ref(props.background)
+const background_api = ref(props.robot.View3DBackground)
+const selectedRobot = ref(props.robot)
 
 let scene
 let camera
@@ -56,7 +50,7 @@ function init() {
             1000
         )
 
-    const dx = props.pos === "left" ? -1 : 1
+    const dx = props.robot.View3Dpos === "left" ? -1 : 1
     camera.position.set(4*dx,2,4)
 
     renderer =
@@ -169,7 +163,7 @@ function loadModel() {
         new GLTFLoader()
 
     loader.load(
-        props.model,
+        props.robot.glbPath,
 
         (gltf) => {
             robot = gltf.scene
@@ -283,9 +277,22 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div ref="container" class="robot-viewer">
-        <div class="viewer-background" :style="{'--background-api':`url(${background_api})`}"></div>
-        <div class="viewer-overlay"></div>
+    <div class="robot-modal" @click.self="props.closeRobot3D">
+        <div class="modal-container">
+            <button class="close-button" @click="props.closeRobot3D">
+                ×
+            </button>
+
+            <div class="viewer">
+                <div ref="container" class="robot-viewer">
+                    <div class="viewer-background" :style="{'--background-api':`url(${background_api})`}"></div>
+                    <div class="viewer-overlay"></div>
+                </div>
+                <div class="viewer-info" :style="{'--pos':selectedRobot.View3Dpos}">
+                    <h2 class="shadowText" :style="{ color: selectedRobot.ThemeColor }">{{ selectedRobot.ShowOutName }}</h2>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -331,5 +338,100 @@ onUnmounted(() => {
 .robot-viewer :deep(canvas){
     position:relative;
     z-index:1;
+}
+
+
+.robot-modal {
+    position: fixed;
+
+    inset: 0;
+    
+
+    z-index: 1000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 120px 40px 40px;
+/* 
+    background:
+        rgba(0, 0, 0, 0.8); */
+
+    backdrop-filter:
+        blur(14px);
+}
+.modal-container {
+    position: relative;
+
+    width:
+        min(1200px, 100%);
+
+    height:
+        min(780px, 85vh);
+
+    background: #0a0a0a;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.15);
+
+    z-index: 100;
+}
+
+.close-button {
+    position: absolute;
+
+    top: 0px;
+
+    right: 0px;
+
+    z-index: 4;
+
+    width: 44px;
+    height: 44px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.25);
+
+    border-radius: 50%;
+
+    background:
+        rgb(51, 51, 51);
+
+    color: white;
+
+    font-size: 28px;
+
+    cursor: pointer;
+    transform: translateX(50%) translateY(-50%);
+}
+.viewer {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+}
+.viewer-info {
+    position: absolute;
+
+    left: 5%;
+    top: 5%;
+    width: 90%;
+
+    text-align: var(--pos);
+
+    z-index: 2;
+
+    pointer-events: none;
+}
+.viewer-info h2 {
+    margin: 0 0 8px;
+    font-size: 60px;
+    letter-spacing: -0.04em;
+}
+.shadowText {
+    text-shadow: -3.5px 3.5px white;
 }
 </style>
