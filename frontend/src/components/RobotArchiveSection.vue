@@ -12,8 +12,6 @@
 <script setup>
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
-import blackRobot2026 from '@/assets/Eurobot2026黑機.glb?url'
-import whiteRobot2026 from '@/assets/Eurobot2026白機.glb?url'
 
 const BackgroundImage = ref("/api/Eurobot/History/Background")
 const robotHistory = ref([])

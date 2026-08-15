@@ -5,6 +5,7 @@ import AboutSection from '@/components/AboutSection.vue'
 import EurobotSection from '@/components/EurobotSection.vue'
 import RobotArchiveSection from '@/components/RobotArchiveSection.vue'
 import AdvisorsSection from '@/components/AdvisorsSection.vue'
+import NewAdvisorsSection from '@/components/NewAdvisorsSection.vue'
 import SponsorsSection from '@/components/SponsorsSection.vue'
 import ContactSection from '@/components/ContactSection.vue'
 import CompetitionsSection from '@/components/CompetitionsSection.vue'
@@ -54,6 +55,7 @@ onUnmounted(() => {
             <RobotArchiveSection id="robotArchive" />
             <CompetitionsSection id="competitions" />
             <AdvisorsSection id="advisors" />
+            <NewAdvisorsSection id="advisor" />
             <!-- <MemberSection id="members" /> -->
             <SponsorsSection id="sponsors" />
             <ContactSection id="contact" />
