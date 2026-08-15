@@ -22,11 +22,11 @@
     {
         "id": 2,
         "name": "黃靖欹教授",
-        "spell":"CHEN, RONG - SHUN",
+        "spell":"HUANG, CHING - I",
         "position": "指導教授",
-        "job":"國立清華大學動機系教授",
-        "department": "美國密西根大學",
-        "major": "機械工程學系博士",
+        "job":"國立清華大學動機系助理教授",
+        "department": "國立陽明交通大學",
+        "major": "電控工程學系博士",
         "description": "協助團隊於電控、嵌入式系統與硬體架構上的技術發展。",
         "image": "static/advisor_image/chinyee.png",
         "skills": [
@@ -42,11 +42,11 @@
     {
         "id": 3,
         "name": "黃浚鋒博士",
-        "spell":"CHEN, RONG - SHUN",
+        "spell":"HUANG, JYUN - FONG",
         "position": "技術顧問",
-        "job":"國立清華大學動機系教授",
-        "department": "美國密西根大學",
-        "major": "機械工程學系博士",
+        "job":"國立清華大學",
+        "department": "動力機械工程學系博士",
+        "major": "PME 10B PME 16D",
         "description": "指導自主導航、電腦視覺與軟體系統架構。",
         "image": "static/advisor_image/greenfong.png",
         "skills": [

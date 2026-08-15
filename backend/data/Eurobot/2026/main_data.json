@@ -14,7 +14,7 @@
       "View3Dpos": "left",
       "glbPath": "Eurobot2026白機.glb",
       "imagePath": "Eurobot2026白機.png",
-      "View3DBackground": "白機3DViewer.png",
+      "View3DBackground": "DIT網站white.png",
       "SeeMoreImagePath": "",
       "description":[
         {
@@ -42,7 +42,7 @@
       "View3Dpos": "right",
       "glbPath": "Eurobot2026黑機.glb",
       "imagePath": "Eurobot2026黑機.png",
-      "View3DBackground": "黑機3DViewer.png",
+      "View3DBackground": "DIT網站black.png",
       "SeeMoreImagePath": "",
       "description":[
         {

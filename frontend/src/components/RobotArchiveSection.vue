@@ -108,7 +108,7 @@ onUnmounted(() => {
                 <div>
                     <p class="archive-eyebrow">OUR JOURNEY</p>
                     <div class="archive-main">
-                        <h2 class="archive-title">年度機器</h2>
+                        <h2 class="archive-title">歷代Eurobot</h2>
                         <h2 class="archive-outline">ARCHIVE</h2>
                     </div>
                 </div>

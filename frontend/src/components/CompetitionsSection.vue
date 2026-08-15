@@ -50,7 +50,7 @@ function openCompetition(item) {
                 </defs>
                 <text>
                     <textPath href="#title-curve" startOffset="50%" text-anchor="middle">
-                        Another Competition
+                        Other Competition
                     </textPath>
                 </text>
             </svg>

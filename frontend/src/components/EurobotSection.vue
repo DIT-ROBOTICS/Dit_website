@@ -14,9 +14,10 @@
 
 
 <script setup>
-import { ref,onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
-import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
+import RobotPreview3D from '@/components/template/RobotPreview3D.vue'
+import { RotateCw, ArrowRight, ArrowLeft, ArrowUpRight, X, Plus, ArrowUp } from 'lucide-vue-next'
 
 const FullJson = ref({})
 const robots = ref([])
@@ -24,20 +25,20 @@ const achievementPhoto = ref("")
 const selectedRobot = ref(null)
 
 async function loadThisYearEurobotData() {
-  try {
-    const response = await fetch('/api/Eurobot')
+    try {
+        const response = await fetch('/api/Eurobot')
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`)
+        }
+
+        FullJson.value = await response.json()
+        robots.value = FullJson.value.Robot_Data
+        achievementPhoto.value = FullJson.value.Background
+    } catch (error) {
+        console.error(error)
+    } finally {
     }
-
-    FullJson.value = await response.json()
-    robots.value = FullJson.value.Robot_Data
-    achievementPhoto.value = FullJson.value.Background
-  } catch (error) {
-    console.error(error)
-  } finally {
-  }
 }
 
 function openRobot3D(robot) {
@@ -56,12 +57,22 @@ function openDetails(robot) {
     console.log('open details:', robot)
 }
 
-function RobotsAmount(){
+function RobotsAmount() {
     let a = robots.value.length
     let title = [
-        "","Our Robot","Two Robots","Three Robots"
+        "", "Our Robot", "Two Robots", "Three Robots"
     ]
     return title[a]
+}
+
+function Robot_Team_Align(robot) {
+    const index = robots.value.findIndex(r => r.id === robot.id)
+    const count = robots.value.length
+
+    if (count % 2 === 1 && index === 0) return "center"
+
+    const offset = count % 2 === 1 ? index - 1 : index
+    return offset % 2 === 0 ? "right" : "left"
 }
 
 onMounted(loadThisYearEurobotData)
@@ -80,14 +91,14 @@ onMounted(loadThisYearEurobotData)
                 <div class="achievement-content">
 
                     <p class="achievement-year">
-                        Eurobot {{FullJson.Year}}
+                        Eurobot {{ FullJson.Year }}
                     </p>
 
                     <h2 class="achievement-title">
                         <span v-for="text in FullJson.BigTitle">{{ text }}</span>
                     </h2>
 
-                    <div class="achievement-awards" :style="{'--text-color':FullJson.awardsColor}">
+                    <div class="achievement-awards" :style="{ '--text-color': FullJson.awardsColor }">
                         <p v-for="text in FullJson.awards">{{ text }}</p>
                     </div>
 
@@ -100,15 +111,15 @@ onMounted(loadThisYearEurobotData)
             <section class="robots-showcase">
                 <div class="section-heading">
                     <h2>{{ RobotsAmount() }} for Eurobot</h2>
-                    <p class="shadowText">
-                        <span v-for="robot in robots" :style="{ color: robot.ThemeColor }">{{ robot.ShowOutName }}</span>
-                    </p>
                 </div>
 
                 <div class="robots-grid">
                     <article v-for="robot in robots" :key="robot.id" class="robot-card">
+                        <p class="shadowText" :style="{ '--text-align': Robot_Team_Align(robot) }">
+                            <span :style="{ color: robot.ThemeColor }">{{ robot.ShowOutName }}</span>
+                        </p>
                         <div class="robot-image-container" @click="openRobot3D(robot)">
-                            <!-- <RobotPreview3D :model="robot.model" /> -->
+                            <!-- <RobotPreview3D :model="robot.glbPath" /> -->
                             <img :src="robot.imagePath" :alt="robot.name">
                             <div class="image-overlay">
                                 <div class="view-3d">
@@ -152,7 +163,9 @@ onMounted(loadThisYearEurobotData)
                     -->
                     <button class="simulation-button">
                         ENTER SIMULATION
-                        <span><ArrowUpRight/></span>
+                        <span>
+                            <ArrowUpRight />
+                        </span>
                     </button>
                 </div>
             </section>
@@ -162,7 +175,7 @@ onMounted(loadThisYearEurobotData)
         <!-- ===== 3D Viewer 彈窗 ===== -->
 
         <Transition name="modal">
-            <RobotViewer3D v-if="selectedRobot" :robot="selectedRobot" :closeRobot3D="closeRobot3D"/>
+            <RobotViewer3D v-if="selectedRobot" :robot="selectedRobot" :closeRobot3D="closeRobot3D" />
         </Transition>
 
     </section>
@@ -171,6 +184,7 @@ onMounted(loadThisYearEurobotData)
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&display=swap');
+
 .robot-year-section {
     position: relative;
     background: #050505;
@@ -432,17 +446,15 @@ onMounted(loadThisYearEurobotData)
     line-height: 1;
 }
 
-.section-heading p {
-    text-align: center;
+.robot-card p {
+    text-align: var(--text-align);
     font-weight: 600;
     font-size:
-        clamp(19px, 4vw, 70px);
+        clamp(19px, 3.5vw, 70px);
     margin: 0;
     line-height: 1.7;
-}
-
-.section-heading p span + span {
-    margin-left: 10vw;
+    padding: 0 2vw;
+    transform: translateY(75%);
 }
 
 .shadowText {
@@ -456,18 +468,16 @@ onMounted(loadThisYearEurobotData)
 
 .robots-grid {
     display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap:
-        clamp(24px, 4vw, 70px);
-
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(24px, 4vw, 70px);
     max-width: 1500px;
-
     margin: -50px auto;
+}
 
-    /* top:-15%; */
+.robots-grid:has(>.robot-card:last-child:nth-child(odd))>.robot-card:first-child {
+    grid-column: 1/-1;
+    justify-self: center;
+    width: calc((100% - clamp(24px, 4vw, 70px))/2);
 }
 
 .robot-card {
@@ -480,7 +490,6 @@ onMounted(loadThisYearEurobotData)
     width: 80%;
 
     margin: 0 auto;
-
     overflow: hidden;
 
     cursor: pointer;
