@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query,Request
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from fastapi.responses import FileResponse
@@ -13,6 +13,21 @@ SPONSORS_LOGO_DIR = BASE_DIR / "static" / "Sponsor_Icon"
 
 
 app = FastAPI()
+
+@app.middleware("http")
+async def log_requests(request:Request,call_next):
+    client_ip=request.headers.get("cf-connecting-ip")
+    if not client_ip:
+        forwarded=request.headers.get("x-forwarded-for")
+        if forwarded:
+            client_ip=forwarded.split(",")[0].strip()
+
+    if not client_ip:
+        client_ip=request.client.host if request.client else "unknown"
+    print(f"[REQUEST] {client_ip} -> {request.method} {request.url.path}")
+    response=await call_next(request)
+    print(f"[RESPONSE] {client_ip} <- {response.status_code} {request.url.path}")
+    return response
 
 app.add_middleware(
     CORSMiddleware,

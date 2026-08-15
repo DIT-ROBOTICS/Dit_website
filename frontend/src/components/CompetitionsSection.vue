@@ -5,6 +5,7 @@
 -->
 
 <script setup>
+import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 const competitions = [
     {
         id: 1,
@@ -70,7 +71,7 @@ function openCompetition(item) {
 
                         <button @click="openCompetition(item)">
                             View More
-                            <span>→</span>
+                            <span><ArrowRight :size="20" :stroke-width="1.5"/></span>
                         </button>
                     </div>
                 </div>
@@ -297,11 +298,12 @@ button {
 button span {
     display: inline-block;
     margin-left: 8px;
+    transform: translateX(0px) translateY(25%);
     transition: transform .25s ease;
 }
 
 button:hover span {
-    transform: translateX(6px);
+    transform: translateX(6px) translateY(25%);
 }
 
 @media(max-width:850px) {

@@ -6,6 +6,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import MemberCard from '@/components/template/MemberCard.vue'
+import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 
 const router = useRouter()
 
@@ -66,7 +67,7 @@ onMounted(loadAdvisors)
 
                 <article class="people-card view-team-card" @click="openTeam">
                     <div class="view-team-content">
-                        <div class="view-team-arrow">→</div>
+                        <div class="view-team-arrow"><ArrowRight/></div>
 
                         <div>
                             <p>BEHIND THE ROBOTS</p>

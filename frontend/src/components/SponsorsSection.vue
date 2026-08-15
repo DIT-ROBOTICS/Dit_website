@@ -11,7 +11,6 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 const sponsors = ref([])
 const angle = ref(0)
 const activeIndex = ref(0)
-const previousIndex = ref(null)
 const hoveredIndex = ref(null)
 const paused = ref(false)
 
@@ -41,7 +40,7 @@ const ringConfig = computed(() => {
         const capacity = capacities[ringIndex] ?? 14
         const itemCount = Math.min(capacity, remaining)
 
-        const rx = 22 + ringIndex * 17
+        const rx = 22 + ringIndex * 11
         const ry = 16 + ringIndex * 13
 
         rings.push({
@@ -103,13 +102,7 @@ function animate(time) {
 function startActiveTimer() {
     activeTimer = setInterval(() => {
         if (paused.value || sponsors.value.length === 0) return
-
-        previousIndex.value = activeIndex.value
         activeIndex.value = (activeIndex.value + 1) % sponsors.value.length
-
-        setTimeout(() => {
-            previousIndex.value = null
-        }, 1000)
     }, 1000)
 }
 
@@ -118,10 +111,6 @@ function isActive(index) {
     return activeIndex.value === index
 }
 
-function isLeaving(index) {
-    if (hoveredIndex.value !== null) return false
-    return previousIndex.value === index
-}
 
 function handleEnter(index) {
     paused.value = true
@@ -150,12 +139,13 @@ onUnmounted(() => {
     <section class="sponsors-section">
         <div class="heading">
             <p>OUR PARTNERS</p>
-            <h2>與我們一起<br>讓想法成為現實。</h2>
+            <h2>與我們一起讓想法成為現實。</h2>
         </div>
 
         <div class="orbit-area">
             <div v-for="(ring, index) in ringConfig" :key="index" class="orbit" :style="{
-                width: `${ring.rx * 2}%`, height: `${ring.ry * 2}%` }"></div>
+                width: `${ring.rx * 2}%`, height: `${ring.ry * 2}%`
+            }"></div>
 
             <div class="center">
                 <span>DIT</span>
@@ -165,8 +155,8 @@ onUnmounted(() => {
             <div v-for="(sponsor, index) in sponsorPositions" :key="sponsor.id" class="sponsor-wrapper"
                 :class="{ focused: isActive(index) }" :style="{ left: `${sponsor.x}%`, top: `${sponsor.y}%` }"
                 @mouseenter="handleEnter(index)" @mouseleave="handleLeave">
-                <a class="sponsor" :class="{ active: isActive(index), leaving: isLeaving(index) }" :href="sponsor.url"
-                    target="_blank" rel="noopener noreferrer">
+                <a class="sponsor" :class="{ active: isActive(index) }" :href="sponsor.url" target="_blank"
+                    rel="noopener noreferrer">
                     <img :src="sponsor.logo" :alt="sponsor.name">
                 </a>
 
@@ -186,17 +176,22 @@ onUnmounted(() => {
 <style scoped>
 .sponsors-section {
     min-height: 100vh;
+    width: 100%;
     padding: 100px 7vw;
     background: #f9f9f9;
-    display: grid;
-    grid-template-columns: .7fr 1.3fr;
+    /* display: grid;
+    grid-template-columns: .7fr 1.3fr; */
     align-items: center;
+    justify-content: center;
     overflow: hidden;
 }
 
 .heading {
+    align-self: center;
+    width: fit-content;
     position: relative;
     z-index: 5;
+    margin-bottom: 100px;
 }
 
 .heading>p {
@@ -253,6 +248,7 @@ onUnmounted(() => {
 }
 
 .sponsor-wrapper {
+    --Width: 150px;
     position: absolute;
     transform: translate(-50%, -50%);
     z-index: 3;
@@ -263,7 +259,7 @@ onUnmounted(() => {
 }
 
 .sponsor {
-    width: 150px;
+    width: var(--Width);
     height: 110px;
     padding: 12px;
     border-radius: 18px;
@@ -272,8 +268,8 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    /* box-shadow: 0 8px 30px rgba(0, 0, 0, .07); */
-    transition: transform .3s cubic-bezier(.2, .8, .2, 1), box-shadow .3s;
+    transform: scale(1);
+    transition: transform 1s cubic-bezier(.2, .8, .2, 1);
     text-decoration: none;
 }
 
@@ -286,43 +282,19 @@ onUnmounted(() => {
     filter: brightness(0);
 }
 
-@keyframes sponsorEnter {
-    0% {
-        transform: scale(1);
-    }
-
-    70% {
-        transform: scale(1.3);
-    }
-
-    100% {
-        transform: scale(1.4);
-    }
+.sponsor.active {
+    transform: scale(1.4);
 }
 
-@keyframes sponsorLeave {
-    0% {
-        transform: scale(1.4);
-    }
-
-    30% {
-        transform: scale(1.3);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
 
 .sponsor-wrapper:hover .sponsor {
-    transform: scale(1.3);
-    /* box-shadow: 0 18px 45px rgba(0, 0, 0, .16); */
-    animation: none;
+    transform: scale(1.4);
+    transition: transform .3s cubic-bezier(.2, .8, .2, 1);
 }
 
 .tooltip {
     position: absolute;
-    left: 135px;
+    left: calc(var(--Width) * 1.1);
     top: 50%;
     transform: translateY(-50%);
     width: 220px;
@@ -337,7 +309,7 @@ onUnmounted(() => {
 
 .tooltip.left {
     left: auto;
-    right: 135px;
+    right: calc(var(--Width) * 1.1);
 }
 
 .tooltip::before {

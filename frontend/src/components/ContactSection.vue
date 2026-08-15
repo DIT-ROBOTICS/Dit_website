@@ -6,6 +6,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 const contacts = ref([])
 const linkGroups = ref([])
 const errorMessage = ref('')
@@ -58,7 +59,7 @@ onMounted(loadlinks)
                 <a class="contact-button"
                     href="https://www.zeczec.com/projects/dit-robotics-2026Eurobobt?r=d245513786893" target="_blank">
                     SUPPORT US
-                    <span>↗</span>
+                    <span><ArrowUpRight/></span>
                 </a>
             </div>
 
@@ -75,7 +76,7 @@ onMounted(loadlinks)
 
                     <button class="retry-button" type="button" @click="loadlinks">
                         RETRY
-                        <span>↻</span>
+                        <span><RotateCw/></span>
                     </button>
                 </div>
 
@@ -91,7 +92,7 @@ onMounted(loadlinks)
                             </p>
                         </div>
 
-                        <span class="contact-arrow">↗</span>
+                        <span class="contact-arrow"><ArrowUpRight/></span>
                     </a>
 
                     <div class="more-links">
@@ -105,7 +106,7 @@ onMounted(loadlinks)
 
                                 <a v-for="link in group.links" :key="link.label" :href="link.href" target="_blank" class="small-link">
                                     {{ link.label }}
-                                    <span>↗</span>
+                                    <span><ArrowUpRight/></span>
                                 </a>
                             </div>
                         </div>
@@ -130,7 +131,7 @@ onMounted(loadlinks)
             </p>
 
             <a class="back-top" href="#" @click="backToTop()">
-                BACK TO TOP ↑
+                BACK TO TOP <ArrowUp/>
             </a>
         </footer>
     </section>

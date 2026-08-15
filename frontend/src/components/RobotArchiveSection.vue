@@ -12,6 +12,7 @@
 <script setup>
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
+import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 
 const BackgroundImage = ref("/api/Eurobot/History/Background")
 const robotHistory = ref([])
@@ -114,7 +115,7 @@ onUnmounted(() => {
 
                 <div class="archive-instruction">
                     <span>EXPLORE THE PAST</span>
-                    <span class="arrow">←</span>
+                    <span class="arrow"><ArrowLeft/></span>
                 </div>
             </header>
 
@@ -165,7 +166,7 @@ onUnmounted(() => {
                                 </div>
 
                                 <span v-if="robot.model" class="robot-arrow">
-                                    ↗
+                                    <ArrowUpRight/>
                                 </span>
                             </div>
                         </button>

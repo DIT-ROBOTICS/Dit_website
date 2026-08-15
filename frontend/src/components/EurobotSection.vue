@@ -16,6 +16,7 @@
 <script setup>
 import { ref,onMounted } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
+import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 
 const FullJson = ref({})
 const robots = ref([])
@@ -150,19 +151,11 @@ onMounted(loadThisYearEurobotData)
                         之後再接模擬系統
                     -->
                     <button class="simulation-button">
-
                         ENTER SIMULATION
-
-                        <span>
-                            ↗
-                        </span>
-
+                        <span><ArrowUpRight/></span>
                     </button>
-
                 </div>
-
             </section>
-
         </div>
 
 
