@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "lucide-vue-next": "^1.0.0",
+    "pdfjs-dist": "^6.2.108",
     "three": "^0.185.1",
     "vue": "rc",
     "vue-router": "^5.2.0"

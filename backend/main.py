@@ -74,7 +74,10 @@ async def other_image_api(
 async def about_page_images_api():
     return GIAPI.get_about_page_images()
 
-
+@app.get("/api/PopUpItem/{file}")
+async def get_pop_up_item(file:str):
+    return GIAPI.get_pop_up_item(file)
+    
 @app.get("/api/Eurobot")
 async def get_latest_eurobot():
     return Eurobot.load_eurobot(Eurobot.get_latest_year())
@@ -112,7 +115,6 @@ async def get_Sponsors_Data():
     return data
 
 @app.get("/api/Sponsors/Logo/{filename:path}")
-
 async def get_Sponsors_Logo(filename:str):
     file_path=SPONSORS_LOGO_DIR/filename
     if not file_path.is_file():

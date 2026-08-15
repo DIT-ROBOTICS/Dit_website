@@ -7,6 +7,7 @@ from PIL import Image
 
 BASE_DIR=Path(__file__).resolve().parent.parent
 DATA_DIR=BASE_DIR/"data"
+ASSETS_DIR=BASE_DIR/"assets"
 
 def natural_sort_key(path):
     return [
@@ -133,3 +134,24 @@ def get_about_page_images():
         f"/api/other_images/aboutPageImages/{file.name}"
         for file in images
     ]
+
+
+def get_pop_up_item(file:str):
+    POP_UP_JSON=ASSETS_DIR/"item_name.json"
+    if not POP_UP_JSON.is_file():
+        raise HTTPException(status_code=404,detail="Pop up config not found")
+
+    with open(POP_UP_JSON,encoding="utf-8")as f:
+        items=json.load(f)
+
+    filename=items.get(file)
+
+    if not filename:
+        raise HTTPException(status_code=404,detail="Pop up item not found")
+
+    file_path=ASSETS_DIR/filename
+
+    if not file_path.is_file():
+        raise HTTPException(status_code=404,detail="Pop up file not found")
+
+    return FileResponse(file_path)

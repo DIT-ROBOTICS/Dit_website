@@ -14,375 +14,372 @@ const heroContainer = ref(null)
 const progress = defineModel('progress', { type: Number, default: 0, })
 
 function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max)
+    return Math.min(Math.max(value, min), max)
 }
 
 function updateHeroProgress() {
-  const element = heroContainer.value
+    const element = heroContainer.value
 
-  if (!element) {
-    return
-  }
+    if (!element) {
+        return
+    }
 
-  const rect = element.getBoundingClientRect()
+    const rect = element.getBoundingClientRect()
 
-  const animationDistance = element.offsetHeight - window.innerHeight
+    const animationDistance = element.offsetHeight - window.innerHeight
 
-  if (animationDistance <= 0) {
-    progress.value = 0
-    return
-  }
+    if (animationDistance <= 0) {
+        progress.value = 0
+        return
+    }
 
-  progress.value = clamp(-rect.top / animationDistance, 0, 1)
+    progress.value = clamp(-rect.top / animationDistance, 0, 1)
 }
 
 onMounted(() => {
-  updateHeroProgress()
+    updateHeroProgress()
 
-  window.addEventListener(
-    'scroll',
-    updateHeroProgress,
-    { passive: true },
-  )
+    window.addEventListener(
+        'scroll',
+        updateHeroProgress,
+        { passive: true },
+    )
 
-  window.addEventListener(
-    'resize',
-    updateHeroProgress,
-  )
+    window.addEventListener(
+        'resize',
+        updateHeroProgress,
+    )
 })
 
 onUnmounted(() => {
-  window.removeEventListener(
-    'scroll',
-    updateHeroProgress,
-  )
+    window.removeEventListener(
+        'scroll',
+        updateHeroProgress,
+    )
 
-  window.removeEventListener(
-    'resize',
-    updateHeroProgress,
-  )
+    window.removeEventListener(
+        'resize',
+        updateHeroProgress,
+    )
 })
 </script>
 
 <template>
-  <section ref="heroContainer" class="hero-scroll-space">
-    <div class="hero" :style="{ '--progress': progress }">
-      <img class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片">
+    <section ref="heroContainer" class="hero-scroll-space">
+        <div class="hero" :style="{ '--progress': progress }">
+            <img class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片">
 
-      <div class="hero-overlay"></div>
+            <div class="hero-overlay"></div>
 
-      <div class="hero-content">
-        <p class="hero-eyebrow">
-          We Do Improve and Try
-        </p>
+            <div class="hero-content">
+                <p class="hero-eyebrow">
+                    We Do Improve and Try
+                </p>
 
-        <h1>We are <span style="-webkit-text-stroke: 15px #6A7ACD;paint-order: stroke fill;">DIT Robotics</span></h1>
+                <h1>We are <span style="-webkit-text-stroke: 15px #6A7ACD;paint-order: stroke fill;">DIT Robotics</span>
+                </h1>
 
-        <div class="hero-description">
-          我們來自清華大學，一群勇於追逐夢想，實現理想的大學生<br>
-          邀請你看看我們的故事吧 <img src="@/assets/image/Canva_Arrow.png" alt="arrow" style="width: 5vw; height: 10px;">
+                <div class="hero-description">
+                    我們來自清華大學，一群勇於追逐夢想，實現理想的大學生<br>
+                    邀請你看看我們的故事吧 <img src="@/assets/image/Canva_Arrow.png" alt="arrow" style="width: 5vw; height: 10px;">
+                </div>
+
+                <a href="#team">
+                    認識團隊
+                </a>
+            </div>
+
         </div>
-
-        <a href="#team">
-          認識團隊
-        </a>
-      </div>
-
-    </div>
-    <div class="title-bar" :style="{ '--progress': progress }">
-      <img :src="logoUrl" alt="DIT Logo">
-
-      <strong>DIT Robotics</strong>
-
-      <nav>
-        <a href="#team">團隊</a>
-        <a href="#EurobotSection">Eurobot</a>
-        <a href="#robotArchive">歷年機器人</a>
-        <a href="#competitions">其他競賽</a>
-        <a href="#advisors">指導教授</a>
-        <a href="#sponsors">贊助商</a>
-        <a href="#contact">聯絡</a>
-      </nav>
-    </div>
-  </section>
+        <Teleport to="body">
+            <div class="title-bar" :style="{ '--progress': progress }">
+                <img :src="logoUrl" alt="DIT Logo">
+                <strong>DIT Robotics</strong>
+                <nav>
+                    <a href="#team">團隊</a>
+                    <a href="#EurobotSection">Eurobot</a>
+                    <a href="#robotArchive">歷年機器人</a>
+                    <a href="#competitions">其他競賽</a>
+                    <a href="#advisors">指導教授</a>
+                    <a href="#sponsors">贊助商</a>
+                    <a href="#contact">聯絡</a>
+                </nav>
+            </div>
+        </Teleport>
+    </section>
 </template>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&display=swap');
 
 .hero-scroll-space {
-  position: relative;
-  height: calc(160vh - 76px);
-  /*calc( 100vh - var(--progress) * (100vh - 76px) );*/
+    position: relative;
+    height: calc(160vh - 76px);
+    /*calc( 100vh - var(--progress) * (100vh - 76px) );*/
 
-  min-height: 76px;
+    min-height: 76px;
 }
 
 .hero {
-  position: sticky;
-  top: 0;
-  z-index: 20;
+    position: sticky;
+    top: 0;
+    z-index: 20;
 
-  height: calc(100vh - var(--progress) * (100vh - 76px));
+    height: calc(100vh - var(--progress) * (100vh - 76px));
 
-  min-height: 76px;
+    min-height: 76px;
 
-  overflow: hidden;
-  color: white;
-  background: #111;
-  box-shadow:
-    0 calc(var(--progress) * 8px) calc(var(--progress) * 30px) rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+    color: white;
+    background: #111;
+    box-shadow:
+        0 calc(var(--progress) * 8px) calc(var(--progress) * 30px) rgba(0, 0, 0, 0.18);
 }
 
 .hero-background {
-  position: absolute;
-  inset: 0;
+    position: absolute;
+    inset: 0;
 
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: left 70%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left 70%;
 
-  opacity:
-    calc(1 - var(--progress) * 0.82);
+    opacity:
+        calc(1 - var(--progress) * 0.82);
 
-  transform:
-    scale(calc(1 + var(--progress) * 0.08));
+    transform:
+        scale(calc(1 + var(--progress) * 0.08));
 
-  filter:
-    blur(calc(var(--progress) * 5px));
+    filter:
+        blur(calc(var(--progress) * 5px));
 }
 
 .hero-overlay {
-  position: absolute;
-  inset: 0;
+    position: absolute;
+    inset: 0;
 
-  background:
-    linear-gradient(90deg,
-      rgba(5, 8, 14, 0.7),
-      rgba(5, 8, 14, 0.25));
+    background:
+        linear-gradient(90deg,
+            rgba(5, 8, 14, 0.7),
+            rgba(5, 8, 14, 0.25));
 
-  opacity:
-    calc(1 - var(--progress) * 0.5);
+    opacity:
+        calc(1 - var(--progress) * 0.5);
 }
 
 .hero-content {
-  position: absolute;
-  left: 8vw;
-  bottom: 9vh;
-  z-index: 2;
+    position: absolute;
+    left: 8vw;
+    bottom: 9vh;
+    z-index: 2;
 
-  max-width: 70vw;
+    max-width: 70vw;
 
-  opacity:
-    calc(1 - var(--progress) * 1.5);
+    opacity:
+        calc(1 - var(--progress) * 1.5);
 
-  transform:
-    translateY(calc(var(--progress) * -60px));
+    transform:
+        translateY(calc(var(--progress) * -60px));
 
-  pointer-events:
-    calc(1 - var(--progress));
+    pointer-events:
+        calc(1 - var(--progress));
 }
 
 .hero-eyebrow {
-  margin: 0 0 18px;
-  font-size: 3vw;
-  font-weight: 900;
-  word-spacing: 0.2em;
-  font-family: 'League Spartan', sans-serif;
+    margin: 0 0 18px;
+    font-size: 3vw;
+    font-weight: 900;
+    word-spacing: 0.2em;
+    font-family: 'League Spartan', sans-serif;
 }
 
 .hero-content h1 {
-  margin: 0;
-  font-size: 5vw;
-  line-height: 1;
-  letter-spacing: 0.04em;
-  font-family: 'League Spartan', sans-serif;
+    margin: 0;
+    font-size: 5vw;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    font-family: 'League Spartan', sans-serif;
 }
 
 .hero-description {
-  white-space: nowrap;
-  max-width: 600px;
-  margin: 26px 0 0;
-  color: rgba(255, 255, 255, 0.72);
-  line-height: 1.9;
-  font-size: 1.3vw;
+    white-space: nowrap;
+    max-width: 600px;
+    margin: 26px 0 0;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.9;
+    font-size: 1.3vw;
 }
 
 .hero-content>a {
-  display: inline-block;
-  margin-top: 30px;
-  padding: 13px 22px;
-  border-radius: 999px;
-  background: white;
-  color: #111;
-  text-decoration: none;
+    display: inline-block;
+    margin-top: 30px;
+    padding: 13px 22px;
+    border-radius: 999px;
+    background: white;
+    color: #111;
+    text-decoration: none;
 }
 
 .title-bar {
-  position: fixed;
-  inset: 0;
-  z-index: 54;
-
-  height: 76px;
-  padding: 0 clamp(20px, 5vw, 72px);
-
-  display: flex;
-  align-items: center;
-  gap: 14px;
-
-  opacity: var(--progress);
-
-  color: white;
-  transform:
-    translateY(calc((1 - var(--progress)) * -24px));
-
-  background:
-    rgba(10, 12, 17, 1);
-
-  backdrop-filter: blur(18px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 54;
+    box-sizing: border-box;
+    height: 76px;
+    padding: 0 clamp(20px, 5vw, 72px);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    opacity: var(--progress);
+    color: white;
+    transform: translateY(calc((1 - var(--progress)) * -24px));
+    background: rgba(10, 12, 17, 1);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 }
 
 .title-bar img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
 }
 
 .title-bar strong {
-  margin-right: auto;
-  font-size: 16px;
+    margin-right: auto;
+    font-size: 16px;
 }
 
 .title-bar nav {
-  display: flex;
-  align-items: center;
-  gap: clamp(14px, 2.4vw, 32px);
+    display: flex;
+    align-items: center;
+    gap: clamp(14px, 2.4vw, 32px);
 }
 
 .title-bar nav a {
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 13px;
-  text-decoration: none;
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 13px;
+    text-decoration: none;
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
 .title-bar nav a:hover {
-  color: white;
-  transform: translateY(-1px);
+    color: white;
+    transform: translateY(-1px);
 }
 
 .scroll-indicator {
-  position: absolute;
-  right: 45px;
-  bottom: 45px;
-  z-index: 3;
+    position: absolute;
+    right: 45px;
+    bottom: 45px;
+    z-index: 3;
 
-  display: flex;
-  align-items: center;
-  gap: 13px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
 
-  opacity:
-    calc(1 - var(--progress) * 2);
+    opacity:
+        calc(1 - var(--progress) * 2);
 
-  font-size: 10px;
-  letter-spacing: 0.2em;
+    font-size: 10px;
+    letter-spacing: 0.2em;
 }
 
 .scroll-indicator i {
-  width: 52px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.5);
+    width: 52px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .fixed-title-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
 
-  height: 76px;
-  padding: 0 clamp(20px, 5vw, 72px);
+    height: 76px;
+    padding: 0 clamp(20px, 5vw, 72px);
 
-  display: flex;
-  align-items: center;
-  gap: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
 
-  color: white;
-  background: rgba(10, 12, 17, 0.88);
-  backdrop-filter: blur(18px);
+    color: white;
+    background: rgba(10, 12, 17, 0.88);
+    backdrop-filter: blur(18px);
 
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-100%);
 
-  transition:
-    opacity 0.25s ease,
-    visibility 0.25s ease,
-    transform 0.25s ease;
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease,
+        transform 0.25s ease;
 }
 
 .fixed-title-bar.visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 .page-content {
-  position: relative;
-  z-index: 1;
+    position: relative;
+    z-index: 1;
 
-  min-height: 100vh;
-  background: #f5f5f3;
+    min-height: 100vh;
+    background: #f5f5f3;
 }
 
 .team-section {
-  scroll-margin-top: 76px;
+    scroll-margin-top: 76px;
 
-  padding:
-    clamp(110px, 12vw, 180px) clamp(24px, 8vw, 120px);
+    padding:
+        clamp(110px, 12vw, 180px) clamp(24px, 8vw, 120px);
 }
 
 .arrow-line {
-  position: relative;
-  width: 140px;
-  height: 2px;
-  background: white;
+    position: relative;
+    width: 140px;
+    height: 2px;
+    background: white;
 
-  transform: rotate(-2deg);
+    transform: rotate(-2deg);
 }
 
 .arrow-line::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 50%;
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
 
-  width: 18px;
-  height: 18px;
+    width: 18px;
+    height: 18px;
 
-  border-top: 2px solid white;
-  border-right: 2px solid white;
+    border-top: 2px solid white;
+    border-right: 2px solid white;
 
-  transform: translateY(-50%) rotate(45deg);
+    transform: translateY(-50%) rotate(45deg);
 }
 
 @media (max-width: 760px) {
-  .title-bar nav {
-    display: none;
-  }
+    .title-bar nav {
+        display: none;
+    }
 
-  .hero-content {
-    left: 24px;
-    right: 24px;
-    bottom: 80px;
-  }
+    .hero-content {
+        left: 24px;
+        right: 24px;
+        bottom: 80px;
+    }
 
-  .scroll-indicator {
-    display: none;
-  }
+    .scroll-indicator {
+        display: none;
+    }
 }
 </style>

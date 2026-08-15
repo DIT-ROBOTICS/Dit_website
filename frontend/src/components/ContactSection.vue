@@ -7,6 +7,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
+import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
 const contacts = ref([])
 const linkGroups = ref([])
 const errorMessage = ref('')
@@ -55,12 +56,9 @@ onMounted(loadlinks)
                     無論是技術交流、競賽合作、贊助或加入團隊，
                     都歡迎與 DIT Robotics 聯絡。
                 </p>
-
-                <a class="contact-button"
-                    href="https://www.zeczec.com/projects/dit-robotics-2026Eurobobt?r=d245513786893" target="_blank">
-                    SUPPORT US
-                    <span><ArrowUpRight/></span>
-                </a>
+                <FilePreviewModal api="/api/PopUpItem/SponsorshipMethods" title="贊助方法" >
+                    <button class="contact-button">SUPPORT US<span><ArrowUpRight/></span></button>
+                </FilePreviewModal>
             </div>
 
             <div class="contact-list">
