@@ -56,7 +56,7 @@ onMounted(loadlinks)
                 </p>
 
                 <a class="contact-button"
-                    href="https://www.zeczec.com/projects/dit-robotics-2026Eurobobt?r=d245513786893">
+                    href="https://www.zeczec.com/projects/dit-robotics-2026Eurobobt?r=d245513786893" target="_blank">
                     SUPPORT US
                     <span>↗</span>
                 </a>
@@ -80,7 +80,7 @@ onMounted(loadlinks)
                 </div>
 
                 <template v-else>
-                    <a v-for="contact in contacts" :key="contact.label" :href="contact.href" class="contact-item">
+                    <a v-for="contact in contacts" :key="contact.label" :href="contact.href" target="_blank" class="contact-item">
                         <div>
                             <p class="contact-label">
                                 {{ contact.label }}
@@ -103,7 +103,7 @@ onMounted(loadlinks)
                                     {{ group.title }}
                                 </p>
 
-                                <a v-for="link in group.links" :key="link.label" :href="link.href" class="small-link">
+                                <a v-for="link in group.links" :key="link.label" :href="link.href" target="_blank" class="small-link">
                                     {{ link.label }}
                                     <span>↗</span>
                                 </a>

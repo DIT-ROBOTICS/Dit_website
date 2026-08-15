@@ -1,0 +1,254 @@
+[
+  {
+    "id": 1,
+    "name": "優群科技",
+    "logo": "ARGOSY.svg",
+    "description": "主要合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 2,
+    "name": "博隆精密",
+    "logo": "BOLITE.svg",
+    "description": "技術合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 3,
+    "name": "BOSSARD",
+    "logo": "BOSSARD.svg",
+    "description": "設備贊助",
+    "url": "https://example.com"
+  },
+  {
+    "id": 4,
+    "name": "C SUN志聖",
+    "logo": "CSUN.svg",
+    "description": "團隊合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 5,
+    "name": "DALAB",
+    "logo": "DALAB.svg",
+    "description": "材料贊助",
+    "url": "https://example.com"
+  },
+  {
+    "id": 6,
+    "name": "DELTA",
+    "logo": "DELTA.svg",
+    "description": "技術支持",
+    "url": "https://example.com"
+  },
+  {
+    "id": 7,
+    "name": "EL MONTE NURSERY",
+    "logo": "ELQ.svg",
+    "description": "團隊合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 8,
+    "name": "FRMEMS",
+    "logo": "FRMEMS.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 9,
+    "name": "G2C+",
+    "logo": "G2C+.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 10,
+    "name": "均華精密",
+    "logo": "GMM.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 11,
+    "name": "均豪精密",
+    "logo": "GPM.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 12,
+    "name": "ICMEMS",
+    "logo": "ICMEMS.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 13,
+    "name": "IMT LAB",
+    "logo": "IMT LAB.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 14,
+    "name": "大立光電動手作獎助金",
+    "logo": "LARGAN.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 15,
+    "name": "MAXON",
+    "logo": "MAXON.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 16,
+    "name": "聯發科技",
+    "logo": "MEDIATEK.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 17,
+    "name": "NTHU PME",
+    "logo": "NTHUPME.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 18,
+    "name": "NTHU 校友總會",
+    "logo": "NTHU校友總會.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 19,
+    "name": "PMP",
+    "logo": "PMP.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 20,
+    "name": "PRUSA",
+    "logo": "PRUSA.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 21,
+    "name": "RTE LAB",
+    "logo": "RTE LAB.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 22,
+    "name": "松峰精機",
+    "logo": "SOHO.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 23,
+    "name": "ST",
+    "logo": "ST.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 24,
+    "name": "SYNOLOGY",
+    "logo": "SYNOLOGY.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 25,
+    "name": "TANKO",
+    "logo": "TANKO.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 26,
+    "name": "TEL",
+    "logo": "TEL.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 27,
+    "name": "TITC",
+    "logo": "TITC.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 28,
+    "name": "VIRTUOSO",
+    "logo": "VIRTUOSO.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 29,
+    "name": "WU",
+    "logo": "WU.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 30,
+    "name": "獻策顧問 X3",
+    "logo": "X3.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 31,
+    "name": "動機係友們",
+    "logo": "係友們.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 32,
+    "name": "惠特科技",
+    "logo": "惠特科技.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 33,
+    "name": "教育部",
+    "logo": "教育部.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 34,
+    "name": "漢民",
+    "logo": "漢民.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 35,
+    "name": "聯詠科技",
+    "logo": "聯詠.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  },
+  {
+    "id": 36,
+    "name": "HOROROK",
+    "logo": "露營區.svg",
+    "description": "競賽合作夥伴",
+    "url": "https://example.com"
+  }
+]

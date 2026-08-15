@@ -2,13 +2,14 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from fastapi.responses import FileResponse
-import uvicorn,socket
+import uvicorn,socket,json
 import PyAPI.EurobotAPI as Eurobot
 import PyAPI.GetItemAPI as GIAPI
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 MEMBER_IMAGE_DIR = BASE_DIR / "static" / "members"
+SPONSORS_LOGO_DIR = BASE_DIR / "static" / "Sponsor_Icon"
 
 
 app = FastAPI()
@@ -85,6 +86,24 @@ async def get_eurobot_file(year:int,filename:str):
     if not file_path.is_file():
         raise HTTPException(status_code=404,detail="File not found")
     return FileResponse(file_path)
+
+@app.get("/api/Sponsors")
+async def get_Sponsors_Data():
+    file_path = DATA_DIR / "SponsorsData.json"
+    with open(file_path,"r",encoding="utf-8") as f:
+        data=json.load(f)
+    for d in data:
+        d["logo"] = f"/api/Sponsors/Logo/{d['logo']}"
+    return data
+
+@app.get("/api/Sponsors/Logo/{filename:path}")
+
+async def get_Sponsors_Logo(filename:str):
+    file_path=SPONSORS_LOGO_DIR/filename
+    if not file_path.is_file():
+        raise HTTPException(status_code=404,detail="File not found")
+    return FileResponse(file_path)
+
     
 
 
