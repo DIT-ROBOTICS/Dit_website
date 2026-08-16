@@ -323,11 +323,11 @@ onUnmounted(() => {
     background:
         radial-gradient(
             circle at center,
-            transparent 20%,
-            rgba(20,20,20,0.25) 55%,
-            rgba(15,15,15,0.75) 100%
+            rgba(20,20,20,0.45) 10%,
+            rgba(20,20,20,0.70) 55%,
+            rgba(15,15,15,0.95) 100%
         );
-    z-index:2;
+    z-index:1;
     pointer-events:none;
 }
 
@@ -337,7 +337,7 @@ onUnmounted(() => {
 
 .robot-viewer :deep(canvas){
     position:relative;
-    z-index:1;
+    z-index:2;
 }
 
 

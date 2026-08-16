@@ -92,8 +92,10 @@ onUnmounted(() => {
         </div>
         <Teleport to="body">
             <div class="title-bar" :style="{ '--progress': progress }">
-                <img :src="logoUrl" alt="DIT Logo">
-                <strong>DIT Robotics</strong>
+                <a href="#hero" class="title-brand">
+                    <img :src="logoUrl" alt="DIT Logo">
+                    <strong>DIT Robotics</strong>
+                </a>
                 <nav>
                     <a href="#team">團隊</a>
                     <a href="#EurobotSection">Eurobot</a>
@@ -240,15 +242,25 @@ onUnmounted(() => {
     -webkit-backdrop-filter: blur(18px);
 }
 
-.title-bar img {
-    width: 42px;
-    height: 42px;
-    object-fit: contain;
+.title-brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-right:auto;
+    color:white;
+    text-decoration:none;
+    cursor:pointer;
 }
 
-.title-bar strong {
-    margin-right: auto;
-    font-size: 16px;
+.title-brand img{
+    width:42px;
+    height:42px;
+    object-fit:contain;
+    border-radius: 10px;
+}
+
+.title-brand strong{
+    font-size:16px;
 }
 
 .title-bar nav {

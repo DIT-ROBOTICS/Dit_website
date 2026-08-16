@@ -17,6 +17,7 @@
 import { ref, onMounted } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import RobotPreview3D from '@/components/template/RobotPreview3D.vue'
+import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
 import { RotateCw, ArrowRight, ArrowLeft, ArrowUpRight, X, Plus, ArrowUp } from 'lucide-vue-next'
 
 const FullJson = ref({})
@@ -128,10 +129,12 @@ onMounted(loadThisYearEurobotData)
                                 </div>
                             </div>
                         </div>
-                        <button class="detail-button" @click="openDetails(robot)">
-                            <span>See more </span>
-                            <img src="@/assets/image/Canva_Arrow.png" alt="arrow" style="width: 4vw; height: 15px;">
-                        </button>
+                        <FilePreviewModal api="/api/PopUpItem/WhiteSeeMore" title="NTHU DIT">
+                            <button class="detail-button" @click="openDetails(robot)">
+                                <span>See more </span>
+                                <img src="@/assets/image/Canva_Arrow.png" alt="arrow" style="width: 4vw; height: 15px;">
+                            </button>
+                        </FilePreviewModal>
                     </article>
                 </div>
             </section>

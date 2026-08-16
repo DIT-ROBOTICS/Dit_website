@@ -291,9 +291,10 @@ onUnmounted(() => {
     width: min(1200px, 95vw);
     height: min(850px, 95dvh);
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .12);
     border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 30px 100px rgba(0, 0, 0, .4);
+    background: #161616;
+    box-shadow: 0 30px 100px rgba(0, 0, 0, .65);
 }
 
 .preview-header {
@@ -304,7 +305,9 @@ onUnmounted(() => {
     height: max(42px, 5%);
     box-sizing: border-box;
     padding: 0 15px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+    background: #1b1b1b;
+    color: #fff;
 }
 
 .preview-title {
@@ -313,6 +316,7 @@ onUnmounted(() => {
     max-width: 60%;
     overflow: hidden;
     transform: translateX(-50%);
+    color: rgba(255, 255, 255, .88);
     font-size: 16px;
     font-weight: 600;
     text-overflow: ellipsis;
@@ -337,13 +341,15 @@ onUnmounted(() => {
     border: 0;
     border-radius: 50%;
     background: transparent;
+    color: rgba(255, 255, 255, .8);
     font-size: 22px;
     cursor: pointer;
     transition: .2s;
 }
 
 .action-button:hover {
-    transform: scale(1.3);
+    color: #fff;
+    transform: scale(1.4);
 }
 
 .close-button {
@@ -357,18 +363,19 @@ onUnmounted(() => {
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
-    background: #ddd;
+    background: #242424;
 }
 
 .pdf-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
+    gap: 24px;
     width: 100%;
     min-height: 100%;
-    padding: 20px;
+    padding: 28px;
     box-sizing: border-box;
+    background: #242424;
 }
 
 .pdf-container :deep(.pdf-page) {
@@ -376,7 +383,7 @@ onUnmounted(() => {
     max-width: 100%;
     height: auto !important;
     background: #fff;
-    box-shadow: 0 2px 14px rgba(0, 0, 0, .15);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, .45);
 }
 
 .preview-frame {
@@ -417,18 +424,19 @@ onUnmounted(() => {
     min-height: 100%;
     padding: 40px;
     box-sizing: border-box;
+    color: rgba(255, 255, 255, .75);
     text-align: center;
 }
 
 .error {
-    color: #c33;
+    color: #ff7777;
 }
 
 .open-button {
     padding: 10px 18px;
-    border: 0;
+    border: 1px solid rgba(255, 255, 255, .2);
     border-radius: 8px;
-    background: #222;
+    background: rgba(255, 255, 255, .1);
     color: #fff;
     cursor: pointer;
 }
