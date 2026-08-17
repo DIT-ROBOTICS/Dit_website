@@ -6,8 +6,8 @@ const menuOpen = ref(false)
 const messageOpen = ref(true)
 const assistantRef = ref(null)
 const position = ref({
-  x: window.innerWidth - 150,
-  y: window.innerHeight - 150,
+  x: window.innerWidth,
+  y: window.innerHeight,
 })
 
 let dragging = false
@@ -178,12 +178,6 @@ onBeforeUnmount(() => {
 
 <template>
   <aside ref="assistantRef" class="robot-assistant" :style="{ left: `${position.x}px`, top: `${position.y}px` }">
-    <transition name="bubble">
-      <div v-if="messageOpen" class="speech-bubble">
-        嗨！需要我帶你認識 DIT 嗎？
-        <button type="button" aria-label="關閉提示" @click="messageOpen = false">×</button>
-      </div>
-    </transition>
     <transition name="menu">
       <div v-if="menuOpen" class="robot-menu">
         <p>前往哪個區域？</p>

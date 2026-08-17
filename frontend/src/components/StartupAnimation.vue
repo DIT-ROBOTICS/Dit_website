@@ -1,65 +1,74 @@
-<!--
-網頁的啟動動畫
--->
-
 <script setup>
-import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import logoUrl from '@/assets/dit_logo.png'
 
 const emit = defineEmits(['finished'])
 
-const progress = ref(0)
-const phase = ref('loading')
+const PROGRESS_UPDATE_INTERVAL_MS = 20
+const LAUNCH_DELAY_MS = 200
+const SCREEN_DISMISS_DELAY_MS = 1800
 
-const showWelcome = computed(() => {
-  return progress.value >= 50 && phase.value === 'loading'
-})
+const loadingProgress = ref(0)
+const isLaunching = ref(false)
 
-let progressTimer = null
-let launchTimer = null
-let finishTimer = null
+// 載入過半後顯示歡迎文字，起飛時立即隱藏。
+const shouldShowWelcome = computed(
+  () => loadingProgress.value >= 50 && !isLaunching.value,
+)
 
-onMounted(() => {
-  progressTimer = window.setInterval(() => {
-    progress.value += 1
+let progressIntervalId
+let launchTimeoutId
+let finishTimeoutId
 
-    if (progress.value >= 100) {
-      progress.value = 100
+function startLaunchSequence() {
+  window.clearInterval(progressIntervalId)
 
-      window.clearInterval(progressTimer)
+  // 短暫停留在 100%，再開始 Logo 起飛動畫。
+  launchTimeoutId = window.setTimeout(() => {
+    isLaunching.value = true
+  }, LAUNCH_DELAY_MS)
 
-      launchTimer = window.setTimeout(() => {
-        phase.value = 'launching'
-      }, 200)
+  // 通知父元件移除啟動畫畫面。
+  finishTimeoutId = window.setTimeout(() => {
+    emit('finished')
+  }, SCREEN_DISMISS_DELAY_MS)
+}
 
-      finishTimer = window.setTimeout(() => {
-        emit('finished')
-      }, 1800)
+function startLoadingProgress() {
+  progressIntervalId = window.setInterval(() => {
+    loadingProgress.value += 1
+
+    if (loadingProgress.value >= 100) {
+      loadingProgress.value = 100
+      startLaunchSequence()
     }
-  }, 20)
-})
+  }, PROGRESS_UPDATE_INTERVAL_MS)
+}
 
-onUnmounted(() => {
-  window.clearInterval(progressTimer)
-  window.clearTimeout(launchTimer)
-  window.clearTimeout(finishTimer)
-})
+function clearAnimationTimers() {
+  window.clearInterval(progressIntervalId)
+  window.clearTimeout(launchTimeoutId)
+  window.clearTimeout(finishTimeoutId)
+}
+
+onMounted(startLoadingProgress)
+
+onUnmounted(clearAnimationTimers)
 </script>
 
 <template>
   <div class="startup-screen">
-    <div class="logo-wrapper" :class="{ launching: phase === 'launching' }">
-      <div class="progress-ring" :style="{ '--progress': progress }">
+    <div class="logo-wrapper" :class="{ launching: isLaunching }">
+      <div class="progress-ring" :style="{ '--progress': loadingProgress }">
         <svg viewBox="0 0 180 180">
-          <circle class="track" cx="90" cy="90" r="80" />
-          <circle class="value" cx="90" cy="90" r="80" />
+          <circle class="progress-track" cx="90" cy="90" r="80" />
+          <circle class="progress-value" cx="90" cy="90" r="80" />
         </svg>
-        <div class="logo-morph">
-          <img class="startup-logo" :src="logoUrl" alt="DIT Logo">
-        </div>
+        <img class="startup-logo" :src="logoUrl" alt="DIT Logo" />
       </div>
+
       <Transition name="welcome">
-        <p v-if="showWelcome" class="welcome-text">
+        <p v-if="shouldShowWelcome" class="welcome-text">
           WELCOME TO DIT ROBOTICS
         </p>
       </Transition>
@@ -68,23 +77,9 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.startup-logo,
-.startup-robot {
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  backface-visibility: visible;
-  transition:
-    opacity 0.45s ease,
-    transform 0.45s ease;
-}
-
-.startup-robot {
-  opacity: 0;
-  transform: scale(0.65) rotate(-20deg);
-}
-
 .startup-screen {
+  --launch-animation: 1.8s cubic-bezier(0.25, 0.75, 0.25, 1) forwards;
+
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -94,21 +89,21 @@ onUnmounted(() => {
 
 .logo-wrapper {
   position: absolute;
-  left: 50%;
   top: 50%;
+  left: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   transform: translate(-50%, -50%);
+}
+
+.logo-wrapper,
+.progress-ring {
   transform-style: preserve-3d;
 }
 
-/* ========================================
-   Progress Ring
-======================================== */
-
+/* 圓環周長 = 2 × π × 80，dashoffset 會依載入進度逐漸減少。 */
 .progress-ring {
-  --radius: 80;
   --circumference: 502.65;
 
   position: relative;
@@ -116,7 +111,12 @@ onUnmounted(() => {
   height: 180px;
   display: grid;
   place-items: center;
-  transform-style: preserve-3d;
+}
+
+.startup-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
 }
 
 .progress-ring svg {
@@ -132,11 +132,11 @@ onUnmounted(() => {
   stroke-width: 4;
 }
 
-.track {
+.progress-track {
   stroke: #e7e7e7;
 }
 
-.value {
+.progress-value {
   stroke: #111;
   stroke-linecap: round;
   stroke-dasharray: var(--circumference);
@@ -145,10 +145,6 @@ onUnmounted(() => {
   );
   transition: stroke-dashoffset 0.05s linear;
 }
-
-/* ========================================
-   Welcome Text
-======================================== */
 
 .welcome-text {
   position: absolute;
@@ -164,10 +160,7 @@ onUnmounted(() => {
   text-transform: uppercase;
 }
 
-/*
-  Vue Transition
-*/
-
+/* Vue Transition：歡迎文字淡入與淡出。 */
 .welcome-enter-active {
   transition:
     opacity 0.8s ease,
@@ -179,11 +172,6 @@ onUnmounted(() => {
   transform: translateX(-50%) translateY(10px);
 }
 
-.welcome-enter-to {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
 .welcome-leave-active {
   transition: opacity 0.2s ease;
 }
@@ -192,33 +180,18 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* ========================================
-   Launch Animation
-======================================== */
-
+/* 進度完成後，Logo 飛往畫面右下角。 */
 .logo-wrapper.launching {
-  animation:
-    logo-flight
-    1.8s
-    cubic-bezier(0.25, 0.75, 0.25, 1)
-    forwards;
+  animation: logo-flight var(--launch-animation);
 }
 
 .logo-wrapper.launching .progress-ring {
-  animation:
-    logo-spin
-    1.8s
-    cubic-bezier(0.25, 0.75, 0.25, 1)
-    forwards;
+  animation: logo-spin var(--launch-animation);
 }
 
 .logo-wrapper.launching svg {
   animation: ring-hide 0.25s forwards;
 }
-
-/* ========================================
-   Keyframes
-======================================== */
 
 @keyframes logo-flight {
   0% {
@@ -228,20 +201,17 @@ onUnmounted(() => {
   }
 
   100% {
-    top: calc(100% - clamp(18px, 4vw, 52px));
-    left: calc(100% - clamp(18px, 4vw, 45px));
+    /* 修改 top 與 left 可調整 Logo 的最終位置。 */
+    top: calc(100% - 60px);
+    left: calc(100% - 60px);
     transform:
-      translate(-100%, -100%)
+      translate(-50%, -50%)
       scale(0.66)
       rotateY(1080deg);
   }
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotateY(0deg);
-  }
-
   to {
     transform: rotateY(1080deg);
   }

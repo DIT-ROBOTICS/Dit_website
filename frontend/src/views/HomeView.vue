@@ -3,12 +3,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import HeroSection from '@/components/HeroSection.vue'
 import AboutSection from '@/components/AboutSection.vue'
 import EurobotSection from '@/components/EurobotSection.vue'
-import RobotArchiveSection from '@/components/RobotArchiveSection.vue'
-import AdvisorsSection from '@/components/AdvisorsSection.vue'
-import NewAdvisorsSection from '@/components/NewAdvisorsSection.vue'
 import SponsorsSection from '@/components/SponsorsSection.vue'
 import ContactSection from '@/components/ContactSection.vue'
-import CompetitionsSection from '@/components/CompetitionsSection.vue'
 
 const heroProgress = ref(0)
 
@@ -52,11 +48,6 @@ onUnmounted(() => {
         <div class="about-wrapper">
             <AboutSection id="team" />
             <EurobotSection id="EurobotSection" />
-            <!-- <RobotArchiveSection id="robotArchive" /> -->
-            <!-- <CompetitionsSection id="competitions" /> -->
-            <AdvisorsSection id="advisors" />
-            <!-- <NewAdvisorsSection id="advisors" /> -->
-            <!-- <MemberSection id="members" /> -->
             <SponsorsSection id="sponsors" />
             <ContactSection id="contact" />
         </div>

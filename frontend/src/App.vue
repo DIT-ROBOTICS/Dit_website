@@ -23,7 +23,7 @@ if(startup){
 
   <div class="website" :class="{ visible: startupFinished }" >
     <HomeView />
-    <!-- <FloatingRobot v-if="startupFinished" /> -->
+    <FloatingRobot v-if="startupFinished" />
   </div>
 </template>
 
