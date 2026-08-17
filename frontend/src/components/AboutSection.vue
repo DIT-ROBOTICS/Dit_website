@@ -1,9 +1,32 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 // About 區塊的團隊照片與文字資料。
 const photoUrls = ref([])
 const aboutData = ref({})
+
+// 展開後的「純照片：融合漸層：純色背景」比例，修改這三個數字即可調整版面。
+const dailyLayoutRatio = {
+    photo: 1,
+    gradient: 2,
+    solid: 2,
+    // 文字從整個相簿左側多少百分比的位置開始（50 代表正中央）。
+    textStart: 50,
+}
+
+const dailyGalleryStyle = computed(() => {
+    const { photo, gradient, solid, textStart } = dailyLayoutRatio
+    const total = photo + gradient + solid
+    const contentTotal = gradient + solid
+
+    return {
+        '--daily-image-width': `${((photo + gradient) / total) * 100}vw`,
+        '--daily-content-width': `${(contentTotal / total) * 100}vw`,
+        '--daily-overlap-width': `${(gradient / total) * 100}vw`,
+        '--daily-gradient-share': `${(gradient / contentTotal) * 100}%`,
+        '--daily-text-offset': `${textStart - (photo / total) * 100}vw`,
+    }
+})
 
 // 從後端取得團隊照片清單。
 async function loadImages() {
@@ -84,23 +107,21 @@ function getPhotoStyle(index, total) {
         </div>
 
         <!-- 團隊簡介文字。 -->
-        <div class="about-description">
-            <p class="about-description-text">{{ aboutData.description }}</p>
-        </div>
+        <div class="about-description">{{ aboutData.description }}</div>
 
         <!-- 團隊日常內容標題。 -->
         <h2 class="daily-title">{{ aboutData.daily_title }}</h2>
 
         <!-- 四張橫向鋪滿的日常照片；聚焦時展開該項目的介紹。 -->
-        <div class="daily-gallery">
+        <div class="daily-gallery" :style="dailyGalleryStyle">
             <article v-for="(detail, index) in (aboutData.MoreDetail || []).slice(0, 4)" :key="detail.title"
-                class="daily-card" tabindex="0">
+                class="daily-card" tabindex="0" :style="{'--Theme-Color':aboutData.ThemeColor}">
                 <img v-if="photoUrls.length" class="daily-card-image" :src="photoUrls[index % photoUrls.length]"
                     :alt="detail.title" />
+                <span class="daily-card-image-title">{{ detail.title }}</span>
                 <div class="daily-card-content">
-                    <span class="daily-card-icon" aria-hidden="true">{{ detail.icon }}</span>
                     <h3 class="daily-card-title">{{ detail.title }}</h3>
-                    <p class="daily-card-text">DIT 團隊日常，從每一次合作與實作中累積經驗。</p>
+                    <p class="daily-card-text">{{ detail.detail }}</p>
                 </div>
             </article>
         </div>
@@ -133,6 +154,7 @@ function getPhotoStyle(index, total) {
     font-size: clamp(42px, 3vw, 72px);
     line-height: 1.15;
     font-weight: 700;
+    letter-spacing: 0.2em;
     margin: 0;
 }
 
@@ -163,6 +185,7 @@ function getPhotoStyle(index, total) {
     margin: 70px auto;
     text-align: center;
     font-size: 25px;
+    letter-spacing: 0.2em;
     line-height: 2;
     color: #555;
 }
@@ -181,8 +204,9 @@ function getPhotoStyle(index, total) {
 .daily-gallery {
     display: flex;
     width: calc(100% + 16vw);
-    height: clamp(220px, 18vw, 340px);
+    height: clamp(220px, 30vw, 600px);
     margin-inline: -8vw;
+    margin-bottom: 150px;
     overflow: hidden;
     background: #171717;
 }
@@ -194,7 +218,7 @@ function getPhotoStyle(index, total) {
     min-width: 0;
     overflow: hidden;
     color: #fff;
-    background: #171717;
+    background: var(--Theme-Color);
     outline: none;
     transition: flex-grow 650ms cubic-bezier(0.22, 1, 0.36, 1),
         flex-basis 650ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -213,18 +237,15 @@ function getPhotoStyle(index, total) {
         border-width: 0;
     }
 
-    /* 固定為初始四等分的寬度，避免展開途中圖片先放大再縮回。 */
-    .daily-card-image,
-    .daily-card:hover .daily-card-image,
-    .daily-card:focus-visible .daily-card-image {
+    /* 未展開時維持四等分寬度。 */
+    .daily-card-image {
         width: 25vw;
-        /* min-width: 25vw; */
     }
 
-    /* 展開後照片中心位於畫面左起 25%，左側留白沿用卡片背景色。 */
+    /* 展開後照片與文字為 1:2。 */
     .daily-card:hover .daily-card-image,
     .daily-card:focus-visible .daily-card-image {
-        margin-left: 12.5vw;
+        margin-left: 0;
     }
 }
 
@@ -239,35 +260,87 @@ function getPhotoStyle(index, total) {
 
 .daily-card-image {
     width: 25vw;
-    /* height: 100%; */
+    min-width: 25vw;
+    flex: 0 0 25vw;
+    height: 100%;
     display: block;
     object-fit: cover;
     filter: brightness(0.82);
     transition: width 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        min-width 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        flex-basis 650ms cubic-bezier(0.22, 1, 0.36, 1),
         margin-left 650ms cubic-bezier(0.22, 1, 0.36, 1),
         filter 450ms ease;
 }
 
 .daily-card:hover .daily-card-image,
 .daily-card:focus-visible .daily-card-image {
-    width: 25vw;
+    width: var(--daily-image-width);
+    min-width: var(--daily-image-width);
+    flex-basis: var(--daily-image-width);
     filter: brightness(1);
 }
 
+.daily-card-image-title {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 0;
+    width: 25vw;
+    padding: 0 20px;
+    color: #fff;
+    font-size: clamp(20px, 2.5vw, 50px);
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-align: center;
+    text-shadow: 0 3px 18px rgba(0, 0, 0, 0.7);
+    box-sizing: border-box;
+    opacity: 1;
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition: opacity 300ms ease;
+}
+
+.daily-card:hover .daily-card-image-title,
+.daily-card:focus-visible .daily-card-image-title {
+    opacity: 0;
+}
+
 .daily-card-content {
+    position: relative;
     display: flex;
-    width: 75vw;
+    width: var(--daily-content-width);
+    min-width: var(--daily-content-width);
+    flex: 0 0 var(--daily-content-width);
     padding: clamp(22px, 3vw, 52px);
+    padding-left: var(--daily-text-offset);
     flex-direction: column;
     justify-content: center;
     box-sizing: border-box;
+    background: linear-gradient(to right, transparent 0 var(--daily-gradient-share),
+            var(--Theme-Color) var(--daily-gradient-share) 100%);
     opacity: 0;
     transform: translateX(28px);
-    transition: opacity 300ms ease 120ms, transform 450ms ease 100ms;
+    transition: opacity 300ms ease 120ms, transform 450ms ease 100ms,
+        margin-left 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 讓照片在文字區左緣自然融入深色背景。 */
+.daily-card-content::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: var(--daily-gradient-share);
+    background: linear-gradient(to right, transparent, var(--Theme-Color) 100%);
+    pointer-events: none;
 }
 
 .daily-card:hover .daily-card-content,
 .daily-card:focus-visible .daily-card-content {
+    margin-left: calc(-1 * var(--daily-overlap-width));
     opacity: 1;
     transform: translateX(0);
 }
@@ -277,17 +350,23 @@ function getPhotoStyle(index, total) {
 }
 
 .daily-card-title {
+    position: relative;
+    z-index: 1;
     margin: 18px 0 14px;
     font-size: clamp(24px, 2.4vw, 42px);
     line-height: 1.2;
     white-space: nowrap;
+    letter-spacing: 0.2em;
 }
 
 .daily-card-text {
+    position: relative;
+    z-index: 1;
     margin: 0;
     color: rgba(255, 255, 255, 0.72);
     font-size: clamp(14px, 1.15vw, 18px);
     line-height: 1.8;
+    letter-spacing: 0.1em;
 }
 
 @media (max-width: 800px) {
@@ -313,14 +392,28 @@ function getPhotoStyle(index, total) {
     .daily-card:focus-visible .daily-card-image {
         width: 55%;
         min-width: 55%;
+        flex-basis: 55%;
     }
 
-    .daily-card-content {
+    .daily-card-content,
+    .daily-card:hover .daily-card-content,
+    .daily-card:focus-visible .daily-card-content {
         width: 45%;
         min-width: 45%;
+        flex-basis: 45%;
         padding: 22px;
+        margin-left: 0;
+        background: var(--Theme-Color);
         opacity: 1;
         transform: none;
+    }
+
+    .daily-card-content::before {
+        display: none;
+    }
+
+    .daily-card-image-title {
+        width: 55%;
     }
 
     .daily-card-title {
@@ -331,6 +424,7 @@ function getPhotoStyle(index, total) {
 @media (prefers-reduced-motion: reduce) {
     .daily-card,
     .daily-card-image,
+    .daily-card-image-title,
     .daily-card-content {
         transition: none;
     }
