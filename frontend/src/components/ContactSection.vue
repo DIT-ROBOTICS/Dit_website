@@ -54,10 +54,7 @@ onMounted(loadLinks)
         <p class="eyebrow">CONTACT US</p>
 
         <!-- 聯絡區塊主標題。 -->
-        <h2 class="contact-title">
-          HAVE AN IDEA?<br /><br />
-          LET'S DIT
-        </h2>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/Dh_jmZ1kZ28?si=wVV3VIwE9Su_pLn5&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
         <!-- 聯絡說明。 -->
         <p class="contact-description">
@@ -152,8 +149,11 @@ onMounted(loadLinks)
         </div>
       </div>
 
-      <!-- 當前年份版權聲明。 -->
-      <p class="copyright">© {{ currentYear }} DIT Robotics. All rights reserved.</p>
+      <!-- 學系識別與當前年份版權聲明。 -->
+      <div class="footer-legal">
+        <p class="department-label">國立清華大學動力機械工程學系</p>
+        <p class="copyright">© {{ currentYear }} DIT Robotics. All rights reserved.</p>
+      </div>
 
       <!-- 平滑捲動回頁面頂端。 -->
       <a class="back-top" href="#" @click.prevent="backToTop">
@@ -229,7 +229,7 @@ onMounted(loadLinks)
 }
 
 .contact-description {
-  max-width: 520px;
+  /* max-width: 600px; */
   margin: 36px 0 0;
 
   color: rgba(255, 255, 255, 0.58);
@@ -251,7 +251,7 @@ onMounted(loadLinks)
   color: #0a0a0a;
   background: white;
 
-  font-size: 13px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.12em;
 
@@ -385,9 +385,25 @@ onMounted(loadLinks)
   font-size: 11px;
 }
 
+.footer-legal {
+  text-align: center;
+}
+
+.department-label,
 .copyright {
   margin: 0;
+}
 
+.department-label {
+  margin-bottom: 7px;
+
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.copyright {
   color: rgba(255, 255, 255, 0.35);
   font-size: 11px;
 }
@@ -436,8 +452,9 @@ onMounted(loadLinks)
     gap: 24px;
   }
 
-  .copyright {
+  .footer-legal {
     order: 3;
+    text-align: left;
   }
 
   .back-top {

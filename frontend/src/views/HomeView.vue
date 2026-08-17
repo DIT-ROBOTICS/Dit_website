@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import HeroSection from '@/components/HeroSection.vue'
 import AboutSection from '@/components/AboutSection.vue'
+import AdvisorsSection from '@/components/AdvisorsSection.vue'
 import EurobotSection from '@/components/EurobotSection.vue'
 import SponsorsSection from '@/components/SponsorsSection.vue'
 import ContactSection from '@/components/ContactSection.vue'
@@ -48,6 +49,7 @@ onUnmounted(() => {
         <div class="about-wrapper">
             <AboutSection id="aboutSection" class="about-anchor" />
             <EurobotSection id="EurobotSection" />
+            <AdvisorsSection id="advisors" />
             <SponsorsSection id="sponsors" />
             <ContactSection id="contact" />
         </div>

@@ -198,8 +198,8 @@ onBeforeUnmount(() => {
   touch-action: none;
 }
 .robot-button {
-  width: 88px;
-  height: 88px;
+  width: 70px;
+  height: 70px;
   padding: 0;
   border: none;
   border-radius: 50%;

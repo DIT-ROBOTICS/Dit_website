@@ -90,32 +90,29 @@ function getPhotoStyle(index, total) {
 
         <!-- 團隊日常內容標題。 -->
         <h2 class="daily-title">{{ aboutData.daily_title }}</h2>
+
+        <!-- 四張橫向鋪滿的日常照片；聚焦時展開該項目的介紹。 -->
+        <div class="daily-gallery">
+            <article v-for="(detail, index) in (aboutData.MoreDetail || []).slice(0, 4)" :key="detail.title"
+                class="daily-card" tabindex="0">
+                <img v-if="photoUrls.length" class="daily-card-image" :src="photoUrls[index % photoUrls.length]"
+                    :alt="detail.title" />
+                <div class="daily-card-content">
+                    <span class="daily-card-icon" aria-hidden="true">{{ detail.icon }}</span>
+                    <h3 class="daily-card-title">{{ detail.title }}</h3>
+                    <p class="daily-card-text">DIT 團隊日常，從每一次合作與實作中累積經驗。</p>
+                </div>
+            </article>
+        </div>
     </section>
 </template>
 
 <style scoped>
 .about-section {
     position: relative;
-    padding: 120px 8vw;
+    padding: 120px 8vw 0;
     background: #fafafa;
     z-index: 1;
-}
-
-.about-section::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -124px;
-    width: 100%;
-    height: 125px;
-    background: linear-gradient(to bottom,
-            #fafafa 0%,
-            #fafafa 10%,
-            rgba(250, 250, 250, 0.8) 40%,
-            rgba(250, 250, 250, 0.4) 70%,
-            rgba(250, 250, 250, 0) 100%);
-    pointer-events: none;
-    z-index: 10;
 }
 
 .about-heading {
@@ -178,5 +175,164 @@ function getPhotoStyle(index, total) {
     letter-spacing: 0.15em;
     font-size: clamp(26px, 2.5vw, 42px);
     font-weight: 900;
+}
+
+/* 團隊日常互動相簿 */
+.daily-gallery {
+    display: flex;
+    width: calc(100% + 16vw);
+    height: clamp(220px, 18vw, 340px);
+    margin-inline: -8vw;
+    overflow: hidden;
+    background: #171717;
+}
+
+.daily-card {
+    position: relative;
+    display: flex;
+    flex: 1 1 25%;
+    min-width: 0;
+    overflow: hidden;
+    color: #fff;
+    background: #171717;
+    outline: none;
+    transition: flex-grow 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        flex-basis 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-width 300ms ease;
+}
+
+.daily-card + .daily-card {
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 滑入其中一張時，該項目接管整個相簿，其餘項目同步收合。 */
+@media (min-width: 801px) {
+    .daily-gallery:has(.daily-card:hover) .daily-card:not(:hover),
+    .daily-gallery:has(.daily-card:focus-visible) .daily-card:not(:focus-visible) {
+        flex: 0 1 0;
+        border-width: 0;
+    }
+
+    /* 固定為初始四等分的寬度，避免展開途中圖片先放大再縮回。 */
+    .daily-card-image,
+    .daily-card:hover .daily-card-image,
+    .daily-card:focus-visible .daily-card-image {
+        width: 25vw;
+        /* min-width: 25vw; */
+    }
+
+    /* 展開後照片中心位於畫面左起 25%，左側留白沿用卡片背景色。 */
+    .daily-card:hover .daily-card-image,
+    .daily-card:focus-visible .daily-card-image {
+        margin-left: 12.5vw;
+    }
+}
+
+.daily-card:hover,
+.daily-card:focus-visible {
+    flex: 1 0 100%;
+}
+
+.daily-card:focus-visible {
+    box-shadow: inset 0 0 0 4px #fff;
+}
+
+.daily-card-image {
+    width: 25vw;
+    /* height: 100%; */
+    display: block;
+    object-fit: cover;
+    filter: brightness(0.82);
+    transition: width 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        margin-left 650ms cubic-bezier(0.22, 1, 0.36, 1),
+        filter 450ms ease;
+}
+
+.daily-card:hover .daily-card-image,
+.daily-card:focus-visible .daily-card-image {
+    width: 25vw;
+    filter: brightness(1);
+}
+
+.daily-card-content {
+    display: flex;
+    width: 75vw;
+    padding: clamp(22px, 3vw, 52px);
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateX(28px);
+    transition: opacity 300ms ease 120ms, transform 450ms ease 100ms;
+}
+
+.daily-card:hover .daily-card-content,
+.daily-card:focus-visible .daily-card-content {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.daily-card-icon {
+    font-size: clamp(28px, 3vw, 48px);
+}
+
+.daily-card-title {
+    margin: 18px 0 14px;
+    font-size: clamp(24px, 2.4vw, 42px);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.daily-card-text {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: clamp(14px, 1.15vw, 18px);
+    line-height: 1.8;
+}
+
+@media (max-width: 800px) {
+    .daily-gallery {
+        height: auto;
+        flex-direction: column;
+    }
+
+    .daily-card,
+    .daily-card:hover,
+    .daily-card:focus-visible {
+        min-height: 250px;
+        flex: none;
+    }
+
+    .daily-card + .daily-card {
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+        border-left: 0;
+    }
+
+    .daily-card-image,
+    .daily-card:hover .daily-card-image,
+    .daily-card:focus-visible .daily-card-image {
+        width: 55%;
+        min-width: 55%;
+    }
+
+    .daily-card-content {
+        width: 45%;
+        min-width: 45%;
+        padding: 22px;
+        opacity: 1;
+        transform: none;
+    }
+
+    .daily-card-title {
+        white-space: normal;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .daily-card,
+    .daily-card-image,
+    .daily-card-content {
+        transition: none;
+    }
 }
 </style>
