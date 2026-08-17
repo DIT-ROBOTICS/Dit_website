@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import heroImageUrl from '@/assets/Hero_Image.png'
+import heroVideoUrl from '@/assets/hero背景影片.m4v'
 import logoUrl from '@/assets/dit_logo.png'
 
 const heroContainer = ref(null)
@@ -42,7 +43,8 @@ onUnmounted(() => {
         <!-- 會隨捲動進度收合的首頁封面。 -->
         <div class="hero" :style="{ '--progress': progress }">
             <!-- 封面背景圖。 -->
-            <img class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片" />
+            <!-- <img class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片" /> -->
+            <video class="hero-background" :src="heroVideoUrl" autoplay muted loop playsinline preload="auto"></video>
 
             <!-- 深色漸層遮罩，提高文字可讀性。 -->
             <div class="hero-overlay"></div>
@@ -50,7 +52,7 @@ onUnmounted(() => {
             <!-- 封面主文字區。 -->
             <div class="hero-content">
                 <!-- 團隊精神標語。 -->
-                <p class="hero-eyebrow">We Do Improve and Try</p>
+                <p class="hero-eyebrow">Do, Improve, and Try</p>
 
                 <!-- 網站主標題。 -->
                 <h1 class="hero-title">We are <span class="hero-title-highlight">DIT Robotics</span></h1>
@@ -62,7 +64,7 @@ onUnmounted(() => {
                 </p>
 
                 <!-- 前往團隊介紹的主要按鈕。 -->
-        <a class="hero-cta" href="#aboutSection">認識團隊</a>
+                <a class="hero-cta" href="#aboutSection">認識團隊</a>
             </div>
         </div>
 
@@ -277,38 +279,38 @@ onUnmounted(() => {
 }
 
 @media (max-width: 760px) {
-  .title-bar {
-    gap: 10px;
-    padding-inline: 16px;
-  }
+    .title-bar {
+        gap: 10px;
+        padding-inline: 16px;
+    }
 
-  .title-brand {
-    flex-shrink: 0;
-  }
+    .title-brand {
+        flex-shrink: 0;
+    }
 
-  .title-brand-name {
-    display: none;
-  }
+    .title-brand-name {
+        display: none;
+    }
 
-  .title-navigation {
-    min-width: 0;
-    flex: 1;
-    gap: 18px;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-  }
+    .title-navigation {
+        min-width: 0;
+        flex: 1;
+        gap: 18px;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+    }
 
-  .title-navigation::-webkit-scrollbar {
-    display: none;
-  }
+    .title-navigation::-webkit-scrollbar {
+        display: none;
+    }
 
-  .title-navigation-link {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
+    .title-navigation-link {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
 
-  .hero-content {
+    .hero-content {
         left: 24px;
         right: 24px;
         bottom: 80px;
@@ -317,9 +319,9 @@ onUnmounted(() => {
 
 /* 小螢幕保留導覽列兩側的最小留白。 */
 @media (max-width: 400px) {
-  .title-bar {
-    padding-inline: 12px;
-  }
+    .title-bar {
+        padding-inline: 12px;
+    }
 }
 
 /* 大螢幕限制導覽列留白與連結間距，維持原本版面上限。 */
