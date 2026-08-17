@@ -9,6 +9,10 @@ const activeIndex = ref(0)
 const hoveredIndex = ref(null)
 const paused = ref(false)
 
+// 將 JS 的橢圓半徑單位換算成容器尺寸。
+const ORBIT_WIDTH_PER_RADIUS_UNIT = 30
+const ORBIT_HEIGHT_PER_RADIUS_UNIT = 20
+
 // requestAnimationFrame 與自動聚焦計時器的 ID。
 let animationId = null
 let lastTime = 0
@@ -53,6 +57,23 @@ const ringConfig = computed(() => {
     }
 
     return rings
+})
+
+// 容器尺寸由最外圈橢圓半徑決定，讓 div 隨圈數自動縮放。
+const orbitAreaStyle = computed(() => {
+    const outerRing = ringConfig.value.at(-1)
+
+    if (!outerRing) {
+        return {
+            '--orbit-width': '660px',
+            '--orbit-height': '320px',
+        }
+    }
+
+    return {
+        '--orbit-width': `${outerRing.rx * ORBIT_WIDTH_PER_RADIUS_UNIT}px`,
+        '--orbit-height': `${outerRing.ry * ORBIT_HEIGHT_PER_RADIUS_UNIT}px`,
+    }
 })
 
 // 將每間贊助商換算成環繞區內的百分比座標。
@@ -155,7 +176,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Logo 環繞動畫的展示區。 -->
-        <div class="orbit-area">
+        <div class="orbit-area" :style="orbitAreaStyle">
             <!-- 環繞中心的 DIT Logo。 -->
             <div class="center">
                 <img class="center-logo" :src="ditLogoUrl" alt="DIT Robotics" />
@@ -222,8 +243,9 @@ onUnmounted(() => {
 
 .orbit-area {
     position: relative;
-    width: 100%;
-    height: min(78vh, 760px);
+    width: min(100%, var(--orbit-width));
+    height: min(78vh, var(--orbit-height));
+    margin-inline: auto;
 }
 
 .center,
@@ -402,7 +424,7 @@ onUnmounted(() => {
     }
 
     .orbit-area {
-        height: 600px;
+        height: min(600px, var(--orbit-height));
     }
 
     .sponsor {
