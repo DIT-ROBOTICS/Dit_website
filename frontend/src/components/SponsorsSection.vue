@@ -1,24 +1,20 @@
-<!--
-展示贊助商：
-形式預計會像張浩翔在機器上放的那個相同
-但是滑鼠移動到每個贊助商上面的時候可以跳出贊助商公司的官網
-和一些其他資訊之類的
--->
-
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import dit_logo from "@/assets/dit_logo_text.png"
+import ditLogoUrl from '@/assets/dit_logo_text.png'
 
+// 贊助商資料與環繞動畫狀態。
 const sponsors = ref([])
 const angle = ref(0)
 const activeIndex = ref(0)
 const hoveredIndex = ref(null)
 const paused = ref(false)
 
+// requestAnimationFrame 與自動聚焦計時器的 ID。
 let animationId = null
 let lastTime = 0
 let activeTimer = null
 
+// 從後端取得贊助商名稱、Logo、簡介與官網連結。
 async function loadSponsorsData() {
     try {
         const response = await fetch('/api/Sponsors')
@@ -28,6 +24,8 @@ async function loadSponsorsData() {
         console.error(error)
     }
 }
+
+// 依贊助商數量分配各圈容量與橢圓半徑。
 const ringConfig = computed(() => {
     const count = sponsors.value.length
     if (count === 0) return []
@@ -47,7 +45,7 @@ const ringConfig = computed(() => {
         rings.push({
             rx,
             ry,
-            itemCount
+            itemCount,
         })
 
         remaining -= itemCount
@@ -56,6 +54,8 @@ const ringConfig = computed(() => {
 
     return rings
 })
+
+// 將每間贊助商換算成環繞區內的百分比座標。
 const sponsorPositions = computed(() => {
     const rings = ringConfig.value
     if (rings.length === 0) return []
@@ -65,7 +65,7 @@ const sponsorPositions = computed(() => {
 
     rings.forEach((ring, ringIndex) => {
         const countInRing = ring.itemCount
-        const step = Math.PI * 2 / countInRing
+        const step = (Math.PI * 2) / countInRing
         const offset = ringIndex % 2 === 0 ? 0 : step / 2
 
         for (let i = 0; i < countInRing; i++) {
@@ -80,7 +80,7 @@ const sponsorPositions = computed(() => {
                 ...sponsor,
                 x,
                 y,
-                tooltipSide: x > 50 ? 'left' : 'right'
+                tooltipSide: x > 50 ? 'left' : 'right',
             })
 
             sponsorIndex++
@@ -89,6 +89,8 @@ const sponsorPositions = computed(() => {
 
     return result
 })
+
+// 根據每幀經過的時間持續旋轉，滑鼠懸停時暫停。
 function animate(time) {
     if (!lastTime) lastTime = time
     const delta = time - lastTime
@@ -100,6 +102,8 @@ function animate(time) {
 
     animationId = requestAnimationFrame(animate)
 }
+
+// 每秒自動將視覺焦點切換到下一間贊助商。
 function startActiveTimer() {
     activeTimer = setInterval(() => {
         if (paused.value || sponsors.value.length === 0) return
@@ -107,29 +111,32 @@ function startActiveTimer() {
     }, 1000)
 }
 
+// 懸停項目優先，否則使用自動切換的項目。
 function isActive(index) {
     if (hoveredIndex.value !== null) return hoveredIndex.value === index
     return activeIndex.value === index
 }
 
-
+// 懸停時停止旋轉與自動切換，並顯示詳細資訊。
 function handleEnter(index) {
     paused.value = true
     hoveredIndex.value = index
 }
 
+// 離開後恢復環繞動畫。
 function handleLeave() {
     paused.value = false
     hoveredIndex.value = null
 }
 
-
+// 元件掛載後載入資料並啟動兩種動畫。
 onMounted(() => {
     loadSponsorsData()
     animationId = requestAnimationFrame(animate)
     startActiveTimer()
 })
 
+// 離開頁面時清除動畫與計時器，避免持續佔用資源。
 onUnmounted(() => {
     cancelAnimationFrame(animationId)
     clearInterval(activeTimer)
@@ -137,35 +144,44 @@ onUnmounted(() => {
 </script>
 
 <template>
+    <!-- 贊助商展示區塊。 -->
     <section class="sponsors-section">
+        <!-- 區塊標題。 -->
         <div class="heading">
-            <p>SPONSORS</p>
-            <h2>與我們一起讓想法成為現實。</h2>
+            <!-- 英文小標。 -->
+            <p class="heading-label">SPONSORS</p>
+            <!-- 區塊主標題。 -->
+            <h2 class="heading-title">與我們一起讓想法成為現實。</h2>
         </div>
 
+        <!-- Logo 環繞動畫的展示區。 -->
         <div class="orbit-area">
-            <div v-for="(ring, index) in ringConfig" :key="index" class="orbit" :style="{
-                width: `${ring.rx * 2}%`, height: `${ring.ry * 2}%`
-            }"></div>
-
+            <!-- 環繞中心的 DIT Logo。 -->
             <div class="center">
-                <img :src="dit_logo">
+                <img class="center-logo" :src="ditLogoUrl" alt="DIT Robotics" />
             </div>
 
+            <!-- 單一贊助商的定位容器。 -->
             <div v-for="(sponsor, index) in sponsorPositions" :key="sponsor.id" class="sponsor-wrapper"
                 :class="{ focused: isActive(index) }" :style="{ left: `${sponsor.x}%`, top: `${sponsor.y}%` }"
                 @mouseenter="handleEnter(index)" @mouseleave="handleLeave">
+                <!-- 連結至贊助商官網的 Logo 卡片。 -->
                 <a class="sponsor" :class="{ active: isActive(index) }" :href="sponsor.url" target="_blank"
                     rel="noopener noreferrer">
-                    <img :src="sponsor.logo" :alt="sponsor.name">
+                    <img class="sponsor-logo" :src="sponsor.logo" :alt="sponsor.name" />
                 </a>
 
+                <!-- 懸停時顯示的贊助商資訊卡。 -->
                 <Transition name="tooltip">
                     <div v-if="hoveredIndex === index" class="tooltip" :class="sponsor.tooltipSide">
+                        <!-- 合作關係標籤。 -->
                         <p class="tooltip-label">PARTNER</p>
-                        <h3>{{ sponsor.name }}</h3>
-                        <p>{{ sponsor.description }}</p>
-                        <span>前往網站 ↗</span>
+                        <!-- 贊助商名稱。 -->
+                        <h3 class="tooltip-title">{{ sponsor.name }}</h3>
+                        <!-- 贊助商簡介。 -->
+                        <p class="tooltip-description">{{ sponsor.description }}</p>
+                        <!-- 官網連結提示。 -->
+                        <span class="tooltip-link-label">前往網站 ↗</span>
                     </div>
                 </Transition>
             </div>
@@ -176,14 +192,11 @@ onUnmounted(() => {
 <style scoped>
 .sponsors-section {
     --Width: 130px;
+
     min-height: 100vh;
     width: 100%;
     padding: 100px 7vw;
     background: #f9f9f9;
-    /* display: grid;
-    grid-template-columns: .7fr 1.3fr; */
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
 }
 
@@ -194,14 +207,14 @@ onUnmounted(() => {
     z-index: 5;
 }
 
-.heading>p {
+.heading-label {
     font-size: 13px;
-    letter-spacing: .22em;
+    letter-spacing: 0.22em;
     font-weight: 700;
     margin-bottom: 20px;
 }
 
-.heading h2 {
+.heading-title {
     font-size: clamp(38px, 4vw, 72px);
     line-height: 1.05;
     margin: 0;
@@ -213,21 +226,15 @@ onUnmounted(() => {
     height: min(78vh, 760px);
 }
 
-.orbit {
+.center,
+.sponsor-wrapper {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    /* border: 1px solid rgba(0, 0, 0, .12); */
-    border-radius: 50%;
-    pointer-events: none;
 }
 
 .center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -235,20 +242,12 @@ onUnmounted(() => {
     pointer-events: none;
 }
 
-.center img {
+.center-logo {
     width: var(--Width);
     aspect-ratio: 1;
 }
 
-.center strong {
-    font-size: 11px;
-    letter-spacing: .3em;
-    margin-top: -3px;
-}
-
 .sponsor-wrapper {
-    position: absolute;
-    transform: translate(-50%, -50%);
     z-index: 3;
 }
 
@@ -267,11 +266,11 @@ onUnmounted(() => {
     justify-content: center;
     box-sizing: border-box;
     transform: scale(1);
-    transition: transform 1s cubic-bezier(.2, .8, .2, 1);
+    transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
     text-decoration: none;
 }
 
-.sponsor img {
+.sponsor-logo {
     display: block;
     width: 100%;
     height: 100%;
@@ -280,14 +279,13 @@ onUnmounted(() => {
     filter: brightness(0);
 }
 
-.sponsor.active {
+.sponsor.active,
+.sponsor-wrapper:hover .sponsor {
     transform: scale(1.4);
 }
 
-
 .sponsor-wrapper:hover .sponsor {
-    transform: scale(1.4);
-    transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .tooltip {
@@ -301,7 +299,7 @@ onUnmounted(() => {
     color: white;
     border-radius: 14px;
     pointer-events: none;
-    box-shadow: 0 18px 45px rgba(0, 0, 0, .2);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
     z-index: 200;
 }
 
@@ -318,7 +316,7 @@ onUnmounted(() => {
     width: 14px;
     height: 14px;
     background: #111;
-    transform: translateY(-50%)rotate(45deg);
+    transform: translateY(-50%) rotate(45deg);
 }
 
 .tooltip.left::before {
@@ -328,31 +326,34 @@ onUnmounted(() => {
 
 .tooltip-label {
     font-size: 9px;
-    letter-spacing: .2em;
-    opacity: .5;
-    margin: 0 0 8px;
+    letter-spacing: 0.2em;
+    opacity: 0.5;
 }
 
-.tooltip h3 {
+.tooltip-title {
     font-size: 18px;
+}
+
+.tooltip-label,
+.tooltip-title {
     margin: 0 0 8px;
 }
 
-.tooltip>p:not(.tooltip-label) {
+.tooltip-description {
     font-size: 12px;
     line-height: 1.6;
-    opacity: .7;
+    opacity: 0.7;
     margin: 0 0 14px;
 }
 
-.tooltip span {
+.tooltip-link-label {
     font-size: 11px;
     font-weight: 700;
 }
 
 .tooltip-enter-active,
 .tooltip-leave-active {
-    transition: .2s ease;
+    transition: 0.2s ease;
 }
 
 .tooltip-enter-from,
@@ -362,17 +363,16 @@ onUnmounted(() => {
 
 .tooltip-enter-from.right,
 .tooltip-leave-to.right {
-    transform: translateY(-50%)translateX(-10px);
+    transform: translateY(-50%) translateX(-10px);
 }
 
 .tooltip-enter-from.left,
 .tooltip-leave-to.left {
-    transform: translateY(-50%)translateX(10px);
+    transform: translateY(-50%) translateX(10px);
 }
 
-@media(max-width:1100px) {
+@media (max-width: 1100px) {
     .sponsors-section {
-        grid-template-columns: .6fr 1.4fr;
         padding: 80px 4vw;
     }
 
@@ -392,9 +392,8 @@ onUnmounted(() => {
     }
 }
 
-@media(max-width:900px) {
+@media (max-width: 900px) {
     .sponsors-section {
-        grid-template-columns: 1fr;
         padding: 80px 25px;
     }
 
