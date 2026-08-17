@@ -96,34 +96,25 @@ function getPhotoStyle(index, total) {
 <style scoped>
 .about-section {
     position: relative;
-
     padding: 120px 8vw;
-
     background: #fafafa;
-
     z-index: 1;
 }
 
 .about-section::after {
     content: '';
-
     position: absolute;
-
     left: 0;
     bottom: -124px;
-
     width: 100%;
     height: 125px;
-
     background: linear-gradient(to bottom,
             #fafafa 0%,
             #fafafa 10%,
             rgba(250, 250, 250, 0.8) 40%,
             rgba(250, 250, 250, 0.4) 70%,
             rgba(250, 250, 250, 0) 100%);
-
     pointer-events: none;
-
     z-index: 10;
 }
 
@@ -151,31 +142,22 @@ function getPhotoStyle(index, total) {
 /* 照片區域 */
 .photo-stack {
     position: relative;
-
     width: min(1400px, 95%);
-
     height: 450px;
-
     margin: 50px auto 0;
 }
 
 .team-photo {
     position: absolute;
-
     /*
       不固定 height，
       保留照片原本比例
     */
     width: clamp(240px, 34vw, 480px);
-
     height: auto;
-
     display: block;
-
     border-radius: 28px;
-
     object-fit: contain;
-
     box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
 }
 
