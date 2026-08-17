@@ -46,7 +46,7 @@ onUnmounted(() => {
         <HeroSection v-model:progress="heroProgress" id="hero"/>
 
         <div class="about-wrapper">
-            <AboutSection id="team" />
+            <AboutSection id="aboutSection" class="about-anchor" />
             <EurobotSection id="EurobotSection" />
             <SponsorsSection id="sponsors" />
             <ContactSection id="contact" />
@@ -66,5 +66,13 @@ onUnmounted(() => {
     margin-top: calc(-60vh - (40vh * var(--hero-progress)) + 76px);
 
     background: #f5f5f3;
+}
+
+.about-anchor {
+    /*
+     * 補償 Hero 尚未收合時的剩餘位移，
+     * 讓 #aboutSection 總是停在 About 區塊頂端。
+     */
+    scroll-margin-top: calc((1 - var(--hero-progress)) * 40vh);
 }
 </style>
