@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
+import ArrowRight from '@/components/icons/FreeArrowRight.vue'
 import { ArrowUpRight } from 'lucide-vue-next'
 
 // 當年 Eurobot 資料、機器人清單與 3D 檢視狀態。
@@ -122,8 +123,8 @@ onUnmounted(() => {
                         <!-- 開啟機器人詳細資料的檔案預覽視窗。 -->
                         <FilePreviewModal api="/api/PopUpItem/WhiteSeeMore" title="NTHU DIT">
                             <button class="detail-button" type="button">
-                                <span class="detail-button-label">See more</span>
-                                <img class="detail-button-arrow" src="@/assets/image/Canva_Arrow.png" alt="" />
+                                <span class="detail-button-label">See more </span>
+                                <ArrowRight class="detail-button-arrow"/>
                             </button>
                         </FilePreviewModal>
                     </article>
@@ -134,7 +135,10 @@ onUnmounted(() => {
                     <span class="eurobot-history-button-label">歷屆 EUROBOT</span>
                     <ArrowUpRight class="eurobot-history-button-icon" />
                 </button>
+
             </section>
+            <div id="Advisors_teleport" style="z-index: 300;"></div>
+
         </div>
 
         <!-- 目前選取機器人的 3D 檢視視窗。 -->
@@ -364,6 +368,9 @@ onUnmounted(() => {
 .detail-button {
     margin: auto;
     padding: 0 0 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
     border: none;
     font-family: 'League Spartan', sans-serif;
     font-size: clamp(18px, 2vw, 32px);
@@ -374,9 +381,11 @@ onUnmounted(() => {
 }
 
 .detail-button-arrow {
-    width: clamp(40px, 4vw, 70px);
-    height: 15px;
-    object-fit: contain;
+    width: 50px;
+    height: 24px;
+    flex: none;
+    transform: scaleX(1.2);
+    transform-origin: left center;
 }
 
 .detail-button:hover {
