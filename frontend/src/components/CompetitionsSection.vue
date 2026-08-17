@@ -83,7 +83,7 @@ function openCompetition(item) {
 <style scoped>
 .competition-wrapper {
     width: 100%;
-    background: #848484;
+    background: #3e3e3e;
     overflow: hidden;
 }
 

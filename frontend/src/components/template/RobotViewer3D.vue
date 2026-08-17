@@ -305,6 +305,7 @@ onUnmounted(() => {
     border-radius:5px;
     overflow:hidden;
     cursor:grab;
+    z-index: 9999;
 }
 
 .viewer-background{

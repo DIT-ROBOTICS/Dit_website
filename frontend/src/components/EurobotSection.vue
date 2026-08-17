@@ -146,26 +146,18 @@ onMounted(loadThisYearEurobotData)
                 <div class="simulation-card">
 
                     <p class="eyebrow">
-                        SIMULATION
+                        歷屆EUROBOT
                     </p>
 
                     <h2>
-                        SEE THEM
-                        <br>
-                        IN ACTION.
+                        SEE OUR HISTORY
                     </h2>
 
                     <p>
-                        選擇機器人的策略，
-                        在虛擬 Eurobot 場地中觀看兩台機器執行任務。
+                        查看團隊的競賽歷史
                     </p>
-
-                    <!--
-                        目前先只做視覺
-                        之後再接模擬系統
-                    -->
                     <button class="simulation-button">
-                        ENTER SIMULATION
+                        歷屆EUROBOT
                         <span>
                             <ArrowUpRight />
                         </span>
@@ -635,19 +627,17 @@ onMounted(loadThisYearEurobotData)
 .simulation-card {
     width: min(1100px, 100%);
 
-    padding:
-        clamp(45px, 7vw, 100px);
+    padding: clamp(45px, 3vw, 50px);
 
     background: rgba(5, 5, 5, 1);
-    border:
-        1px solid rgba(255, 255, 255, 1);
+    border: 1px solid rgba(255, 255, 255, 1);
 }
 
 .simulation-card h2 {
     margin: 0;
 
     font-size:
-        clamp(54px, 8vw, 120px);
+        clamp(54px, 6vw, 120px);
 
     line-height: 0.88;
 
