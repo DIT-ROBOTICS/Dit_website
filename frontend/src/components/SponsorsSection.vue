@@ -172,7 +172,7 @@ onUnmounted(() => {
             <!-- 英文小標。 -->
             <p class="heading-label">SPONSORS</p>
             <!-- 區塊主標題。 -->
-            <h2 class="heading-title">與我們一起讓想法成為現實。</h2>
+            <h2 class="heading-title">與我們一起讓想法成為現實</h2>
         </div>
 
         <!-- Logo 環繞動畫的展示區。 -->
@@ -216,7 +216,7 @@ onUnmounted(() => {
 
     min-height: 100vh;
     width: 100%;
-    padding: 100px 7vw;
+    padding: 50px 7vw;
     background: #f9f9f9;
     overflow: hidden;
 }
@@ -238,6 +238,7 @@ onUnmounted(() => {
 .heading-title {
     font-size: clamp(38px, 4vw, 72px);
     line-height: 1.05;
+    letter-spacing: 0.11em;
     margin: 0;
 }
 

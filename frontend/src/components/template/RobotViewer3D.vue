@@ -288,8 +288,8 @@ onUnmounted(() => {
                     <div class="viewer-background" :style="{'--background-api':`url(${background_api})`}"></div>
                     <div class="viewer-overlay"></div>
                 </div>
-                <div class="viewer-info" :style="{'--pos':selectedRobot.View3Dpos}">
-                    <h2 class="shadowText" :style="{ color: selectedRobot.ThemeColor }">{{ selectedRobot.ShowOutName }}</h2>
+                <div class="viewer-info" :style="{'--pos':selectedRobot.View3Dpos,color: selectedRobot.ThemeColor}">
+                    {{ selectedRobot.ShowOutName }}
                 </div>
             </div>
         </div>
@@ -415,23 +415,17 @@ onUnmounted(() => {
 }
 .viewer-info {
     position: absolute;
-
     left: 5%;
     top: 5%;
     width: 90%;
-
     text-align: var(--pos);
-
     z-index: 2;
-
     pointer-events: none;
-}
-.viewer-info h2 {
+    font-family: 'Orbitron', sans-serif;
     margin: 0 0 8px;
     font-size: 60px;
-    letter-spacing: -0.04em;
-}
-.shadowText {
-    text-shadow: -3.5px 3.5px white;
+    letter-spacing: 0.08em;
+    text-shadow: 0 3px 4px #000;
+    font-weight: 900;
 }
 </style>
