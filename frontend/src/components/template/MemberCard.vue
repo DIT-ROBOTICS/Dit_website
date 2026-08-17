@@ -54,7 +54,7 @@ function openFullInfoWindow() {
 
             <h3>{{ props.info.name }}</h3>
 
-            <p v-if="props.info.department" class="people-department">{{ props.info.department }}</p>
+            <!-- <p v-if="props.info.department" class="people-department">{{ props.info.department }}</p>
 
             <p v-if="props.info.description" class="people-description">{{ props.info.description }}</p>
 
@@ -65,9 +65,9 @@ function openFullInfoWindow() {
             <button class="profile-link" type="button" @click.stop="openFullInfoWindow()">
                 View Profile
                 <span>↗</span>
-            </button>
+            </button> -->
         </div>
     </article>
 </template>
 
-<style scoped src="@/assets/styles/member-scroller.css"></style>
+<style scoped src="@/styles/member-scroller.css"></style>

@@ -98,11 +98,10 @@ onMounted(loadlinks)
 
                         <div class="link-groups">
                             <div v-for="group in linkGroups" :key="group.title" class="link-group">
-                                <p class="link-group-title">
-                                    {{ group.title }}
-                                </p>
+                                <p class="link-group-title"> {{ group.title }} </p>
 
                                 <a v-for="link in group.links" :key="link.label" :href="link.href" target="_blank" class="small-link">
+                                    <img v-if="link.icon" :src="link.icon" :alt="`${link.label} icon`" class="small-link-icon">
                                     {{ link.label }}
                                     <span><ArrowUpRight/></span>
                                 </a>
@@ -252,7 +251,7 @@ onMounted(loadlinks)
     align-items: center;
     justify-content: space-between;
 
-    padding: 28px 4px;
+    padding: 14px 4px;
 
     border-top: 1px solid rgba(255, 255, 255, 0.14);
 
@@ -464,9 +463,14 @@ onMounted(loadlinks)
     flex-direction: column;
     align-items: flex-start;
 }
-
+.small-link-icon{
+    width:12px;
+    height:12px;
+    object-fit:contain;
+    flex-shrink:0;
+}
 .link-group-title {
-    margin: 0 0 16px;
+    margin: 0 0 5px;
 
     color: rgba(255, 255, 255, 0.7);
 
@@ -480,7 +484,7 @@ onMounted(loadlinks)
     align-items: center;
     gap: 6px;
 
-    margin: 5px 0;
+    margin: 2px 0;
 
     color: rgba(255, 255, 255, 0.38);
 

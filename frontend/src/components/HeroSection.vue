@@ -76,12 +76,13 @@ onUnmounted(() => {
                     We Do Improve and Try
                 </p>
 
-                <h1>We are <span style="-webkit-text-stroke: 15px #6A7ACD;paint-order: stroke fill;">DIT Robotics</span>
+                <h1>We are <span>DIT Robotics</span>
                 </h1>
 
                 <div class="hero-description">
                     我們來自清華大學，一群勇於追逐夢想，實現理想的大學生<br>
-                    邀請你看看我們的故事吧 <img src="@/assets/image/Canva_Arrow.png" alt="arrow" style="width: 5vw; height: 10px;">
+                    邀請你看看我們的故事吧～
+                    <!-- <img src="@/assets/image/Canva_Arrow.png" alt="arrow" style="width: 5vw; height: 10px;"> -->
                 </div>
 
                 <a href="#team">
@@ -189,18 +190,31 @@ onUnmounted(() => {
 
 .hero-eyebrow {
     margin: 0 0 18px;
-    font-size: 3vw;
+    font-size: 2.6vw;
     font-weight: 900;
     word-spacing: 0.2em;
-    font-family: 'League Spartan', sans-serif;
+    letter-spacing: 0.1em;
+    /* font-family: 'League Spartan', sans-serif; */
+    font-family:'Orbitron',sans-serif;
 }
 
 .hero-content h1 {
     margin: 0;
-    font-size: 5vw;
+    font-size: 4vw;
     line-height: 1;
-    letter-spacing: 0.04em;
-    font-family: 'League Spartan', sans-serif;
+    letter-spacing: 0.1em;
+    /* font-family: 'League Spartan', sans-serif; */
+    font-family:'Orbitron',sans-serif;
+}
+
+.hero-content h1 span {
+    font-family:'Orbitron',sans-serif;
+    font-size: 5vw;
+    letter-spacing: 0.07em;
+    font-weight: 900;
+    color: #8594c9;
+    -webkit-text-stroke:3px currentColor;
+    text-shadow:0px 3px 5px #000000;
 }
 
 .hero-description {
@@ -210,13 +224,14 @@ onUnmounted(() => {
     color: rgba(255, 255, 255, 0.72);
     line-height: 1.9;
     font-size: 1.3vw;
+    letter-spacing: 0.1em;
 }
 
 .hero-content>a {
     display: inline-block;
     margin-top: 30px;
     padding: 13px 22px;
-    border-radius: 999px;
+    border-radius: 15px;
     background: white;
     color: #111;
     text-decoration: none;

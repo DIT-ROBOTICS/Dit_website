@@ -7,6 +7,7 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import dit_logo from "@/assets/dit_logo_text.png"
 
 const sponsors = ref([])
 const angle = ref(0)
@@ -41,7 +42,7 @@ const ringConfig = computed(() => {
         const itemCount = Math.min(capacity, remaining)
 
         const rx = 22 + ringIndex * 11
-        const ry = 16 + ringIndex * 13
+        const ry = 16 + ringIndex * 11
 
         rings.push({
             rx,
@@ -138,7 +139,7 @@ onUnmounted(() => {
 <template>
     <section class="sponsors-section">
         <div class="heading">
-            <p>OUR PARTNERS</p>
+            <p>SPONSORS</p>
             <h2>與我們一起讓想法成為現實。</h2>
         </div>
 
@@ -148,8 +149,7 @@ onUnmounted(() => {
             }"></div>
 
             <div class="center">
-                <span>DIT</span>
-                <strong>PARTNERS</strong>
+                <img :src="dit_logo">
             </div>
 
             <div v-for="(sponsor, index) in sponsorPositions" :key="sponsor.id" class="sponsor-wrapper"
@@ -175,6 +175,7 @@ onUnmounted(() => {
 
 <style scoped>
 .sponsors-section {
+    --Width: 130px;
     min-height: 100vh;
     width: 100%;
     padding: 100px 7vw;
@@ -191,7 +192,6 @@ onUnmounted(() => {
     width: fit-content;
     position: relative;
     z-index: 5;
-    margin-bottom: 100px;
 }
 
 .heading>p {
@@ -235,20 +235,18 @@ onUnmounted(() => {
     pointer-events: none;
 }
 
-.center span {
-    font-size: clamp(35px, 5vw, 80px);
-    font-weight: 900;
-    line-height: .9;
+.center img {
+    width: var(--Width);
+    aspect-ratio: 1;
 }
 
 .center strong {
     font-size: 11px;
     letter-spacing: .3em;
-    margin-top: 10px;
+    margin-top: -3px;
 }
 
 .sponsor-wrapper {
-    --Width: 150px;
     position: absolute;
     transform: translate(-50%, -50%);
     z-index: 3;

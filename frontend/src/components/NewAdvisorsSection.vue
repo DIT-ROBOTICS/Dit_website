@@ -115,7 +115,7 @@ onMounted(loadAdvisors)
     </section>
 </template>
 
-<style scoped src="@/assets/styles/member-scroller.css"></style>
+<style scoped src="@/styles/member-scroller.css"></style>
 <style scoped>
 .advisor-section {
     width: 100%;
@@ -135,14 +135,14 @@ onMounted(loadAdvisors)
 .advisor-heading p {
     margin: 0;
     font-size: clamp(38px, 4vw, 64px);
-    font-weight: 300;
+    font-weight: 900;
     letter-spacing: .02em;
 }
 
 .advisor-stage {
     position: relative;
-    min-height: 520px;
-    padding: 30px 5vw 45px;
+    /* min-height: 480px; */
+    padding: 20px 5vw 30px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     align-items: end;
@@ -155,6 +155,7 @@ onMounted(loadAdvisors)
     position: relative;
     min-width: 0;
     cursor: pointer;
+    font-weight: 900;
     transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .4s ease;
 }
 
@@ -165,7 +166,7 @@ onMounted(loadAdvisors)
 .advisor-portrait {
     position: relative;
     width: 100%;
-    height: 330px;
+    height: 280px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -186,7 +187,7 @@ onMounted(loadAdvisors)
     position: absolute;
     z-index: 1;
     font-size: clamp(42px, 4vw, 70px);
-    font-weight: 300;
+    font-weight: 500;
     white-space: nowrap;
     pointer-events: none;
 }
@@ -209,7 +210,7 @@ onMounted(loadAdvisors)
     margin: 20px 0 0;
     text-align: center;
     font-size: clamp(24px, 2.1vw, 36px);
-    font-weight: 300;
+    font-weight: 600;
     letter-spacing: .05em;
 }
 

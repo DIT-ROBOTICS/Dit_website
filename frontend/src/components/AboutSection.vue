@@ -91,7 +91,7 @@ function getPhotoStyle(index, total) {
       -1      0      1
        ↑      ↓      ↑
     */
-    const y = 30 + (1 - Math.abs(normalized)) * 110
+    const y = 30 + (1 - Math.abs(normalized)) * 50
 
     return {
         left: `${x}%`,
@@ -129,7 +129,7 @@ function getPhotoStyle(index, total) {
         <div class="department-grid" :style="{'--button-color':ThemeColor}">
             <div v-for="item in MoreDetail" :key="item.title" class="department-card" @click="goToLink(item)">
                 <svg class="card-border" viewBox="0 0 600 180" preserveAspectRatio="none">
-                    <rect x="3" y="3" width="594" height="174" rx="38" ry="38" />
+                    <rect x="3" y="3" width="594" height="174" rx="19" ry="19" />
                 </svg>
 
                 <div class="department-content">
@@ -164,10 +164,10 @@ function getPhotoStyle(index, total) {
     position: absolute;
 
     left: 0;
-    bottom: -249px;
+    bottom: -124px;
 
     width: 100%;
-    height: 250px;
+    height: 125px;
 
     background: linear-gradient(
         to bottom,
@@ -210,7 +210,7 @@ function getPhotoStyle(index, total) {
 
     width: min(1400px, 95%);
 
-    height: 520px;
+    height: 450px;
 
     margin: 50px auto 0;
 }
@@ -266,9 +266,9 @@ function getPhotoStyle(index, total) {
     margin: 0 auto;
 
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
 
-    column-gap: 180px;
+    column-gap: 5vw;
     row-gap: 100px;
 }
 
@@ -285,7 +285,7 @@ function getPhotoStyle(index, total) {
 
     background: #fafafa;
 
-    border-radius: 38px;
+    border-radius: 19px;
 
     cursor: pointer;
 
@@ -307,7 +307,7 @@ function getPhotoStyle(index, total) {
     width: 100%;
     height: 100%;
 
-    border-radius: 38px;
+    border-radius: 19px;
 
     background: var(--button-color);
 

@@ -92,7 +92,7 @@ onMounted(loadMembers)
   </section>
 </template>
 
-<style scoped src="@/assets/styles/member-scroller.css"></style>
+<style scoped src="@/styles/member-scroller.css"></style>
 <style scoped>
 .members-section {
   background: #f5f5f3;
