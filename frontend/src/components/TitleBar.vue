@@ -26,13 +26,13 @@ defineProps({
             </a>
 
             <nav class="title-navigation" aria-label="主要導覽">
-                <a class="title-navigation-link" :href="sectionHref('#aboutSection')">團隊</a>
+                <a class="title-navigation-link mobile-hidden" :href="sectionHref('#aboutSection')">團隊</a>
                 <a class="title-navigation-link" href="/Eurobot">Eurobot</a>
-                <a class="title-navigation-link" :href="sectionHref('#robotArchive')">歷年機器人</a>
+                <a class="title-navigation-link mobile-hidden" :href="sectionHref('Eurobot#RobotArchive')">歷年機器人</a>
                 <a class="title-navigation-link" :href="sectionHref('#competitions')">其他競賽</a>
                 <a class="title-navigation-link" :href="sectionHref('#advisors')">指導教授</a>
                 <a class="title-navigation-link" :href="sectionHref('#sponsors')">贊助商</a>
-                <a class="title-navigation-link" :href="sectionHref('#contact')">聯絡</a>
+                <a class="title-navigation-link" :href="sectionHref('#contact')">聯絡我們</a>
             </nav>
         </header>
     </Teleport>
@@ -135,6 +135,10 @@ defineProps({
     .title-navigation-link {
         flex-shrink: 0;
         white-space: nowrap;
+    }
+
+    .title-navigation-link.mobile-hidden {
+        display: none;
     }
 }
 

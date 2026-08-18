@@ -60,8 +60,17 @@ const annotations = computed(() => {
     const cropLeft = (1 - cropWidth) / 2
     const cropTop = (1 - cropHeight) / 2
 
+    // 先依 id 由小到大排序；非數字 id 則使用文字排序。
+    const sortedRules = [...(eurobotData.value.VenueRules || [])].sort((a, b) => {
+        const numberA = Number(a.id)
+        const numberB = Number(b.id)
+
+        if (Number.isFinite(numberA) && Number.isFinite(numberB)) return numberA - numberB
+        return String(a.id ?? '').localeCompare(String(b.id ?? ''), 'zh-Hant', { numeric: true })
+    })
+
     // pointX 預設置中於 0～3，pointY 預設置中於 0～2。
-    const rules = (eurobotData.value.VenueRules || []).map((rule, index) => ({
+    const rules = sortedRules.map((rule, index) => ({
         ...rule,
         index,
         x: numericPoint(rule.pointX, 1.5),
@@ -91,6 +100,18 @@ const annotations = computed(() => {
         const rank = group.findIndex((item) => item.index === rule.index)
 
         /*
+         * 手機版數字由圖片中心朝外偏移，避免一律往上而遮住場地中央。
+         * 若 point 剛好位於中心，則預設往上；角落 point 會沿斜線方向外移。
+         */
+        const directionX = rule.imageX - 0.5
+        const directionY = rule.imageY - 0.5
+        const directionLength = Math.hypot(directionX, directionY) || 1
+        const unitX = directionLength === 1 && directionX === 0 && directionY === 0 ? 0 : directionX / directionLength
+        const unitY = directionLength === 1 && directionX === 0 && directionY === 0 ? -1 : directionY / directionLength
+        const mobileOffset = 30
+        const lineAngle = Math.atan2(-unitY, -unitX) * 180 / Math.PI
+
+        /*
          * 以舞台垂直中心 50% 為基準，向上、向下平均展開。
          * 例如同側 3 筆且 calloutSpacing=15，位置會是 35%、50%、65%。
          */
@@ -112,6 +133,9 @@ const annotations = computed(() => {
             // 箭頭起點位於左右文字欄靠近圖片的邊緣。
             anchorX: side === 'left' ? 20 : 80,
             anchorY: labelY * 100,
+            mobileOffsetX: unitX * mobileOffset,
+            mobileOffsetY: unitY * mobileOffset,
+            mobileLineAngle: lineAngle,
         }
     })
 })
@@ -166,9 +190,25 @@ onMounted(loadRules)
 
                     <!-- 三欄舞台：左側說明、中央圖片、右側說明。 -->
                     <div v-if="eurobotData.VenueImage" class="venue-stage">
-                        <!-- 載入事件會取得圖片真實比例，並觸發 annotations 重新計算。 -->
-                        <img class="venue-image" :src="eurobotData.VenueImage"
-                            :alt="`Eurobot ${eurobotData.Year} 場地`" @load="saveVenueImageAspect" />
+                        <!-- 圖片定位容器讓手機版 point 能使用純圖片座標，不受桌面左右欄影響。 -->
+                        <div class="venue-image-area">
+                            <!-- 載入事件會取得圖片真實比例，並觸發 annotations 重新計算。 -->
+                            <img class="venue-image" :src="eurobotData.VenueImage"
+                                :alt="`Eurobot ${eurobotData.Year} 場地`" @load="saveVenueImageAspect" />
+
+                            <!-- 手機版：讓規則 id 徽章中心直接對齊圖片目標點。 -->
+                            <span v-for="rule in annotations" :key="`mobile-point-${rule.index}`"
+                                class="venue-mobile-point"
+                                :style="{
+                                    left: `${rule.imageX * 100}%`,
+                                    top: `${rule.imageY * 100}%`,
+                                    '--offset-x': `${rule.mobileOffsetX}px`,
+                                    '--offset-y': `${rule.mobileOffsetY}px`,
+                                    '--line-angle': `${rule.mobileLineAngle}deg`,
+                                }">
+                                {{ rule.id }}
+                            </span>
+                        </div>
 
                         <!-- SVG 疊在整個舞台上，從文字欄 anchor 畫線至圖片 point。 -->
                         <svg class="venue-lines" aria-hidden="true">
@@ -193,6 +233,7 @@ onMounted(loadRules)
                         <div v-for="rule in annotations" :key="`label-${rule.index}`"
                             class="venue-callout" :class="`is-${rule.side}`"
                             :style="{ top: `${rule.labelY * 100}%` }">
+                            <span>{{ rule.id }}</span>
                             <p>{{ rule.content || '請在 main_data.json 填入此標註的規則內容。' }}</p>
                         </div>
                     </div>
@@ -279,13 +320,21 @@ onMounted(loadRules)
     width: 100%;
 }
 
-.venue-image {
+.venue-image-area {
     grid-column: 2;
+    position: relative;
+    align-self: center;
+}
+
+.venue-image {
     width: 100%;
     height: auto;
     display: block;
-    align-self: center;
     filter: drop-shadow(0 24px 45px rgba(0, 0, 0, 0.28));
+}
+
+.venue-mobile-point {
+    display: none;
 }
 
 .venue-lines {
@@ -325,7 +374,7 @@ onMounted(loadRules)
     z-index: 4;
     width: 19%;
     display: flex;
-    gap: 25px;
+    gap: 5px;
     align-items: flex-start;
     transform: translateY(-50%);
 }
@@ -379,6 +428,35 @@ onMounted(loadRules)
 
     .venue-point {
         display: none;
+    }
+
+    .venue-mobile-point {
+        position: absolute;
+        z-index: 4;
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        background: #171717;
+        color: #fff;
+        box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.2);
+        font-size: 12px;
+        font-weight: 800;
+        transform: translate(calc(-50% + var(--offset-x)), calc(-50% + var(--offset-y)));
+    }
+
+    .venue-mobile-point::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 16px;
+        height: 2px;
+        background: #fff;
+        transform: rotate(var(--line-angle)) translateX(14px);
+        transform-origin: left center;
     }
 
     .venue-callout,
