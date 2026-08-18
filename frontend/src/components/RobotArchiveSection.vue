@@ -14,12 +14,16 @@ import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 
+// 只在手機寬度停用 3D，平板與桌面版仍可預覽。
+const mobileBreakpoint = '(max-width: 520px)'
 const BackgroundImage = ref("/api/Eurobot/History/Background")
 const robotHistory = ref([])
 
 const trackElement = ref(null)
 const activeIndex = ref(0)
 const selectedRobot = ref(null)
+const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
+let mobileMediaQuery
 
 async function loadHistoryEurobotData(){
     try{
@@ -46,6 +50,8 @@ async function loadHistoryEurobotData(){
 }
 
 function openRobot(robot) {
+    if (isMobile.value || !robot.glbPath) return
+
     selectedRobot.value = robot
     document.body.style.overflow = 'hidden'
 }
@@ -53,6 +59,12 @@ function openRobot(robot) {
 function closeRobot() {
     selectedRobot.value = null
     document.body.style.overflow = ''
+}
+
+// 切換到手機寬度時，關閉可能已開啟的 3D 視窗。
+function updateMobileState(event) {
+    isMobile.value = event.matches
+    if (isMobile.value && selectedRobot.value) closeRobot()
 }
 
 function scrollToYear(index) {
@@ -88,12 +100,17 @@ function updateActiveYear() {
 }
 
 onMounted(async () => {
+    mobileMediaQuery = window.matchMedia(mobileBreakpoint)
+    isMobile.value = mobileMediaQuery.matches
+    mobileMediaQuery.addEventListener('change', updateMobileState)
+
     await loadHistoryEurobotData()
     await nextTick()
     updateActiveYear()
 })
 
 onUnmounted(() => {
+    mobileMediaQuery?.removeEventListener('change', updateMobileState)
     document.body.style.overflow = ''
 })
 </script>
@@ -150,11 +167,12 @@ onUnmounted(() => {
 
                     <div class="robots-area" :class="{ single: item.Robot_Data.length === 1 }">
                         <button v-for="robot in item.Robot_Data" :key="robot.id" class="robot-card"
-                            :class="{ clickable: robot.glbPath }" type="button" @click="openRobot(robot)">
+                            :class="{ clickable: robot.glbPath && !isMobile }" type="button"
+                            :disabled="isMobile || !robot.glbPath" @click="openRobot(robot)">
                             <div class="robot-image-wrapper">
                                 <img :src="robot.imagePath" :alt="robot.name">
 
-                                <div v-if="robot.glbPath" class="view-3d">
+                                <div v-if="robot.glbPath && !isMobile" class="view-3d">
                                     VIEW 3D
                                 </div>
                             </div>
@@ -185,7 +203,8 @@ onUnmounted(() => {
             </div>
         </div>
         <Transition name="modal">
-            <RobotViewer3D v-if="selectedRobot" :robot="selectedRobot" :closeRobot3D="closeRobot"/>
+            <RobotViewer3D v-if="selectedRobot && !isMobile" :robot="selectedRobot"
+                :closeRobot3D="closeRobot"/>
         </Transition>
     </section>
 </template>

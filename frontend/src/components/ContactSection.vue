@@ -53,12 +53,12 @@ onMounted(loadLinks)
                 <!-- 英文小標。 -->
                 <p class="eyebrow">CONTACT US</p>
 
-                <!-- 聯絡區塊主標題。 -->
-                <iframe width="560" height="315"
+                <!-- 團隊影片：桌面維持原尺寸，手機依可用寬度等比例縮放。 -->
+                <iframe class="contact-video" width="560" height="315"
                     src="https://www.youtube.com/embed/Dh_jmZ1kZ28?si=wVV3VIwE9Su_pLn5&amp;controls=0"
                     title="YouTube video player" frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    referrerpolicy="strict-origin-when-cross-origin" loading="lazy" allowfullscreen></iframe>
 
                 <!-- 聯絡說明。 -->
                 <p class="contact-description">
@@ -213,6 +213,14 @@ onMounted(loadLinks)
     letter-spacing: 0.22em;
 
     color: rgba(255, 255, 255, 0.45);
+}
+
+.contact-video {
+    display: block;
+    width: min(560px, 100%);
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border: 0;
 }
 
 .contact-title {
@@ -431,8 +439,8 @@ onMounted(loadLinks)
 
     .contact-main {
         grid-template-columns: 1fr;
-        gap: 80px;
-        margin-bottom: 100px;
+        gap: 64px;
+        margin-bottom: 72px;
     }
 
     .contact-title {
@@ -460,7 +468,34 @@ onMounted(loadLinks)
 
 @media (max-width: 520px) {
     .contact-section {
-        padding-top: 80px;
+        padding: 72px 18px 28px;
+    }
+
+    .contact-section::before {
+        width: 420px;
+        height: 420px;
+        right: -250px;
+        top: -150px;
+    }
+
+    .contact-section::after {
+        width: 240px;
+        height: 240px;
+        right: -130px;
+        top: -55px;
+    }
+
+    .contact-main {
+        gap: 52px;
+        margin-bottom: 64px;
+    }
+
+    .eyebrow {
+        margin-bottom: 18px;
+    }
+
+    .contact-video {
+        width: 100%;
     }
 
     .contact-title {
@@ -468,15 +503,55 @@ onMounted(loadLinks)
     }
 
     .contact-description {
+        margin-top: 24px;
         font-size: 14px;
+        line-height: 1.75;
     }
 
     .contact-button {
         width: 100%;
+        min-width: 0;
+        margin-top: 30px;
     }
 
     .contact-item {
-        padding: 22px 2px;
+        padding: 18px 2px;
+    }
+
+    .contact-value {
+        font-size: 16px;
+        overflow-wrap: anywhere;
+    }
+
+    .contact-footer {
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 16px;
+        row-gap: 28px;
+        padding-top: 28px;
+    }
+
+    .brand {
+        grid-column: 1;
+        min-width: 0;
+    }
+
+    .footer-legal {
+        grid-column: 1 / -1;
+        order: 3;
+        width: 100%;
+        text-align: center;
+    }
+
+    .department-label {
+        line-height: 1.6;
+    }
+
+    .back-top {
+        grid-column: 2;
+        justify-self: end;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 }
 
@@ -565,9 +640,18 @@ onMounted(loadLinks)
 }
 
 @media (max-width: 600px) {
+    .more-links {
+        margin-top: 38px;
+    }
+
     .link-groups {
         grid-template-columns: repeat(1, 1fr);
         gap: 28px 20px;
+    }
+
+    .small-link-arrow {
+        opacity: 0.65;
+        transform: none;
     }
 }
 @media (min-width: 1600px) {

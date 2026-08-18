@@ -53,6 +53,15 @@ body {
 
 * {
   box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .website {

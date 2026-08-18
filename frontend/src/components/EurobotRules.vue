@@ -184,8 +184,8 @@ onMounted(loadRules)
                 <!-- 最新年度的場地圖片與規則標註。 -->
                 <section v-if="!loading && !loadError" class="venue-section">
                     <header class="venue-heading">
-                        <h3>{{ eurobotData.Year }}EUROBOT規則介紹</h3>
-                        <p>Eurobot是一場100秒的計時比賽，兩邊隊伍分數高者勝利</p>
+                        <h3 class="venue-heading-title">{{ eurobotData.Year }}EUROBOT規則介紹</h3>
+                        <p class="venue-heading-description">Eurobot是一場100秒的計時比賽，兩邊隊伍分數高者勝利</p>
                     </header>
 
                     <!-- 三欄舞台：左側說明、中央圖片、右側說明。 -->
@@ -212,13 +212,14 @@ onMounted(loadRules)
 
                         <!-- SVG 疊在整個舞台上，從文字欄 anchor 畫線至圖片 point。 -->
                         <svg class="venue-lines" aria-hidden="true">
-                            <defs>
-                                <marker id="venue-arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                            <defs class="venue-arrow-definitions">
+                                <marker id="venue-arrow" class="venue-arrow-marker" viewBox="0 0 10 10" refX="9" refY="5"
                                     markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                                    <path d="M 0 0 L 10 5 L 0 10 z" />
+                                    <path class="venue-arrow-head" d="M 0 0 L 10 5 L 0 10 z" />
                                 </marker>
                             </defs>
                             <line v-for="rule in annotations" :key="`line-${rule.index}`"
+                                class="venue-connector-line"
                                 :x1="`${rule.anchorX}%`" :y1="`${rule.anchorY}%`"
                                 :x2="`${rule.targetX}%`" :y2="`${rule.targetY}%`"
                                 marker-end="url(#venue-arrow)" />
@@ -233,14 +234,17 @@ onMounted(loadRules)
                         <div v-for="rule in annotations" :key="`label-${rule.index}`"
                             class="venue-callout" :class="`is-${rule.side}`"
                             :style="{ top: `${rule.labelY * 100}%` }">
-                            <span>{{ rule.id }}</span>
-                            <p>{{ rule.content || '請在 main_data.json 填入此標註的規則內容。' }}</p>
+                            <span class="venue-callout-id">{{ rule.id }}</span>
+                            <p class="venue-callout-content">
+                                {{ rule.content || '請在 main_data.json 填入此標註的規則內容。' }}
+                            </p>
                         </div>
                     </div>
 
                     <!-- VenueImage 尚未設定時保留清楚的資料提示。 -->
                     <p v-else class="venue-empty">
-                        請在當年度的 <code>main_data.json</code> 填入 <code>VenueImage</code> 圖片檔名。
+                        請在當年度的 <code class="venue-empty-code">main_data.json</code>
+                        填入 <code class="venue-empty-code">VenueImage</code> 圖片檔名。
                     </p>
                 </section>
             </div>
@@ -249,6 +253,7 @@ onMounted(loadRules)
 </template>
 
 <style scoped>
+/* ===== 規則區塊外框與提亮背景 ===== */
 .eurobot-rules {
     position: relative;
     width: 100%;
@@ -275,8 +280,9 @@ onMounted(loadRules)
     margin: 0 auto;
 }
 
+/* ===== Eurobot 介紹文字 ===== */
 .eurobot-rules-label,
-.venue-heading p {
+.venue-heading-description {
     margin: 0 0 18px;
     font-size: 20px;
     font-weight: 800;
@@ -298,6 +304,7 @@ onMounted(loadRules)
     white-space: pre-line;
 }
 
+/* ===== 場地區塊標題 ===== */
 .venue-section {
     margin-top: clamp(90px, 12vw, 170px);
 }
@@ -307,16 +314,16 @@ onMounted(loadRules)
     text-align: center;
 }
 
-.venue-heading h3 {
+.venue-heading-title {
     margin: 0;
     font-size: clamp(34px, 4vw, 62px);
 }
 
+/* ===== 三欄場地舞台：左說明 22%｜圖片 56%｜右說明 22% ===== */
 .venue-stage {
     position: relative;
     display: grid;
     grid-template-columns: 22% 56% 22%;
-    align-items: stretch;
     width: 100%;
 }
 
@@ -333,6 +340,7 @@ onMounted(loadRules)
     filter: drop-shadow(0 24px 45px rgba(0, 0, 0, 0.28));
 }
 
+/* 手機數字點預設隱藏，只在手機斷點啟用。 */
 .venue-mobile-point {
     display: none;
 }
@@ -347,16 +355,17 @@ onMounted(loadRules)
     pointer-events: none;
 }
 
-.venue-lines line {
+.venue-connector-line {
     stroke: rgba(255, 255, 255, 0.86);
     stroke-width: 1.5;
     vector-effect: non-scaling-stroke;
 }
 
-.venue-lines marker path {
+.venue-arrow-head {
     fill: #fff;
 }
 
+/* ===== 桌面版目標點與左右規則文字 ===== */
 .venue-point {
     position: absolute;
     z-index: 3;
@@ -387,14 +396,14 @@ onMounted(loadRules)
     right: 0;
 }
 
-.venue-callout span {
+.venue-callout-id {
     flex: none;
     color: rgba(255, 255, 255, 0.55);
     font-size: 12px;
     letter-spacing: 0.12em;
 }
 
-.venue-callout p {
+.venue-callout-content {
     margin: 0;
     font-size: clamp(13px, 2vw, 20px);
     line-height: 1.65;
@@ -409,17 +418,14 @@ onMounted(loadRules)
     color: rgba(255, 255, 255, 0.72);
 }
 
-.venue-empty code {
+.venue-empty-code {
     color: #fff;
 }
 
+/* ===== 手機版：圖片上顯示編號，規則文字改為圖片下方列表 ===== */
 @media (max-width: 800px) {
     .venue-stage {
         display: block;
-    }
-
-    .venue-image {
-        width: 100%;
     }
 
     .venue-lines {

@@ -6,6 +6,9 @@ import EurobotRules from '@/components/EurobotRules.vue'
 import ArrowRight from '@/components/icons/FreeArrowRight.vue'
 import { ArrowUpRight } from 'lucide-vue-next'
 
+// 手機版沿用元件既有的 850px 響應式斷點。
+const mobileBreakpoint = '(max-width: 850px)'
+
 defineProps({
     achievementMarginTop: {
         type: String,
@@ -18,6 +21,8 @@ const eurobotData = ref({})
 const robots = ref([])
 const achievementPhoto = ref('')
 const selectedRobot = ref(null)
+const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
+let mobileMediaQuery
 
 // 從後端載入當年戰績、背景與機器人資料。
 async function loadThisYearEurobotData() {
@@ -35,6 +40,8 @@ async function loadThisYearEurobotData() {
 
 // 開啟指定機器人的 3D 檢視器，並鎖定背景捲動。
 function openRobot3D(robot) {
+    if (isMobile.value) return
+
     selectedRobot.value = robot
     document.body.style.overflow = 'hidden'
 }
@@ -43,6 +50,12 @@ function openRobot3D(robot) {
 function closeRobot3D() {
     selectedRobot.value = null
     document.body.style.overflow = ''
+}
+
+// 螢幕切換成手機寬度時立即關閉 3D 視窗，並停用所有預覽入口。
+function updateMobileState(event) {
+    isMobile.value = event.matches
+    if (isMobile.value && selectedRobot.value) closeRobot3D()
 }
 
 // 依卡片數量與位置決定機器人名稱對齊方向。
@@ -56,11 +69,17 @@ function getRobotNameAlignment(robot) {
     return offset % 2 === 0 ? 'right' : 'left'
 }
 
-// 元件掛載後載入 Eurobot 資料。
-onMounted(loadThisYearEurobotData)
+// 元件掛載後載入資料，並監聽桌面／手機斷點變化。
+onMounted(() => {
+    loadThisYearEurobotData()
+    mobileMediaQuery = window.matchMedia(mobileBreakpoint)
+    isMobile.value = mobileMediaQuery.matches
+    mobileMediaQuery.addEventListener('change', updateMobileState)
+})
 
 // 若開啟 3D 視窗時離開頁面，確保恢復 body 捲動。
 onUnmounted(() => {
+    mobileMediaQuery?.removeEventListener('change', updateMobileState)
     document.body.style.overflow = ''
 })
 </script>
@@ -114,13 +133,15 @@ onUnmounted(() => {
                             </span>
                         </p>
 
-                        <!-- 點擊後開啟 3D 檢視器的機器人圖片。 -->
-                        <div class="robot-image-container" role="button" tabindex="0" @click="openRobot3D(robot)"
+                        <!-- 桌面版可點擊開啟 3D；手機版只保留一般機器人圖片。 -->
+                        <div class="robot-image-container" :class="{ 'is-interactive': !isMobile }"
+                            :role="isMobile ? undefined : 'button'" :tabindex="isMobile ? undefined : 0"
+                            @click="openRobot3D(robot)"
                             @keydown.enter="openRobot3D(robot)" @keydown.space.prevent="openRobot3D(robot)">
                             <img class="robot-image" :src="robot.imagePath" :alt="robot.name" />
 
-                            <!-- 圖片懸停時的 3D 檢視提示。 -->
-                            <div class="image-overlay">
+                            <!-- 3D 提示不會在手機版建立。 -->
+                            <div v-if="!isMobile" class="image-overlay">
                                 <div class="view-3d">
                                     <span class="view-icon">360°</span>
                                     <span class="view-label">INTERACTIVE VIEW</span>
@@ -152,7 +173,8 @@ onUnmounted(() => {
 
         <!-- 目前選取機器人的 3D 檢視視窗。 -->
         <Transition name="modal">
-            <RobotViewer3D v-if="selectedRobot" :robot="selectedRobot" :closeRobot3D="closeRobot3D" />
+            <RobotViewer3D v-if="selectedRobot && !isMobile" :robot="selectedRobot"
+                :closeRobot3D="closeRobot3D" />
         </Transition>
     </section>
 </template>
@@ -301,10 +323,13 @@ onUnmounted(() => {
     width: 80%;
     margin: 0 auto;
     overflow: hidden;
-    cursor: pointer;
     background: transparent;
     transform: scale(1);
     transition: transform 0.3s ease;
+}
+
+.robot-image-container.is-interactive {
+    cursor: pointer;
 }
 
 .robot-image {
@@ -314,7 +339,7 @@ onUnmounted(() => {
     transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.robot-image-container:hover {
+.robot-image-container.is-interactive:hover {
     transform: scale(1.045);
 }
 
@@ -329,7 +354,7 @@ onUnmounted(() => {
     transition: background 0.35s ease;
 }
 
-.robot-image-container:hover .image-overlay {
+.robot-image-container.is-interactive:hover .image-overlay {
     background: radial-gradient(circle at 50% 45%, #24242472, #ffffff00 70%);
 }
 
@@ -345,7 +370,7 @@ onUnmounted(() => {
     transition: 0.35s ease;
 }
 
-.robot-image-container:hover .view-3d {
+.robot-image-container.is-interactive:hover .view-3d {
     opacity: 1;
     transform: translateY(0);
 }
@@ -447,7 +472,7 @@ onUnmounted(() => {
     .achievement-panel {
         margin-top: 250px;
         margin-bottom: 100px;
-        padding: 110px 24px 70px;
+        padding: 110px clamp(16px, 4vw, 24px) 70px;
         align-items: flex-end;
     }
 
@@ -456,6 +481,7 @@ onUnmounted(() => {
         margin-left: 0;
         align-items: flex-start;
         transform: none;
+        text-align: left;
     }
 
     .achievement-year {
@@ -464,12 +490,13 @@ onUnmounted(() => {
     }
 
     .achievement-title {
-        font-size: clamp(48px, 14vw, 72px);
-    }
-
-    .achievement-title-line:last-child {
-        margin-left: 0;
-        margin-top: 4px;
+        width: 100%;
+        max-width: 100%;
+        font-size: clamp(36px, 11vw, 56px);
+        text-align: left;
+        white-space: pre-line;
+        word-break: keep-all;
+        overflow-wrap: anywhere;
     }
 
     .achievement-awards {
@@ -479,7 +506,7 @@ onUnmounted(() => {
     }
 
     .achievement-award {
-        font-size: clamp(25px, 8vw, 38px);
+        font-size: clamp(12px, 6vw, 38px);
     }
 
     .background-image {
@@ -493,7 +520,7 @@ onUnmounted(() => {
 
     .robots-grid {
         grid-template-columns: 1fr;
-        gap: 100px;
+        gap: 48px;
     }
 
     .robots-grid:has(> .robot-card:last-child:nth-child(odd))>.robot-card:first-child {
@@ -518,12 +545,16 @@ onUnmounted(() => {
 @media (max-width: 520px) {
     .achievement-panel {
         margin-top: 180px;
-        padding-left: 20px;
-        padding-right: 20px;
+        padding-left: 16px;
+        padding-right: 16px;
     }
 
     .robot-image-container {
         width: 95%;
+    }
+
+    .robots-grid {
+        gap: 32px;
     }
 
     .eurobot-history-button {
