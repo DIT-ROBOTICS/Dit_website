@@ -1,10 +1,29 @@
 {
   "Year":2026,
   "Background": "2026competition.jpg",
-  "BigTitle": ["THIS YEAR","We Made IT"],
+  "BigTitle": "THIS YEAR\nWe Made IT ",
   "awards": ["World TOP 2","Team Choice Award"],
   "awardsColor": "#c75b5b",
   "description": "這裡放一些當年比賽的描述",
+  "VenueRules":[
+    {
+      "pointX":0.15, "pointY":0.82,
+      "content":"比賽剩下最後15秒時，小機器人SIMA須從家中出發，並走至綠色格線內停下，並使至動器運轉，即可得分"
+    },
+    {
+      "pointX":2.7, "pointY":1.8,
+      "content":"機器人須從藍方或黃方出發"
+    },
+    {
+      "pointX":2.8, "pointY":1.2,
+      "content":"收集場邊四個一組的木塊，並將木塊正面翻至隊伍顏色\n再將翻好的木塊放至綠色格線內，有幾塊就算幾分"
+    },
+    {
+      "pointX":2.78, "pointY":0.05,
+      "content":"除此之外還要將場邊的溫度計推至10，即可得到最高分"
+    }
+  ],
+  "VenueImage":"Eurobot場地.png",
   "Robot_Data": [
     {
       "id": 1,

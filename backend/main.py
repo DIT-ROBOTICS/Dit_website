@@ -81,6 +81,12 @@ async def get_pop_up_item(file:str):
 @app.get("/api/Eurobot")
 async def get_latest_eurobot():
     return Eurobot.load_eurobot(Eurobot.get_latest_year())
+@app.get("/api/Eurobot/Introduction")
+async def get_eurobot_introduction():
+    file_path=Eurobot.EUROBOT_DIR/"EurobotIntroduction.txt"
+    if not file_path.is_file():
+        raise HTTPException(status_code=404,detail="File not found")
+    return FileResponse(file_path)
 
 @app.get("/api/Eurobot/History")
 async def get_eurobot_history():

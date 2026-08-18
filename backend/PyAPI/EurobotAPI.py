@@ -42,6 +42,10 @@ def load_eurobot(year:int):
 
     data["Background"]=f"/api/Eurobot/{year}/file/{data['Background']}"
 
+    venue_image=data.get("VenueImage")
+    if venue_image:
+        data["VenueImage"]=f"/api/Eurobot/{year}/file/{venue_image}"
+
     for robot in data["Robot_Data"]:
         robot["glbPath"]=f"/api/Eurobot/{year}/file/{robot['glbPath']}"
         robot["imagePath"]=f"/api/Eurobot/{year}/file/{robot['imagePath']}"
