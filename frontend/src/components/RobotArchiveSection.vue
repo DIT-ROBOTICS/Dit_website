@@ -211,6 +211,7 @@ onUnmounted(() => {
 
 <style scoped>
 .robot-archive {
+    --title-bar-height: 76px;
     position: relative;
     width: 100%;
     /* overflow: hidden; */
@@ -220,10 +221,10 @@ onUnmounted(() => {
 .sticky-background {
     position: sticky;
 
-    top: 76px;
+    top: var(--title-bar-height);
 
     width: 100%;
-    height: calc(100vh - 76px);
+    height: calc(100vh - var(--title-bar-height));
 
     overflow: hidden;
 
@@ -247,7 +248,8 @@ onUnmounted(() => {
     position: relative;
     width: 100%;
     z-index: 2;
-    margin-top: -100vh;
+    /* 只覆蓋 sticky background，不再多往上跨出 section 76px。 */
+    margin-top: calc(-100vh + var(--title-bar-height));
     padding: 10vw 0 10vw;
 }
 

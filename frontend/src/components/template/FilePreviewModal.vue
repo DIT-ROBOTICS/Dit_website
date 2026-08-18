@@ -204,7 +204,8 @@ onUnmounted(() => {
 
 <template>
     <div class="file-preview-trigger" @click="open">
-        <slot />
+        <!-- 提供 open 給需要直接綁定事件的觸發按鈕；一般 slot 仍保留冒泡相容性。 -->
+        <slot :open="open" />
     </div>
 
     <Teleport to="body">
