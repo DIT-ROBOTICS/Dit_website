@@ -2,7 +2,6 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
-import EurobotRules from '@/components/EurobotRules.vue'
 import ArrowRight from '@/components/icons/FreeArrowRight.vue'
 import { ArrowUpRight } from 'lucide-vue-next'
 
@@ -14,6 +13,10 @@ defineProps({
         type: String,
         default: '400px',
     },
+    showHistoryButton: {
+        type: Boolean,
+        default: true,
+    },
 })
 
 // 當年 Eurobot 資料、機器人清單與 3D 檢視狀態。
@@ -22,7 +25,9 @@ const robots = ref([])
 const achievementPhoto = ref('')
 const selectedRobot = ref(null)
 const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
+const mobilePreviewNoticeId = ref(null)
 let mobileMediaQuery
+let mobileNoticeTimer
 
 // 從後端載入當年戰績、背景與機器人資料。
 async function loadThisYearEurobotData() {
@@ -46,6 +51,20 @@ function openRobot3D(robot) {
     document.body.style.overflow = 'hidden'
 }
 
+// 手機版以提示取代 3D 視窗；桌面和平板維持原本預覽功能。
+function handleRobotPreview(robot) {
+    if (!isMobile.value) {
+        openRobot3D(robot)
+        return
+    }
+
+    mobilePreviewNoticeId.value = robot.id
+    clearTimeout(mobileNoticeTimer)
+    mobileNoticeTimer = setTimeout(() => {
+        mobilePreviewNoticeId.value = null
+    }, 3000)
+}
+
 // 關閉 3D 檢視器並恢復頁面捲動。
 function closeRobot3D() {
     selectedRobot.value = null
@@ -56,6 +75,7 @@ function closeRobot3D() {
 function updateMobileState(event) {
     isMobile.value = event.matches
     if (isMobile.value && selectedRobot.value) closeRobot3D()
+    mobilePreviewNoticeId.value = null
 }
 
 // 依卡片數量與位置決定機器人名稱對齊方向。
@@ -80,6 +100,7 @@ onMounted(() => {
 // 若開啟 3D 視窗時離開頁面，確保恢復 body 捲動。
 onUnmounted(() => {
     mobileMediaQuery?.removeEventListener('change', updateMobileState)
+    clearTimeout(mobileNoticeTimer)
     document.body.style.overflow = ''
 })
 </script>
@@ -135,9 +156,11 @@ onUnmounted(() => {
 
                         <!-- 桌面版可點擊開啟 3D；手機版只保留一般機器人圖片。 -->
                         <div class="robot-image-container" :class="{ 'is-interactive': !isMobile }"
-                            :role="isMobile ? undefined : 'button'" :tabindex="isMobile ? undefined : 0"
-                            @click="openRobot3D(robot)"
-                            @keydown.enter="openRobot3D(robot)" @keydown.space.prevent="openRobot3D(robot)">
+                            role="button" tabindex="0"
+                            :aria-label="isMobile ? '顯示 3D 預覽裝置提示' : `查看 ${robot.name} 的 3D 預覽`"
+                            @click="handleRobotPreview(robot)"
+                            @keydown.enter="handleRobotPreview(robot)"
+                            @keydown.space.prevent="handleRobotPreview(robot)">
                             <img class="robot-image" :src="robot.imagePath" :alt="robot.name" />
 
                             <!-- 3D 提示不會在手機版建立。 -->
@@ -147,12 +170,25 @@ onUnmounted(() => {
                                     <span class="view-label">INTERACTIVE VIEW</span>
                                 </div>
                             </div>
+
+                            <Transition name="mobile-preview-notice">
+                                <div v-if="isMobile && mobilePreviewNoticeId === robot.id"
+                                    class="mobile-3d-notice" role="status">
+                                    <div class="mobile-3d-notice-content">
+                                        <span class="mobile-3d-notice-icon">360°</span>
+                                        <span class="mobile-3d-notice-text">
+                                            請使用電腦查看 3D 機器人預覽
+                                        </span>
+                                    </div>
+                                </div>
+                            </Transition>
                         </div>
 
                         <!-- 開啟機器人詳細資料的檔案預覽視窗。 -->
-                        <FilePreviewModal api="/api/PopUpItem/WhiteSeeMore" title="NTHU DIT">
-                            <button class="detail-button" type="button">
-                                <span class="detail-button-label">See more </span>
+                        <FilePreviewModal v-slot="{ open: openPreview }" api="/api/PopUpItem/WhiteSeeMore"
+                            title="NTHU DIT">
+                            <button class="detail-button" type="button" @click.stop="openPreview">
+                                <span>See more </span>
                                 <ArrowRight class="detail-button-arrow"/>
                             </button>
                         </FilePreviewModal>
@@ -160,7 +196,7 @@ onUnmounted(() => {
                 </div>
 
                 <!-- 前往歷屆 Eurobot 內容的按鈕。 -->
-                <RouterLink class="eurobot-history-button" id="eurobot-history-button"
+                <RouterLink v-if="showHistoryButton" class="eurobot-history-button" id="eurobot-history-button"
                     to="/Eurobot#RobotArchive">
                     <span class="eurobot-history-button-label">歷屆 EUROBOT</span>
                     <ArrowUpRight class="eurobot-history-button-icon" />
@@ -332,6 +368,68 @@ onUnmounted(() => {
     cursor: pointer;
 }
 
+.mobile-3d-notice {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: radial-gradient(circle at 50% 48%, rgba(5, 5, 5, 0.68), rgba(5, 5, 5, 0.2) 38%, transparent 70%);
+    color: #fff;
+    text-align: center;
+    pointer-events: none;
+}
+
+.mobile-3d-notice-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 220px;
+}
+
+.mobile-3d-notice-icon {
+    width: 68px;
+    height: 68px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+}
+
+.mobile-3d-notice-text {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.65;
+    letter-spacing: 0.08em;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+}
+
+.mobile-preview-notice-enter-active,
+.mobile-preview-notice-leave-active {
+    transition: opacity 260ms ease;
+}
+
+.mobile-preview-notice-enter-active .mobile-3d-notice-content,
+.mobile-preview-notice-leave-active .mobile-3d-notice-content {
+    transition: transform 260ms ease, opacity 260ms ease;
+}
+
+.mobile-preview-notice-enter-from,
+.mobile-preview-notice-leave-to {
+    opacity: 0;
+}
+
+.mobile-preview-notice-enter-from .mobile-3d-notice-content,
+.mobile-preview-notice-leave-to .mobile-3d-notice-content {
+    opacity: 0;
+    transform: translateY(12px);
+}
+
 .robot-image {
     width: 100%;
     height: 100%;
@@ -393,6 +491,8 @@ onUnmounted(() => {
 }
 
 .detail-button {
+    position: relative;
+    z-index: 10;
     margin: auto;
     padding: 0 0 18px;
     display: inline-flex;
