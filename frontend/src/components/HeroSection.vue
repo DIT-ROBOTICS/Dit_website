@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import heroImageUrl from '@/assets/Hero_Image.png'
 import heroVideoUrl from '@/assets/hero背景影片.m4v'
-import logoUrl from '@/assets/dit_logo.png'
+import TitleBar from '@/components/TitleBar.vue'
 
 const heroContainer = ref(null)
 const progress = defineModel('progress', { type: Number, default: 0 })
@@ -68,30 +68,8 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <!-- 將頂部導覽掛載到 body，避免受封面容器裁切。 -->
-        <Teleport to="body">
-            <!-- 隨封面收合而淡入的頂部導覽。 -->
-            <header class="title-bar" :style="{ '--progress': progress }">
-                <!-- 回到首頁的品牌連結。 -->
-                <a href="#hero" class="title-brand">
-                    <!-- DIT 品牌 Logo。 -->
-                    <img class="title-brand-logo" :src="logoUrl" alt="DIT Logo" />
-                    <!-- DIT 品牌名稱。 -->
-                    <strong class="title-brand-name">DIT Robotics</strong>
-                </a>
-
-                <!-- 網站主要區塊導覽。 -->
-                <nav class="title-navigation" aria-label="主要導覽">
-                    <a class="title-navigation-link" href="#aboutSection">團隊</a>
-                    <a class="title-navigation-link" href="#EurobotSection">Eurobot</a>
-                    <a class="title-navigation-link" href="#robotArchive">歷年機器人</a>
-                    <a class="title-navigation-link" href="#competitions">其他競賽</a>
-                    <a class="title-navigation-link" href="#advisors">指導教授</a>
-                    <a class="title-navigation-link" href="#sponsors">贊助商</a>
-                    <a class="title-navigation-link" href="#contact">聯絡</a>
-                </nav>
-            </header>
-        </Teleport>
+        <!-- 隨封面收合而淡入的獨立頂部導覽。 -->
+        <TitleBar :progress="progress" />
     </section>
 </template>
 
@@ -209,131 +187,15 @@ onUnmounted(() => {
     color: #111;
 }
 
-.title-bar,
-.title-brand,
-.title-navigation {
-    display: flex;
-    align-items: center;
-}
-
-.title-bar,
-.title-brand {
-    gap: 14px;
-}
-
-.hero-cta,
-.title-brand,
-.title-navigation-link {
+.hero-cta {
     text-decoration: none;
 }
 
-.title-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 54;
-    box-sizing: border-box;
-    height: 76px;
-    padding-inline: 5vw;
-    opacity: var(--progress);
-    color: white;
-    transform: translateY(calc((1 - var(--progress)) * -24px));
-    background: rgba(10, 12, 17, 1);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-}
-
-.title-brand {
-    margin-right: auto;
-    color: white;
-    cursor: pointer;
-}
-
-.title-brand-logo {
-    width: 42px;
-    height: 42px;
-    object-fit: contain;
-    border-radius: 10px;
-}
-
-.title-brand-name {
-    font-size: 16px;
-}
-
-.title-navigation {
-    gap: 2.4vw;
-}
-
-.title-navigation-link {
-    color: rgba(255, 255, 255, 0.72);
-    font-size: 13px;
-    transition:
-        color 0.2s ease,
-        transform 0.2s ease;
-}
-
-.title-navigation-link:hover {
-    color: white;
-    transform: translateY(-1px);
-}
-
 @media (max-width: 760px) {
-    .title-bar {
-        gap: 10px;
-        padding-inline: 16px;
-    }
-
-    .title-brand {
-        flex-shrink: 0;
-    }
-
-    .title-brand-name {
-        display: none;
-    }
-
-    .title-navigation {
-        min-width: 0;
-        flex: 1;
-        gap: 18px;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scrollbar-width: none;
-    }
-
-    .title-navigation::-webkit-scrollbar {
-        display: none;
-    }
-
-    .title-navigation-link {
-        flex-shrink: 0;
-        white-space: nowrap;
-    }
-
     .hero-content {
         left: 24px;
         right: 24px;
         bottom: 80px;
-    }
-}
-
-/* 小螢幕保留導覽列兩側的最小留白。 */
-@media (max-width: 400px) {
-    .title-bar {
-        padding-inline: 12px;
-    }
-}
-
-/* 大螢幕限制導覽列留白與連結間距，維持原本版面上限。 */
-@media (min-width: 1333.34px) {
-    .title-navigation {
-        gap: 32px;
-    }
-}
-
-@media (min-width: 1440px) {
-    .title-bar {
-        padding-inline: 72px;
     }
 }
 </style>
