@@ -2,8 +2,16 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
+import EurobotRules from '@/components/EurobotRules.vue'
 import ArrowRight from '@/components/icons/FreeArrowRight.vue'
 import { ArrowUpRight } from 'lucide-vue-next'
+
+defineProps({
+    achievementMarginTop: {
+        type: String,
+        default: '400px',
+    },
+})
 
 // 當年 Eurobot 資料、機器人清單與 3D 檢視狀態。
 const eurobotData = ref({})
@@ -59,7 +67,8 @@ onUnmounted(() => {
 
 <template>
     <!-- 當年 Eurobot 戰績與機器人展示區。 -->
-    <section id="featured-robot" class="robot-year-section">
+    <section id="featured-robot" class="robot-year-section"
+        :style="{ '--achievement-margin-top': achievementMarginTop }">
         <!-- 捲動時固定在畫面後方的團隊照片。 -->
         <div class="sticky-background">
             <!-- 當年 Eurobot 團隊背景圖。 -->
@@ -78,11 +87,7 @@ onUnmounted(() => {
                     <p class="achievement-year">Eurobot {{ eurobotData.Year }}</p>
 
                     <!-- 當年主視覺標題。 -->
-                    <h2 class="achievement-title">
-                        <span v-for="text in eurobotData.BigTitle" :key="text" class="achievement-title-line">
-                            {{ text }}
-                        </span>
-                    </h2>
+                    <h2 class="achievement-title">{{ eurobotData.BigTitle }}</h2>
 
                     <!-- 當年競賽獎項。 -->
                     <div class="achievement-awards" :style="{ '--text-color': eurobotData.awardsColor }">
@@ -92,6 +97,9 @@ onUnmounted(() => {
                     </div>
                 </div>
             </section>
+
+            <!-- EurobotRules 會透過 Teleport 掛載到此處。 -->
+            <section id="Eurobot_rules"></section>
 
             <!-- 當年機器人展示區。 -->
             <section class="robots-showcase">
@@ -131,10 +139,11 @@ onUnmounted(() => {
                 </div>
 
                 <!-- 前往歷屆 Eurobot 內容的按鈕。 -->
-                <button class="eurobot-history-button" type="button">
+                <RouterLink class="eurobot-history-button" id="eurobot-history-button"
+                    to="/Eurobot#RobotArchive">
                     <span class="eurobot-history-button-label">歷屆 EUROBOT</span>
                     <ArrowUpRight class="eurobot-history-button-icon" />
-                </button>
+                </RouterLink>
 
             </section>
             <div id="Advisors_teleport" style="z-index: 300;"></div>
@@ -189,7 +198,7 @@ onUnmounted(() => {
 
 .achievement-panel {
     position: relative;
-    margin-top: 400px;
+    margin-top: var(--achievement-margin-top);
     margin-bottom: 150px;
     display: flex;
     padding: clamp(90px, 10vh, 140px) clamp(40px, 10vw, 120px);
@@ -220,15 +229,8 @@ onUnmounted(() => {
     line-height: 0.98;
     letter-spacing: 0.05em;
     font-weight: 800;
-}
-
-.achievement-title-line {
-    display: block;
-}
-
-.achievement-title-line:last-child {
-    margin-left: -0.5em;
-    margin-top: 8px;
+    text-align: right;
+    white-space: pre-wrap;
 }
 
 .achievement-awards {
@@ -397,6 +399,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    text-decoration: none;
     gap: 40px;
     width: max-content;
     min-width: 240px;
