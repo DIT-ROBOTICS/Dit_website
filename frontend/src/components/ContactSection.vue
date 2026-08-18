@@ -310,7 +310,7 @@ onMounted(loadLinks)
 
 .contact-value {
     margin: 0;
-
+    white-space: pre-line;
     font-size: clamp(16px, 1.5vw, 22px);
     letter-spacing: -0.02em;
 }
@@ -567,6 +567,12 @@ onMounted(loadLinks)
 @media (max-width: 600px) {
     .link-groups {
         grid-template-columns: repeat(1, 1fr);
+        gap: 28px 20px;
+    }
+}
+@media (min-width: 1600px) {
+    .link-groups {
+        grid-template-columns: repeat(3, 1fr);
         gap: 28px 20px;
     }
 }

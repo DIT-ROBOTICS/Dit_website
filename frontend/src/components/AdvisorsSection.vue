@@ -117,7 +117,7 @@ onMounted(loadAdvisors)
 }
 
 .advisor-card {
-    --card-width: min(256px, 17.6vw);
+    --card-width: min(500px, 17.6vw);
     position: absolute;
     z-index: 1;
     /* top: 50%; */
@@ -143,7 +143,7 @@ onMounted(loadAdvisors)
 .advisor-card.is-active {
     z-index: 3;
     left: 65%;
-    width: min(736px, 56vw);
+    width: min(850px, 60vw);
     height: 380px;
     transform: translate(-50%, 0);
     box-shadow: 0 25px 50px rgba(18, 14, 56, 0.28);
