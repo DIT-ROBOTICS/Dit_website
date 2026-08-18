@@ -1,11 +1,14 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { RouterView, useRoute } from 'vue-router'
 
 import StartupAnimation from '@/components/StartupAnimation.vue'
 import FloatingRobot from '@/components/FloatingRobot.vue'
-import HomeView from '@/views/HomeView.vue'
+import TitleBar from '@/components/TitleBar.vue'
 
 const startupFinished = ref(false)
+const route = useRoute()
+const isHomeRoute = computed(() => route.path === '/')
 
 function finishStartup() {
   startupFinished.value = true
@@ -22,9 +25,14 @@ if(startup){
   <StartupAnimation v-if="!startupFinished" @finished="finishStartup" />
 
   <div class="website" :class="{ visible: startupFinished }" >
-    <HomeView />
-    <FloatingRobot v-if="startupFinished" />
+    <RouterView />
   </div>
+
+  <!-- 全路由共用，不受個別分頁的堆疊與裁切影響。 -->
+  <FloatingRobot v-if="startupFinished" />
+
+  <!-- 首頁由 Hero 控制動畫；其他分頁固定顯示同一條導覽列。 -->
+  <TitleBar v-if="startupFinished && !isHomeRoute" :progress="1" />
 </template>
 
 <style>
