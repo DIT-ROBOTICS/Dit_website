@@ -466,7 +466,7 @@ onMounted(loadLinks)
     }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
     .contact-section {
         padding: 72px 18px 28px;
     }

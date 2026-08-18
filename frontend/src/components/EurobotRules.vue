@@ -423,7 +423,7 @@ onMounted(loadRules)
 }
 
 /* ===== 手機版：圖片上顯示編號，規則文字改為圖片下方列表 ===== */
-@media (max-width: 800px) {
+@media (max-width: 900px) {
     .venue-stage {
         display: block;
     }

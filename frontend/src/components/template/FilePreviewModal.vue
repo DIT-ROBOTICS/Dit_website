@@ -16,7 +16,7 @@ const props = defineProps({
     },
     mobileBreakpoint: {
         type: Number,
-        default: 768
+        default: 600
     }
 })
 

@@ -231,7 +231,7 @@ onMounted(loadAdvisors)
     font-size: 11px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
     .advisors-section { padding: 80px 0; }
     .advisors-stage {
         display: grid;

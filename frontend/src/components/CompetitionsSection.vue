@@ -306,7 +306,7 @@ button:hover span {
     transform: translateX(6px) translateY(25%);
 }
 
-@media(max-width:850px) {
+@media(max-width:900px) {
     .competition-section {
         height: auto;
         display: block;

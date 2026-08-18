@@ -6,8 +6,8 @@ import EurobotRules from '@/components/EurobotRules.vue'
 import ArrowRight from '@/components/icons/FreeArrowRight.vue'
 import { ArrowUpRight } from 'lucide-vue-next'
 
-// 手機版沿用元件既有的 850px 響應式斷點。
-const mobileBreakpoint = '(max-width: 850px)'
+// 手機版統一使用 600px 斷點；平板仍保留 3D 預覽功能。
+const mobileBreakpoint = '(max-width: 600px)'
 
 defineProps({
     achievementMarginTop: {
@@ -468,7 +468,7 @@ onUnmounted(() => {
     opacity: 0;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 900px) {
     .achievement-panel {
         margin-top: 250px;
         margin-bottom: 100px;
@@ -542,7 +542,7 @@ onUnmounted(() => {
     }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
     .achievement-panel {
         margin-top: 180px;
         padding-left: 16px;

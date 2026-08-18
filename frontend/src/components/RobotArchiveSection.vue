@@ -15,7 +15,7 @@ import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 
 // 只在手機寬度停用 3D，平板與桌面版仍可預覽。
-const mobileBreakpoint = '(max-width: 520px)'
+const mobileBreakpoint = '(max-width: 600px)'
 const BackgroundImage = ref("/api/Eurobot/History/Background")
 const robotHistory = ref([])
 
@@ -671,7 +671,7 @@ onUnmounted(() => {
     }
 }
 
-@media(max-width:850px) {
+@media(max-width:900px) {
     .robot-archive {
         padding: 60px 0 45px;
     }
@@ -777,7 +777,7 @@ onUnmounted(() => {
 
 }
 
-@media(max-width:520px) {
+@media(max-width:600px) {
     .archive-eyebrow {
         font-size: 9px;
     }

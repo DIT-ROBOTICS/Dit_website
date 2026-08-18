@@ -105,7 +105,7 @@ defineProps({
     transform: translateY(-1px);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .title-bar {
         gap: 10px;
         padding-inline: 16px;
@@ -137,14 +137,17 @@ defineProps({
         white-space: nowrap;
     }
 
-    .title-navigation-link.mobile-hidden {
-        display: none;
-    }
 }
 
 @media (max-width: 400px) {
     .title-bar {
         padding-inline: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .title-navigation-link.mobile-hidden {
+        display: none;
     }
 }
 
