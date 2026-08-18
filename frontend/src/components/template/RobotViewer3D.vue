@@ -33,6 +33,7 @@ const modelLoading = ref(true)
 const modelProgress = ref(0)
 const modelProgressIsEstimated = ref(false)
 const modelLoadError = ref('')
+const modelFileMissing = ref(false)
 
 let scene
 let camera
@@ -167,10 +168,12 @@ function loadModel() {
     modelProgress.value = 0
     modelProgressIsEstimated.value = false
     modelLoadError.value = ''
+    modelFileMissing.value = false
 
     if (!props.robot.glbPath) {
         modelLoading.value = false
-        modelLoadError.value = '找不到模型檔案'
+        modelFileMissing.value = true
+        modelLoadError.value = '目前沒有此機器的 3D 檔案'
         return
     }
 
@@ -218,8 +221,16 @@ function loadModel() {
                 'GLB load error',
                 error
             )
+
+            const status = error?.target?.status ?? error?.response?.status
+            const errorMessage = String(error?.message || error || '')
+            const isNotFound = status === 404 || /\b404\b|not found/i.test(errorMessage)
+
             modelLoading.value = false
-            modelLoadError.value = '模型載入失敗，請稍後再試'
+            modelFileMissing.value = isNotFound
+            modelLoadError.value = isNotFound
+                ? '目前沒有此機器的 3D 檔案，欲查看檔案請聯絡DIT'
+                : '模型載入失敗，可能是檔案損毀或無法解析，請聯絡DIT'
         }
     )
 }
@@ -348,9 +359,12 @@ onUnmounted(() => {
                             </template>
 
                             <template v-else>
-                                <p class="model-loading-title">LOAD FAILED</p>
+                                <p class="model-loading-title">
+                                    {{ modelFileMissing ? '3D MODEL NOT AVAILABLE' : 'LOAD FAILED' }}
+                                </p>
                                 <p class="model-loading-error">{{ modelLoadError }}</p>
-                                <button class="model-loading-retry" type="button" @click="loadModel">
+                                <button v-if="!modelFileMissing" class="model-loading-retry" type="button"
+                                    @click="loadModel">
                                     重新載入
                                 </button>
                             </template>
