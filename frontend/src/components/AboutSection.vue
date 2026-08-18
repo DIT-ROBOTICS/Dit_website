@@ -68,8 +68,10 @@ async function loadAboutData() {
 }
 
 // 元件掛載後同時載入照片與文字資料。
-onMounted(loadImages)
-onMounted(loadAboutData)
+onMounted(() => {
+    loadImages()
+    loadAboutData()
+})
 
 // 根據照片數量計算水平位置、U 形高度與旋轉角度。
 function getPhotoStyle(index, total) {
@@ -152,10 +154,10 @@ function getPhotoStyle(index, total) {
 }
 
 .about-heading-label {
+    margin: 0 0 18px;
     letter-spacing: 0.2em;
     font-size: 2vw;
     color: #000000;
-    margin-bottom: 18px;
     font-weight: 500;
 }
 
@@ -240,16 +242,11 @@ function getPhotoStyle(index, total) {
 }
 
 /* 滑入其中一張時，該項目接管整個相簿，其餘項目同步收合。 */
-@media (min-width: 801px) {
+@media (min-width: 901px) {
     .daily-gallery:has(.daily-card:hover) .daily-card:not(:hover),
     .daily-gallery:has(.daily-card:focus-visible) .daily-card:not(:focus-visible) {
         flex: 0 1 0;
         border-width: 0;
-    }
-
-    /* 未展開時維持四等分寬度。 */
-    .daily-card-image {
-        width: 25vw;
     }
 
     /* 展開後照片與文字為 1:2。 */
@@ -336,28 +333,26 @@ function getPhotoStyle(index, total) {
 }
 
 /* 讓照片在文字區左緣自然融入深色背景。 */
-.daily-card-content::before {
-    content: '';
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: var(--daily-overlap-width);
-    background: linear-gradient(to right, transparent, var(--Theme-Color) 100%);
-    pointer-events: none;
-}
-
+.daily-card-content::before,
 .daily-card-content::after {
     content: '';
     position: absolute;
     z-index: 0;
     top: 0;
-    right: 0;
     bottom: 0;
+    pointer-events: none;
+}
+
+.daily-card-content::before {
+    left: 0;
+    width: var(--daily-overlap-width);
+    background: linear-gradient(to right, transparent, var(--Theme-Color) 100%);
+}
+
+.daily-card-content::after {
+    right: 0;
     left: var(--daily-overlap-width);
     background: var(--Theme-Color);
-    pointer-events: none;
 }
 
 .daily-card:hover .daily-card-content,
@@ -365,10 +360,6 @@ function getPhotoStyle(index, total) {
     margin-left: calc(-1 * var(--daily-overlap-width));
     opacity: 1;
     transform: translateX(0);
-}
-
-.daily-card-icon {
-    font-size: clamp(28px, 3vw, 48px);
 }
 
 .daily-card-title {
@@ -391,7 +382,51 @@ function getPhotoStyle(index, total) {
     letter-spacing: 0.1em;
 }
 
-@media (max-width: 800px) {
+/* About 上半部的手機排版；不改動照片堆疊邏輯與下方四張日常卡片。 */
+@media (max-width: 600px) {
+    .about-section {
+        padding-top: 76px;
+    }
+
+    .about-heading {
+        max-width: 100%;
+    }
+
+    .about-heading-label {
+        margin: 0 0 14px;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .about-heading-title {
+        font-size: clamp(16px, 8vw, 46px);
+        line-height: 1.25;
+        letter-spacing: 0.12em;
+    }
+
+    .photo-stack {
+        height: clamp(250px, 70vw, 340px);
+        margin-top: 34px;
+        margin-bottom: 0;
+    }
+
+    .about-description {
+        margin: 24px auto 54px;
+        font-size: clamp(15px, 4.2vw, 18px);
+        line-height: 1.85;
+        letter-spacing: 0.1em;
+    }
+
+    .daily-title {
+        margin-top: 54px;
+        margin-bottom: 52px;
+        font-size: clamp(25px, 7vw, 34px);
+        line-height: 1.35;
+        letter-spacing: 0.1em;
+    }
+}
+
+@media (max-width: 900px) {
     .daily-gallery {
         height: auto;
         flex-direction: column;
@@ -417,13 +452,11 @@ function getPhotoStyle(index, total) {
         min-width: 50%;
         flex-basis: 50%;
         height: 100%;
-        object-fit: cover;
     }
 
     .daily-card-content,
     .daily-card:hover .daily-card-content,
     .daily-card:focus-visible .daily-card-content {
-        display: flex;
         width: 50%;
         min-width: 50%;
         flex-basis: 50%;
@@ -434,10 +467,7 @@ function getPhotoStyle(index, total) {
         transform: none;
     }
 
-    .daily-card-content::before {
-        display: none;
-    }
-
+    .daily-card-content::before,
     .daily-card-content::after {
         display: none;
     }

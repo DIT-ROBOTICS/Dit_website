@@ -42,8 +42,10 @@ onUnmounted(() => {
     <section ref="heroContainer" class="hero-scroll-space">
         <!-- 會隨捲動進度收合的首頁封面。 -->
         <div class="hero" :style="{ '--progress': progress }">
-            <!-- 封面背景圖。 -->
+            <!-- 測試靜態圖片時，取消下一行註解並註解掉 video。 -->
             <!-- <img class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片" /> -->
+
+            <!-- 自動播放、靜音並循環的封面背景影片。 -->
             <video class="hero-background" :src="heroVideoUrl" autoplay muted loop playsinline preload="auto"></video>
 
             <!-- 深色漸層遮罩，提高文字可讀性。 -->
@@ -191,11 +193,88 @@ onUnmounted(() => {
     text-decoration: none;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
+    .hero-scroll-space {
+        height: calc(155svh - 76px);
+    }
+
+    .hero {
+        height: calc(100svh - var(--progress) * (100svh - 76px));
+    }
+
+    .hero-background {
+        object-position: 38% center;
+        filter: none;
+        transform: none;
+    }
+
+    .hero-overlay {
+        background:
+            linear-gradient(180deg, rgba(5, 8, 14, 0.18) 20%, rgba(5, 8, 14, 0.82) 100%),
+            linear-gradient(90deg, rgba(5, 8, 14, 0.5), rgba(5, 8, 14, 0.08));
+    }
+
     .hero-content {
-        left: 24px;
-        right: 24px;
-        bottom: 80px;
+        left: clamp(18px, 6vw, 28px);
+        right: clamp(18px, 6vw, 28px);
+        bottom: clamp(54px, 9svh, 84px);
+        max-width: none;
+    }
+
+    .hero-eyebrow {
+        margin-bottom: 14px;
+        font-size: clamp(14px, 4vw, 18px);
+        line-height: 1.4;
+        word-spacing: 0.12em;
+        letter-spacing: 0.08em;
+    }
+
+    .hero-title {
+        max-width: 100%;
+        font-size: clamp(27px, 7.5vw, 38px);
+        line-height: 1.15;
+        letter-spacing: 0.06em;
+    }
+
+    .hero-title-highlight {
+        display: block;
+        margin-top: 6px;
+        font-size: clamp(34px, 9.5vw, 48px);
+        line-height: 1.08;
+        letter-spacing: 0.035em;
+        -webkit-text-stroke-width: 2px;
+    }
+
+    .hero-description {
+        max-width: 100%;
+        margin-top: 20px;
+        white-space: normal;
+        font-size: clamp(13px, 3.6vw, 16px);
+        line-height: 1.75;
+        letter-spacing: 0.04em;
+    }
+
+    .hero-cta {
+        margin-top: 24px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+    }
+}
+
+@media (max-width: 380px) {
+    .hero-title {
+        font-size: 25px;
+    }
+
+    .hero-title-highlight {
+        font-size: 32px;
+    }
+
+    .hero-description {
+        font-size: 13px;
     }
 }
 </style>
