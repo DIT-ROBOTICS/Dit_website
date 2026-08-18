@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import robotImageUrl from '@/assets/dit_logo.png'
 
+const router = useRouter()
 const menuOpen = ref(false)
 const messageOpen = ref(true)
 const assistantRef = ref(null)
@@ -10,6 +12,10 @@ const position = ref({
   y: window.innerHeight,
 })
 
+// Robot 中心距離右下角在此半徑內時，視窗縮放後會繼續貼齊右下角。
+const BOTTOM_RIGHT_SNAP_RADIUS_VW = 30
+const VIEWPORT_MARGIN = 10
+
 let dragging = false
 let hasDragged = false
 let pointerId = null
@@ -17,31 +23,37 @@ let offsetX = 0
 let offsetY = 0
 let startX = 0
 let startY = 0
+let followsBottomRight = true
+let resizeEndTimer = null
 
 const navigationItems = [
   {
-    label: '認識團隊',
-    target: '#team',
+    label: '團隊',
+    target: '/#aboutSection',
   },
   {
-    label: '年度機器人',
-    target: '#featured-robot',
+    label: 'Eurobot',
+    target: '/Eurobot',
   },
   {
-    label: '歷年作品',
-    target: '#robots',
+    label: '歷年機器人',
+    target: '/Eurobot#RobotArchive',
+  },
+  {
+    label: '其他競賽',
+    target: '/#competitions',
   },
   {
     label: '指導教授',
-    target: '#advisors',
+    target: '/#advisors',
   },
   {
     label: '贊助商',
-    target: '#sponsors',
+    target: '/#sponsors',
   },
   {
     label: '聯絡我們',
-    target: '#contact',
+    target: '/#contact',
   },
 ]
 
@@ -59,19 +71,20 @@ function toggleMenu() {
   messageOpen.value = false
 }
 
-function goToSection(target) {
-  const element = document.querySelector(target)
-
-  if (!element) {
-    return
-  }
-
-  element.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start',
-  })
-
+async function goToSection(target) {
+  const destination = router.resolve(target)
+  const isCurrentLocation = router.currentRoute.value.fullPath === destination.fullPath
   menuOpen.value = false
+
+  await router.push(target)
+
+  // 已經位於完全相同的網址時 Router 不會再次觸發 scrollBehavior，手動補上捲動。
+  if (isCurrentLocation && destination.hash) {
+    document.querySelector(destination.hash)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
 }
 
 function startDrag(event) {
@@ -116,18 +129,17 @@ function drag(event) {
 
   const width = assistant.offsetWidth
   const height = assistant.offsetHeight
-  const margin = 10
 
   position.value.x = clamp(
     event.clientX - offsetX,
-    margin,
-    window.innerWidth - width - margin
+    VIEWPORT_MARGIN,
+    window.innerWidth - width - VIEWPORT_MARGIN
   )
 
   position.value.y = clamp(
     event.clientY - offsetY,
-    margin,
-    window.innerHeight - height - margin
+    VIEWPORT_MARGIN,
+    window.innerHeight - height - VIEWPORT_MARGIN
   )
 }
 
@@ -136,11 +148,14 @@ function endDrag(event) {
     return
   }
 
+  const releasedPointerId = pointerId
   dragging = false
   pointerId = null
 
-  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-    event.currentTarget.releasePointerCapture(event.pointerId)
+  updateBottomRightAffinity()
+
+  if (event.currentTarget.hasPointerCapture(releasedPointerId)) {
+    event.currentTarget.releasePointerCapture(releasedPointerId)
   }
 }
 
@@ -151,28 +166,64 @@ function keepInsideViewport() {
     return
   }
 
-  const margin = 10
-
   position.value.x = clamp(
     position.value.x,
-    margin,
-    window.innerWidth - assistant.offsetWidth - margin
+    VIEWPORT_MARGIN,
+    window.innerWidth - assistant.offsetWidth - VIEWPORT_MARGIN
   )
 
   position.value.y = clamp(
     position.value.y,
-    margin,
-    window.innerHeight - assistant.offsetHeight - margin
+    VIEWPORT_MARGIN,
+    window.innerHeight - assistant.offsetHeight - VIEWPORT_MARGIN
   )
+}
+
+// 判斷 Robot 中心是否位於右下角 20vw 半徑內，供下一次 resize 使用。
+function updateBottomRightAffinity() {
+  const assistant = assistantRef.value
+  if (!assistant) return
+
+  const robotCenterX = position.value.x + assistant.offsetWidth / 2
+  const robotCenterY = position.value.y + assistant.offsetHeight / 2
+  const distanceToBottomRight = Math.hypot(
+    window.innerWidth - robotCenterX,
+    window.innerHeight - robotCenterY
+  )
+  const snapRadius = window.innerWidth * BOTTOM_RIGHT_SNAP_RADIUS_VW / 100
+
+  followsBottomRight = distanceToBottomRight <= snapRadius
+}
+
+function moveToBottomRight() {
+  const assistant = assistantRef.value
+  if (!assistant) return
+
+  position.value.x = window.innerWidth - assistant.offsetWidth - VIEWPORT_MARGIN
+  position.value.y = window.innerHeight - assistant.offsetHeight - VIEWPORT_MARGIN
+}
+
+function handleViewportResize() {
+  if (followsBottomRight) {
+    moveToBottomRight()
+  } else {
+    keepInsideViewport()
+  }
+
+  // resize 結束後重新判斷目前位置，供下一次螢幕尺寸改變時使用。
+  clearTimeout(resizeEndTimer)
+  resizeEndTimer = setTimeout(updateBottomRightAffinity, 150)
 }
 
 onMounted(() => {
   keepInsideViewport()
-  window.addEventListener('resize', keepInsideViewport)
+  updateBottomRightAffinity()
+  window.addEventListener('resize', handleViewportResize)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', keepInsideViewport)
+  clearTimeout(resizeEndTimer)
+  window.removeEventListener('resize', handleViewportResize)
 })
 </script>
 
