@@ -1,32 +1,41 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 // About 區塊的團隊照片與文字資料。
 const photoUrls = ref([])
 const aboutData = ref({})
 
-// 展開後的「純照片：融合漸層：純色背景」比例，修改這三個數字即可調整版面。
-const dailyLayoutRatio = {
-    photo: 1,
-    gradient: 2,
-    solid: 2,
+// 展開版面參數：漸層占圖片寬度的比例，以及文字在整個相簿中的起點。
+const dailyLayout = {
+    gradientShare: 0.4,
     // 文字從整個相簿左側多少百分比的位置開始（50 代表正中央）。
     textStart: 50,
+    // 圖片載入前暫時使用 3:1。
+    fallbackAspectRatio: 3,
 }
 
-const dailyGalleryStyle = computed(() => {
-    const { photo, gradient, solid, textStart } = dailyLayoutRatio
-    const total = photo + gradient + solid
-    const contentTotal = gradient + solid
+const dailyPhotoRatios = ref({})
+
+function saveDailyPhotoRatio(index, event) {
+    const image = event.currentTarget
+    if (!image.naturalWidth || !image.naturalHeight) return
+    dailyPhotoRatios.value[index] = image.naturalWidth / image.naturalHeight
+}
+
+function getDailyCardStyle(index) {
+    const aspectRatio = dailyPhotoRatios.value[index] || dailyLayout.fallbackAspectRatio
+    const gradientFactor = aspectRatio * dailyLayout.gradientShare
+    const purePhotoFactor = aspectRatio - gradientFactor
 
     return {
-        '--daily-image-width': `${((photo + gradient) / total) * 100}vw`,
-        '--daily-content-width': `${(contentTotal / total) * 100}vw`,
-        '--daily-overlap-width': `${(gradient / total) * 100}vw`,
-        '--daily-gradient-share': `${(gradient / contentTotal) * 100}%`,
-        '--daily-text-offset': `${textStart - (photo / total) * 100}vw`,
+        '--Theme-Color': aboutData.value.ThemeColor,
+        '--daily-expanded-image-width': `calc(var(--daily-gallery-height) * ${aspectRatio})`,
+        '--daily-overlap-width': `calc(var(--daily-gallery-height) * ${gradientFactor})`,
+        '--daily-pure-photo-width': `calc(var(--daily-gallery-height) * ${purePhotoFactor})`,
+        '--daily-content-width': 'calc(100vw - var(--daily-pure-photo-width))',
+        '--daily-text-offset': `max(22px, calc(${dailyLayout.textStart}vw - var(--daily-pure-photo-width)))`,
     }
-})
+}
 
 // 從後端取得團隊照片清單。
 async function loadImages() {
@@ -113,11 +122,11 @@ function getPhotoStyle(index, total) {
         <h2 class="daily-title">{{ aboutData.daily_title }}</h2>
 
         <!-- 四張橫向鋪滿的日常照片；聚焦時展開該項目的介紹。 -->
-        <div class="daily-gallery" :style="dailyGalleryStyle">
+        <div class="daily-gallery">
             <article v-for="(detail, index) in (aboutData.MoreDetail || []).slice(0, 4)" :key="detail.title"
-                class="daily-card" tabindex="0" :style="{'--Theme-Color':aboutData.ThemeColor}">
+                class="daily-card" tabindex="0" :style="getDailyCardStyle(index)">
                 <img v-if="photoUrls.length" class="daily-card-image" :src="photoUrls[index % photoUrls.length]"
-                    :alt="detail.title" />
+                    :alt="detail.title" @load="saveDailyPhotoRatio(index, $event)" />
                 <span class="daily-card-image-title">{{ detail.title }}</span>
                 <div class="daily-card-content">
                     <h3 class="daily-card-title">{{ detail.title }}</h3>
@@ -202,9 +211,10 @@ function getPhotoStyle(index, total) {
 
 /* 團隊日常互動相簿 */
 .daily-gallery {
+    --daily-gallery-height: clamp(220px, 30vw, 600px);
     display: flex;
     width: calc(100% + 16vw);
-    height: clamp(220px, 30vw, 600px);
+    height: var(--daily-gallery-height);
     margin-inline: -8vw;
     margin-bottom: 150px;
     overflow: hidden;
@@ -275,9 +285,9 @@ function getPhotoStyle(index, total) {
 
 .daily-card:hover .daily-card-image,
 .daily-card:focus-visible .daily-card-image {
-    width: var(--daily-image-width);
-    min-width: var(--daily-image-width);
-    flex-basis: var(--daily-image-width);
+    width: var(--daily-expanded-image-width);
+    min-width: var(--daily-expanded-image-width);
+    flex-basis: var(--daily-expanded-image-width);
     filter: brightness(1);
 }
 
@@ -314,11 +324,11 @@ function getPhotoStyle(index, total) {
     flex: 0 0 var(--daily-content-width);
     padding: clamp(22px, 3vw, 52px);
     padding-left: var(--daily-text-offset);
+    padding-right: 15vw;
     flex-direction: column;
     justify-content: center;
     box-sizing: border-box;
-    background: linear-gradient(to right, transparent 0 var(--daily-gradient-share),
-            var(--Theme-Color) var(--daily-gradient-share) 100%);
+    background: transparent;
     opacity: 0;
     transform: translateX(28px);
     transition: opacity 300ms ease 120ms, transform 450ms ease 100ms,
@@ -333,8 +343,20 @@ function getPhotoStyle(index, total) {
     top: 0;
     bottom: 0;
     left: 0;
-    width: var(--daily-gradient-share);
+    width: var(--daily-overlap-width);
     background: linear-gradient(to right, transparent, var(--Theme-Color) 100%);
+    pointer-events: none;
+}
+
+.daily-card-content::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: var(--daily-overlap-width);
+    background: var(--Theme-Color);
     pointer-events: none;
 }
 
@@ -378,6 +400,7 @@ function getPhotoStyle(index, total) {
     .daily-card,
     .daily-card:hover,
     .daily-card:focus-visible {
+        height: 250px;
         min-height: 250px;
         flex: none;
     }
@@ -390,17 +413,20 @@ function getPhotoStyle(index, total) {
     .daily-card-image,
     .daily-card:hover .daily-card-image,
     .daily-card:focus-visible .daily-card-image {
-        width: 55%;
-        min-width: 55%;
-        flex-basis: 55%;
+        width: 50%;
+        min-width: 50%;
+        flex-basis: 50%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .daily-card-content,
     .daily-card:hover .daily-card-content,
     .daily-card:focus-visible .daily-card-content {
-        width: 45%;
-        min-width: 45%;
-        flex-basis: 45%;
+        display: flex;
+        width: 50%;
+        min-width: 50%;
+        flex-basis: 50%;
         padding: 22px;
         margin-left: 0;
         background: var(--Theme-Color);
@@ -412,8 +438,15 @@ function getPhotoStyle(index, total) {
         display: none;
     }
 
-    .daily-card-image-title {
-        width: 55%;
+    .daily-card-content::after {
+        display: none;
+    }
+
+    .daily-card-image-title,
+    .daily-card:hover .daily-card-image-title,
+    .daily-card:focus-visible .daily-card-image-title {
+        width: 50%;
+        opacity: 1;
     }
 
     .daily-card-title {
