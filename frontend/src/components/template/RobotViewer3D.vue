@@ -29,6 +29,10 @@ const props = defineProps({
 const container = ref(null)
 const background_api = ref(props.robot.View3DBackground)
 const selectedRobot = ref(props.robot)
+const modelLoading = ref(true)
+const modelProgress = ref(0)
+const modelProgressIsEstimated = ref(false)
+const modelLoadError = ref('')
 
 let scene
 let camera
@@ -159,6 +163,17 @@ function addLights() {
 }
 
 function loadModel() {
+    modelLoading.value = true
+    modelProgress.value = 0
+    modelProgressIsEstimated.value = false
+    modelLoadError.value = ''
+
+    if (!props.robot.glbPath) {
+        modelLoading.value = false
+        modelLoadError.value = '找不到模型檔案'
+        return
+    }
+
     const loader =
         new GLTFLoader()
 
@@ -171,15 +186,40 @@ function loadModel() {
             scene.add(robot)
 
             centerModel(robot)
+            modelProgress.value = 100
+            modelProgressIsEstimated.value = false
+
+            // 連續等待兩個繪製週期，確保進度條真的呈現 100% 後才開始淡出。
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    modelLoading.value = false
+                })
+            })
         },
 
-        undefined,
+        (event) => {
+            // API 提供的 glbSize 不會受 proxy 是否保留 Content-Length 影響。
+            const totalBytes = Number(props.robot.glbSize) || event.total
+            if (totalBytes) {
+                modelProgressIsEstimated.value = false
+                modelProgress.value = Math.min(Math.round((event.loaded / totalBytes) * 100), 99)
+                return
+            }
+
+            // 舊 API 沒有總大小時顯示平滑估算值，並保留最後 5% 給模型解析階段。
+            modelProgressIsEstimated.value = true
+            const estimateBase = 40 * 1024 * 1024
+            const estimatedProgress = Math.round(95 * (1 - Math.exp(-event.loaded / estimateBase)))
+            modelProgress.value = Math.max(modelProgress.value, Math.min(estimatedProgress, 95))
+        },
 
         (error) => {
             console.error(
                 'GLB load error',
                 error
             )
+            modelLoading.value = false
+            modelLoadError.value = '模型載入失敗，請稍後再試'
         }
     )
 }
@@ -287,6 +327,35 @@ onUnmounted(() => {
                 <div ref="container" class="robot-viewer">
                     <div class="viewer-background" :style="{'--background-api':`url(${background_api})`}"></div>
                     <div class="viewer-overlay"></div>
+
+                    <!-- 模型下載及初始化期間的狀態畫面。 -->
+                    <Transition name="model-loader">
+                        <div v-if="modelLoading || modelLoadError" class="model-loading" role="status"
+                            aria-live="polite">
+                            <template v-if="modelLoading">
+                                <div class="model-loading-spinner" aria-hidden="true">
+                                    <span class="model-loading-spinner-core"></span>
+                                </div>
+                                <p class="model-loading-title">LOADING 3D MODEL</p>
+                                <div class="model-loading-progress" aria-hidden="true">
+                                    <span class="model-loading-progress-value"
+                                        :class="{ 'is-estimated': modelProgressIsEstimated }"
+                                        :style="{ width: `${modelProgress}%` }"></span>
+                                </div>
+                                <p class="model-loading-percent">
+                                    {{ modelProgressIsEstimated ? `約 ${modelProgress}%` : `${modelProgress}%` }}
+                                </p>
+                            </template>
+
+                            <template v-else>
+                                <p class="model-loading-title">LOAD FAILED</p>
+                                <p class="model-loading-error">{{ modelLoadError }}</p>
+                                <button class="model-loading-retry" type="button" @click="loadModel">
+                                    重新載入
+                                </button>
+                            </template>
+                        </div>
+                    </Transition>
                 </div>
                 <div class="viewer-info" :style="{'--pos':selectedRobot.View3Dpos,color: selectedRobot.ThemeColor}">
                     {{ selectedRobot.ShowOutName }}
@@ -340,6 +409,120 @@ onUnmounted(() => {
     z-index:2;
 }
 
+.model-loading {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background: rgba(8, 9, 14, 0.72);
+    color: #fff;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.model-loading-spinner {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    margin-bottom: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.16);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: model-loading-spin 1s linear infinite;
+}
+
+.model-loading-spinner::after {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: model-loading-spin 1.6s linear infinite reverse;
+}
+
+.model-loading-spinner-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 22px rgba(255, 255, 255, 0.75);
+    transform: translate(-50%, -50%);
+}
+
+.model-loading-title,
+.model-loading-percent,
+.model-loading-error {
+    margin: 0;
+}
+
+.model-loading-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(14px, 1.5vw, 20px);
+    font-weight: 800;
+    letter-spacing: 0.18em;
+}
+
+.model-loading-progress {
+    width: min(280px, 70%);
+    height: 3px;
+    margin-top: 20px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.model-loading-progress-value {
+    display: block;
+    height: 100%;
+    background: currentColor;
+}
+
+.model-loading-progress-value.is-estimated {
+    transition: width 180ms ease;
+}
+
+.model-loading-percent,
+.model-loading-error {
+    margin-top: 12px;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+}
+
+.model-loading-retry {
+    margin-top: 22px;
+    padding: 10px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+}
+
+.model-loader-enter-active,
+.model-loader-leave-active {
+    transition: opacity 300ms ease;
+}
+
+.model-loader-enter-from,
+.model-loader-leave-to {
+    opacity: 0;
+}
+
+@keyframes model-loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
 
 .robot-modal {
     position: fixed;
@@ -369,8 +552,7 @@ onUnmounted(() => {
     width:
         min(1200px, 100%);
 
-    height:
-        min(780px, 85vh);
+    height: 85vh;
 
     background: #0a0a0a;
 

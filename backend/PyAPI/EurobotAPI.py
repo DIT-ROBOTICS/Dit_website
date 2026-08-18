@@ -47,7 +47,10 @@ def load_eurobot(year:int):
         data["VenueImage"]=f"/api/Eurobot/{year}/file/{venue_image}"
 
     for robot in data["Robot_Data"]:
-        robot["glbPath"]=f"/api/Eurobot/{year}/file/{robot['glbPath']}"
+        glb_filename=robot.get("glbPath")
+        glb_file=folder/glb_filename if glb_filename else None
+        robot["glbSize"]=glb_file.stat().st_size if glb_file and glb_file.is_file() else 0
+        robot["glbPath"]=f"/api/Eurobot/{year}/file/{glb_filename}" if glb_filename else ""
         robot["imagePath"]=f"/api/Eurobot/{year}/file/{robot['imagePath']}"
         robot["View3DBackground"]=f"/api/Eurobot/{year}/file/{robot['View3DBackground']}"
         robot["SeeMoreImagePath"]=f"/api/Eurobot/{year}/file/{robot['SeeMoreImagePath']}"
