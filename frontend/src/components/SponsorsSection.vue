@@ -8,6 +8,7 @@ const angle = ref(0)
 const activeIndex = ref(0)
 const hoveredIndex = ref(null)
 const paused = ref(false)
+const usesTouchInteraction = ref(window.matchMedia('(hover: none), (pointer: coarse)').matches)
 
 // 將 JS 的橢圓半徑單位換算成容器尺寸。
 const ORBIT_WIDTH_PER_RADIUS_UNIT = 30
@@ -17,6 +18,7 @@ const ORBIT_HEIGHT_PER_RADIUS_UNIT = 20
 let animationId = null
 let lastTime = 0
 let activeTimer = null
+let touchMediaQuery
 
 // 從後端取得贊助商名稱、Logo、簡介與官網連結。
 async function loadSponsorsData() {
@@ -140,14 +142,46 @@ function isActive(index) {
 
 // 懸停時停止旋轉與自動切換，並顯示詳細資訊。
 function handleEnter(index) {
+    if (usesTouchInteraction.value) return
     paused.value = true
     hoveredIndex.value = index
 }
 
 // 離開後恢復環繞動畫。
 function handleLeave() {
+    if (usesTouchInteraction.value) return
+    resetSponsorSelection()
+}
+
+function resetSponsorSelection() {
     paused.value = false
     hoveredIndex.value = null
+}
+
+/*
+ * 無滑鼠設備採用兩階段操作：
+ * 第一次點擊只顯示資訊卡並暫停旋轉；第二次點同一 Logo 才讓 <a> 正常跳轉。
+ */
+function handleSponsorClick(event, index) {
+    if (!usesTouchInteraction.value) return
+    if (hoveredIndex.value === index) return
+
+    event.preventDefault()
+    paused.value = true
+    hoveredIndex.value = index
+    activeIndex.value = index
+}
+
+// 點擊 Logo 與資訊卡以外的空白處，關閉資訊並恢復環繞動畫。
+function closeSponsorFromOutside(event) {
+    if (!usesTouchInteraction.value || hoveredIndex.value === null) return
+    if (event.target.closest('.sponsor-wrapper')) return
+    resetSponsorSelection()
+}
+
+function updateInteractionMode(event) {
+    usesTouchInteraction.value = event.matches
+    resetSponsorSelection()
 }
 
 // 元件掛載後載入資料並啟動兩種動畫。
@@ -155,18 +189,25 @@ onMounted(() => {
     loadSponsorsData()
     animationId = requestAnimationFrame(animate)
     startActiveTimer()
+
+    touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
+    usesTouchInteraction.value = touchMediaQuery.matches
+    touchMediaQuery.addEventListener('change', updateInteractionMode)
+    document.addEventListener('pointerdown', closeSponsorFromOutside)
 })
 
 // 離開頁面時清除動畫與計時器，避免持續佔用資源。
 onUnmounted(() => {
     cancelAnimationFrame(animationId)
     clearInterval(activeTimer)
+    touchMediaQuery?.removeEventListener('change', updateInteractionMode)
+    document.removeEventListener('pointerdown', closeSponsorFromOutside)
 })
 </script>
 
 <template>
     <!-- 贊助商展示區塊。 -->
-    <section class="sponsors-section">
+    <section class="sponsors-section" :class="{ 'uses-touch': usesTouchInteraction }">
         <!-- 區塊標題。 -->
         <div class="heading">
             <!-- 英文小標。 -->
@@ -188,7 +229,7 @@ onUnmounted(() => {
                 @mouseenter="handleEnter(index)" @mouseleave="handleLeave">
                 <!-- 連結至贊助商官網的 Logo 卡片。 -->
                 <a class="sponsor" :class="{ active: isActive(index) }" :href="sponsor.url" target="_blank"
-                    rel="noopener noreferrer">
+                    rel="noopener noreferrer" @click="handleSponsorClick($event, index)">
                     <img class="sponsor-logo" :src="sponsor.logo" :alt="sponsor.name" />
                 </a>
 
@@ -303,11 +344,11 @@ onUnmounted(() => {
 }
 
 .sponsor.active,
-.sponsor-wrapper:hover .sponsor {
+.sponsors-section:not(.uses-touch) .sponsor-wrapper:hover .sponsor {
     transform: scale(1.4);
 }
 
-.sponsor-wrapper:hover .sponsor {
+.sponsors-section:not(.uses-touch) .sponsor-wrapper:hover .sponsor {
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 

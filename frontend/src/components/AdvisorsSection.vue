@@ -4,10 +4,12 @@
 -->
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const advisors = ref([])
 const activeIndex = ref(null)
+const usesTouchInteraction = ref(window.matchMedia('(hover: none), (pointer: coarse)').matches)
+let touchMediaQuery
 
 async function loadAdvisors() {
     try {
@@ -30,15 +32,52 @@ function cardStyle(index) {
 }
 
 function closeCard(event) {
+    if (usesTouchInteraction.value) return
     if (!event.currentTarget.contains(event.relatedTarget)) activeIndex.value = null
 }
 
-onMounted(loadAdvisors)
+function activateFromHover(index) {
+    if (!usesTouchInteraction.value) activeIndex.value = index
+}
+
+function closeFromHover() {
+    if (!usesTouchInteraction.value) activeIndex.value = null
+}
+
+// 觸控裝置以點擊展開；再次點擊同一卡片不收合，保留給未來的跳轉功能。
+function activateFromTouch(index) {
+    if (usesTouchInteraction.value) activeIndex.value = index
+}
+
+// 點擊顧問卡片以外的空白區域時，關閉目前展開的卡片。
+function closeFromOutside(event) {
+    if (!usesTouchInteraction.value || activeIndex.value === null) return
+    if (event.target.closest('.advisor-card')) return
+    activeIndex.value = null
+}
+
+function updateInteractionMode(event) {
+    usesTouchInteraction.value = event.matches
+    activeIndex.value = null
+}
+
+onMounted(() => {
+    loadAdvisors()
+    touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
+    usesTouchInteraction.value = touchMediaQuery.matches
+    touchMediaQuery.addEventListener('change', updateInteractionMode)
+    document.addEventListener('pointerdown', closeFromOutside)
+})
+
+onUnmounted(() => {
+    touchMediaQuery?.removeEventListener('change', updateInteractionMode)
+    document.removeEventListener('pointerdown', closeFromOutside)
+})
 </script>
 
 <template>
     <Teleport defer to="#Advisors_teleport">
-    <section id="advisors" class="advisors-section" @mouseleave="activeIndex = null">
+    <section id="advisors" class="advisors-section" @mouseleave="closeFromHover">
         <div class="advisors-stage">
             <header class="advisors-heading">
                 <p class="advisors-eyebrow">ADVISORS</p>
@@ -47,8 +86,8 @@ onMounted(loadAdvisors)
 
             <article v-for="(advisor, index) in advisors" :key="advisor.id" class="advisor-card"
                 :class="[cardState(index), `advisor-card-${index}`]" :style="cardStyle(index)" tabindex="0"
-                @mouseenter="activeIndex = index" @mouseleave="activeIndex = null"
-                @focus="activeIndex = index" @blur="closeCard">
+                @mouseenter="activateFromHover(index)" @mouseleave="closeFromHover"
+                @focus="activateFromHover(index)" @blur="closeCard" @click="activateFromTouch(index)">
                 <div class="advisor-photo-wrap">
                     <img class="advisor-photo" :src="`/api/member_images/advisor-image/${advisor.id}`" :alt="advisor.name" />
                 </div>

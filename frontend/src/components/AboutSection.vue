@@ -1,9 +1,12 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 // About 區塊的團隊照片與文字資料。
 const photoUrls = ref([])
 const aboutData = ref({})
+const activeDailyCardIndex = ref(null)
+const usesTouchInteraction = ref(window.matchMedia('(hover: none), (pointer: coarse)').matches)
+let touchMediaQuery
 
 // 展開版面參數：漸層占圖片寬度的比例，以及文字在整個相簿中的起點。
 const dailyLayout = {
@@ -71,7 +74,35 @@ async function loadAboutData() {
 onMounted(() => {
     loadImages()
     loadAboutData()
+
+    touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
+    usesTouchInteraction.value = touchMediaQuery.matches
+    touchMediaQuery.addEventListener('change', updateInteractionMode)
+    document.addEventListener('pointerdown', closeDailyCardFromOutside)
 })
+
+onUnmounted(() => {
+    touchMediaQuery?.removeEventListener('change', updateInteractionMode)
+    document.removeEventListener('pointerdown', closeDailyCardFromOutside)
+})
+
+// 平板或觸控裝置點擊卡片後保持展開；再次點同一張不負責收合，方便未來加入跳轉。
+function activateDailyCard(index) {
+    if (!usesTouchInteraction.value) return
+    activeDailyCardIndex.value = index
+}
+
+// 點擊卡片以外的空白區域時，才將目前展開的卡片復原。
+function closeDailyCardFromOutside(event) {
+    if (!usesTouchInteraction.value || activeDailyCardIndex.value === null) return
+    if (event.target.closest('.daily-card')) return
+    activeDailyCardIndex.value = null
+}
+
+function updateInteractionMode(event) {
+    usesTouchInteraction.value = event.matches
+    activeDailyCardIndex.value = null
+}
 
 // 根據照片數量計算水平位置、U 形高度與旋轉角度。
 function getPhotoStyle(index, total) {
@@ -124,9 +155,10 @@ function getPhotoStyle(index, total) {
         <h2 class="daily-title">{{ aboutData.daily_title }}</h2>
 
         <!-- 四張橫向鋪滿的日常照片；聚焦時展開該項目的介紹。 -->
-        <div class="daily-gallery">
+        <div class="daily-gallery" :class="{ 'uses-touch': usesTouchInteraction }">
             <article v-for="(detail, index) in (aboutData.MoreDetail || []).slice(0, 4)" :key="detail.title"
-                class="daily-card" tabindex="0" :style="getDailyCardStyle(index)">
+                class="daily-card" :class="{ 'is-touch-active': activeDailyCardIndex === index }" tabindex="0"
+                :style="getDailyCardStyle(index)" @click="activateDailyCard(index)">
                 <img v-if="photoUrls.length" class="daily-card-image" :src="photoUrls[index % photoUrls.length]"
                     :alt="detail.title" @load="saveDailyPhotoRatio(index, $event)" />
                 <span class="daily-card-image-title">{{ detail.title }}</span>
@@ -243,20 +275,47 @@ function getPhotoStyle(index, total) {
 
 /* 滑入其中一張時，該項目接管整個相簿，其餘項目同步收合。 */
 @media (min-width: 901px) {
-    .daily-gallery:has(.daily-card:hover) .daily-card:not(:hover),
+    .daily-gallery:not(.uses-touch):has(.daily-card:hover) .daily-card:not(:hover),
     .daily-gallery:has(.daily-card:focus-visible) .daily-card:not(:focus-visible) {
         flex: 0 1 0;
         border-width: 0;
     }
 
+    .daily-gallery:has(.daily-card.is-touch-active) .daily-card:not(.is-touch-active) {
+        flex: 0 1 0;
+        border-width: 0;
+    }
+
     /* 展開後照片與文字為 1:2。 */
-    .daily-card:hover .daily-card-image,
+    .daily-gallery:not(.uses-touch) .daily-card:hover .daily-card-image,
     .daily-card:focus-visible .daily-card-image {
         margin-left: 0;
     }
+
+    .daily-card.is-touch-active {
+        flex: 1 0 100%;
+    }
+
+    .daily-card.is-touch-active .daily-card-image {
+        width: var(--daily-expanded-image-width);
+        min-width: var(--daily-expanded-image-width);
+        flex-basis: var(--daily-expanded-image-width);
+        margin-left: 0;
+        filter: brightness(1);
+    }
+
+    .daily-card.is-touch-active .daily-card-image-title {
+        opacity: 0;
+    }
+
+    .daily-card.is-touch-active .daily-card-content {
+        margin-left: calc(-1 * var(--daily-overlap-width));
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
-.daily-card:hover,
+.daily-gallery:not(.uses-touch) .daily-card:hover,
 .daily-card:focus-visible {
     flex: 1 0 100%;
 }
@@ -280,7 +339,7 @@ function getPhotoStyle(index, total) {
         filter 450ms ease;
 }
 
-.daily-card:hover .daily-card-image,
+.daily-gallery:not(.uses-touch) .daily-card:hover .daily-card-image,
 .daily-card:focus-visible .daily-card-image {
     width: var(--daily-expanded-image-width);
     min-width: var(--daily-expanded-image-width);
@@ -308,7 +367,7 @@ function getPhotoStyle(index, total) {
     transition: opacity 300ms ease;
 }
 
-.daily-card:hover .daily-card-image-title,
+.daily-gallery:not(.uses-touch) .daily-card:hover .daily-card-image-title,
 .daily-card:focus-visible .daily-card-image-title {
     opacity: 0;
 }
@@ -355,7 +414,7 @@ function getPhotoStyle(index, total) {
     background: var(--Theme-Color);
 }
 
-.daily-card:hover .daily-card-content,
+.daily-gallery:not(.uses-touch) .daily-card:hover .daily-card-content,
 .daily-card:focus-visible .daily-card-content {
     margin-left: calc(-1 * var(--daily-overlap-width));
     opacity: 1;
@@ -481,6 +540,58 @@ function getPhotoStyle(index, total) {
 
     .daily-card-title {
         white-space: normal;
+    }
+}
+
+/* 手機版固定為：純照片 1/3｜照片與背景漸層 1/3｜純色背景 1/3。 */
+@media (max-width: 600px) {
+    .daily-card-image,
+    .daily-card:hover .daily-card-image,
+    .daily-card:focus-visible .daily-card-image {
+        width: 66.666%;
+        min-width: 66.666%;
+        flex-basis: 66.666%;
+    }
+
+    .daily-card-content,
+    .daily-card:hover .daily-card-content,
+    .daily-card:focus-visible .daily-card-content {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        min-width: 100%;
+        padding: 20px 18px 20px 55%;
+        background: transparent;
+    }
+
+    .daily-card-content::before {
+        display: block;
+        inset: 0;
+        width: auto;
+        background: linear-gradient(
+            to right,
+            transparent 33.333%,
+            var(--Theme-Color) 66.666%,
+            var(--Theme-Color) 100%
+        );
+    }
+
+    .daily-card-image-title,
+    .daily-card:hover .daily-card-image-title,
+    .daily-card:focus-visible .daily-card-image-title {
+        display: none;
+    }
+
+    .daily-card-title {
+        margin: 0 0 10px;
+        font-size: clamp(18px, 5.2vw, 23px);
+        letter-spacing: 0.1em;
+    }
+
+    .daily-card-text {
+        font-size: 12px;
+        line-height: 1.6;
+        letter-spacing: 0.05em;
     }
 }
 
