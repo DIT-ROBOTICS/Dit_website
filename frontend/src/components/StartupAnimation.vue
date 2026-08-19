@@ -15,8 +15,10 @@ const props = defineProps({
 const PROGRESS_UPDATE_INTERVAL_MS = 20
 const LAUNCH_DELAY_MS = 200
 const SCREEN_DISMISS_DELAY_MS = 1800
+const HERO_VIDEO_VALIDATION_TIMEOUT_MS = 8000
 const HERO_VIDEO_READY_EVENT = 'hero-video-download-ready'
 const HERO_VIDEO_PLAYABLE_EVENT = 'hero-video-playable'
+const HERO_VIDEO_FAILED_EVENT = 'hero-video-failed'
 
 const loadingProgress = ref(0)
 const isLaunching = ref(false)
@@ -29,8 +31,10 @@ const shouldShowWelcome = computed(
 let progressIntervalId
 let launchTimeoutId
 let finishTimeoutId
+let videoValidationTimeoutId
 let launchStarted = false
 let videoDownloadController
+let defaultAnimationStarted = false
 
 function startLaunchSequence() {
   if (launchStarted) return
@@ -49,8 +53,26 @@ function startLaunchSequence() {
 }
 
 function handleHeroVideoPlayable() {
+  if (defaultAnimationStarted) return
+  window.clearTimeout(videoValidationTimeoutId)
   loadingProgress.value = 100
   startLaunchSequence()
+}
+
+// 影片取得失敗或 Hero 無法解碼時，不再等待影片事件，改播一般啟動動畫。
+function startDefaultAnimation() {
+  if (defaultAnimationStarted || launchStarted) return
+
+  defaultAnimationStarted = true
+  videoDownloadController?.abort()
+  window.clearTimeout(videoValidationTimeoutId)
+  window.removeEventListener(HERO_VIDEO_PLAYABLE_EVENT, handleHeroVideoPlayable)
+  loadingProgress.value = 0
+  startLoadingProgress()
+}
+
+function handleHeroVideoFailed() {
+  startDefaultAnimation()
 }
 
 // 完整下載影片並建立 Blob URL，確保 Hero 不需要再次發出影片請求。
@@ -87,6 +109,8 @@ async function downloadHeroVideo() {
       }
     }
 
+    if (loadedBytes === 0) throw new Error('Hero video file is empty')
+
     loadingProgress.value = 99
     const videoBlob = new Blob(chunks, { type: contentType })
     const videoObjectUrl = URL.createObjectURL(videoBlob)
@@ -94,15 +118,18 @@ async function downloadHeroVideo() {
     window.dispatchEvent(new CustomEvent(HERO_VIDEO_READY_EVENT, {
       detail: { url: videoObjectUrl },
     }))
+
+    // 某些損毀檔案不會立即觸發 video error，以逾時避免進度永遠停在 99%。
+    videoValidationTimeoutId = window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent(HERO_VIDEO_FAILED_EVENT))
+      startDefaultAnimation()
+    }, HERO_VIDEO_VALIDATION_TIMEOUT_MS)
   } catch (error) {
     if (error?.name === 'AbortError') return
 
     console.error('Hero 影片下載失敗：', error)
-
-    // 下載失敗時退回一般影片網址，等待 Hero 回報 canplay。
-    window.dispatchEvent(new CustomEvent(HERO_VIDEO_READY_EVENT, {
-      detail: { url: heroVideoUrl },
-    }))
+    window.dispatchEvent(new CustomEvent(HERO_VIDEO_FAILED_EVENT))
+    startDefaultAnimation()
   }
 }
 
@@ -121,6 +148,7 @@ function clearAnimationTimers() {
   window.clearInterval(progressIntervalId)
   window.clearTimeout(launchTimeoutId)
   window.clearTimeout(finishTimeoutId)
+  window.clearTimeout(videoValidationTimeoutId)
   videoDownloadController?.abort()
 }
 
@@ -131,12 +159,14 @@ onMounted(() => {
   }
 
   window.addEventListener(HERO_VIDEO_PLAYABLE_EVENT, handleHeroVideoPlayable)
+  window.addEventListener(HERO_VIDEO_FAILED_EVENT, handleHeroVideoFailed)
   downloadHeroVideo()
 })
 
 onUnmounted(() => {
   clearAnimationTimers()
   window.removeEventListener(HERO_VIDEO_PLAYABLE_EVENT, handleHeroVideoPlayable)
+  window.removeEventListener(HERO_VIDEO_FAILED_EVENT, handleHeroVideoFailed)
 })
 </script>
 

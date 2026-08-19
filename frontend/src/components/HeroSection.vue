@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import heroImageUrl from '@/assets/Hero_Image.png'
-// import heroVideoUrl from '@/assets/hero背景影片.m4v'
 import TitleBar from '@/components/TitleBar.vue'
 
 const platform=window.innerWidth<=600?'Mobile':'Desktop'
@@ -12,8 +11,10 @@ const progress = defineModel('progress', { type: Number, default: 0 })
 
 const HERO_VIDEO_READY_EVENT = 'hero-video-download-ready'
 const HERO_VIDEO_PLAYABLE_EVENT = 'hero-video-playable'
+const HERO_VIDEO_FAILED_EVENT = 'hero-video-failed'
 const STARTUP_FINISHED_EVENT = 'startup-animation-finished'
 const startupAlreadyFinished = Boolean(sessionStorage.getItem('startupFinished'))
+const heroVideoFailed = ref(false)
 let downloadedVideoUrl = ''
 let heroVideoPlayableReported = false
 
@@ -48,6 +49,21 @@ function notifyHeroVideoPlayable() {
         heroVideoPlayableReported = true
         window.dispatchEvent(new CustomEvent(HERO_VIDEO_PLAYABLE_EVENT))
     }
+}
+
+// 下載成功不代表影片可解碼；video error 時改用預設封面並解除啟動畫面等待。
+function handleHeroVideoFailed() {
+    heroVideoFailed.value = true
+
+    if (downloadedVideoUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(downloadedVideoUrl)
+    }
+
+    downloadedVideoUrl = ''
+}
+
+function notifyHeroVideoError() {
+    window.dispatchEvent(new CustomEvent(HERO_VIDEO_FAILED_EVENT))
 }
 
 function playHeroVideo() {
@@ -93,6 +109,7 @@ onMounted(() => {
     if (startupAlreadyFinished) prepareHeroVideo(heroVideoUrl)
 
     window.addEventListener(HERO_VIDEO_READY_EVENT, receiveDownloadedHeroVideo)
+    window.addEventListener(HERO_VIDEO_FAILED_EVENT, handleHeroVideoFailed)
     window.addEventListener(STARTUP_FINISHED_EVENT, startHeroVideoPlayback)
 
     // 若系統層級禁止自動播放，使用者第一次點擊或觸摸時無縫恢復。
@@ -105,6 +122,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     window.removeEventListener(HERO_VIDEO_READY_EVENT, receiveDownloadedHeroVideo)
+    window.removeEventListener(HERO_VIDEO_FAILED_EVENT, handleHeroVideoFailed)
     window.removeEventListener(STARTUP_FINISHED_EVENT, startHeroVideoPlayback)
     document.removeEventListener('pointerdown', playHeroVideo)
     document.removeEventListener('touchstart', playHeroVideo)
@@ -120,13 +138,13 @@ onUnmounted(() => {
     <section ref="heroContainer" class="hero-scroll-space">
         <!-- 會隨捲動進度收合的首頁封面。 -->
         <div class="hero" :style="{ '--progress': progress }">
-            <!-- 測試靜態圖片時，取消下一行註解並註解掉 video。 -->
-            <!-- <img class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片" /> -->
+            <!-- 影片取得或解碼失敗時顯示預設封面。 -->
+            <img v-if="heroVideoFailed" class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片" />
 
             <!-- 自動播放、靜音並循環的封面背景影片。 -->
-            <video ref="heroVideo" class="hero-background"
+            <video v-else ref="heroVideo" class="hero-background"
                 autoplay muted loop playsinline preload="auto"
-                @canplay="notifyHeroVideoPlayable"></video>
+                @canplay="notifyHeroVideoPlayable" @error="notifyHeroVideoError"></video>
 
             <!-- 深色漸層遮罩，提高文字可讀性。 -->
             <div class="hero-overlay"></div>
