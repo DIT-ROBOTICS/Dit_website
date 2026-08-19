@@ -215,9 +215,20 @@ function setupGuideParts() {
     robot.updateMatrixWorld(true)
 
     guideParts.value = parts.map((part, index) => {
-        const object = part.objectName
-            ? findRobotPart(part.objectName)
-            : null
+        // objectName 可為單一字串或陣列；第一個找到的節點負責箭頭定位。
+        const objectNames = Array.isArray(part.objectName)
+            ? part.objectName
+            : part.objectName
+                ? [part.objectName]
+                : []
+        const objects = objectNames
+            .map(objectName => {
+                const object = findRobotPart(objectName)
+                if (!object) console.warn(`找不到零件:${objectName}`)
+                return object
+            })
+            .filter(Boolean)
+        const object = objects[0] || null
 
         // 新舊資料的文字欄位不同，在此統一成檢視器使用的格式。
         const normalizedPart = {
@@ -227,11 +238,10 @@ function setupGuideParts() {
         }
 
         if (!object) {
-            if (part.objectName) console.warn(`找不到零件:${part.objectName}`)
-
             return {
                 ...normalizedPart,
                 object: null,
+                objects: [],
                 anchorLocal: null,
                 screenX: 0,
                 screenY: 0
@@ -246,6 +256,7 @@ function setupGuideParts() {
             ...normalizedPart,
             // Three.js 類別實例不可由 Vue 深層代理，否則矩陣與座標更新可能失效。
             object: markRaw(object),
+            objects: objects.map(item => markRaw(item)),
             anchorLocal: markRaw(anchorLocal),
             screenX: 0,
             screenY: 0
@@ -353,28 +364,33 @@ function startPartHighlight(part) {
     if (!part?.object) return
 
     const highlightColor = new THREE.Color(part.color || props.robot.ThemeColor || '#ffffff')
+    const highlightedMeshSet = new Set()
 
-    part.object.traverse(child => {
-        if (!child.isMesh || !child.material) return
+    // 同一筆詳細資料可綁定多個 3D 節點，所有節點共用同一閃爍週期。
+    part.objects.forEach(object => {
+        object.traverse(child => {
+            if (!child.isMesh || !child.material || highlightedMeshSet.has(child)) return
+            highlightedMeshSet.add(child)
 
-        const originalMaterial = child.material
-        const sourceMaterials = Array.isArray(originalMaterial) ? originalMaterial : [originalMaterial]
-        const highlightMaterials = sourceMaterials.map(material => material.clone())
+            const originalMaterial = child.material
+            const sourceMaterials = Array.isArray(originalMaterial) ? originalMaterial : [originalMaterial]
+            const highlightMaterials = sourceMaterials.map(material => material.clone())
 
-        child.material = Array.isArray(originalMaterial)
-            ? highlightMaterials
-            : highlightMaterials[0]
+            child.material = Array.isArray(originalMaterial)
+                ? highlightMaterials
+                : highlightMaterials[0]
 
-        highlightedMeshes.push({
-            mesh: child,
-            originalMaterial,
-            highlightColor,
-            materials: highlightMaterials.map(material => ({
-                material,
-                baseColor: material.color?.clone() || null,
-                baseEmissive: material.emissive?.clone() || null,
-                baseEmissiveIntensity: material.emissiveIntensity ?? 0
-            }))
+            highlightedMeshes.push({
+                mesh: child,
+                originalMaterial,
+                highlightColor,
+                materials: highlightMaterials.map(material => ({
+                    material,
+                    baseColor: material.color?.clone() || null,
+                    baseEmissive: material.emissive?.clone() || null,
+                    baseEmissiveIntensity: material.emissiveIntensity ?? 0
+                }))
+            })
         })
     })
 
