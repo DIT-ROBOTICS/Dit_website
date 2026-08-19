@@ -5,7 +5,68 @@ import heroVideoUrl from '@/assets/hero背景影片.m4v'
 import TitleBar from '@/components/TitleBar.vue'
 
 const heroContainer = ref(null)
+const heroVideo = ref(null)
 const progress = defineModel('progress', { type: Number, default: 0 })
+
+const HERO_VIDEO_READY_EVENT = 'hero-video-download-ready'
+const HERO_VIDEO_PLAYABLE_EVENT = 'hero-video-playable'
+const STARTUP_FINISHED_EVENT = 'startup-animation-finished'
+const startupAlreadyFinished = Boolean(sessionStorage.getItem('startupFinished'))
+let downloadedVideoUrl = ''
+let heroVideoPlayableReported = false
+
+// Safari 對動態換入的影片來源較嚴格：必須先設定靜音屬性，再設定 src。
+function prepareHeroVideo(source) {
+    const video = heroVideo.value
+    if (!video || !source) return
+
+    video.muted = true
+    video.defaultMuted = true
+    video.volume = 0
+    video.setAttribute('muted', '')
+    video.setAttribute('playsinline', '')
+    video.src = source
+    video.load()
+
+    // 在啟動畫面還在時就申請靜音自動播放，不延遲到進入 Hero 才申請。
+    video.play().catch(() => {
+        // Safari 低耗電模式或使用者禁止自動播放時，改由第一次觸控恢復。
+    })
+}
+
+// StartupAnimation 完整下載影片後，將 Blob URL 交給真正的 video 元素解析。
+function receiveDownloadedHeroVideo(event) {
+    downloadedVideoUrl = event.detail?.url || ''
+    prepareHeroVideo(downloadedVideoUrl)
+}
+
+// Blob 已完整下載，且 video 確認可播放後，才允許啟動畫面進入起飛階段。
+function notifyHeroVideoPlayable() {
+    if (!startupAlreadyFinished && downloadedVideoUrl && !heroVideoPlayableReported) {
+        heroVideoPlayableReported = true
+        window.dispatchEvent(new CustomEvent(HERO_VIDEO_PLAYABLE_EVENT))
+    }
+}
+
+function playHeroVideo() {
+    const video = heroVideo.value
+    if (!video || !video.paused) return
+
+    video.muted = true
+    video.play().catch(() => {})
+}
+
+// 啟動畫面結束後才從頭播放，避免動畫期間消耗剛緩衝好的內容。
+function startHeroVideoPlayback() {
+    const video = heroVideo.value
+    if (!video) return
+
+    video.currentTime = 0
+
+    // 影片已在啟動畫面後方靜音自動播放，通常不需要再呼叫 play()。
+    // 僅在瀏覽器曾意外暫停時嘗試恢復，避免 Safari 拒絕延遲的自動播放請求。
+    playHeroVideo()
+}
 
 function updateHeroProgress() {
     const element = heroContainer.value
@@ -27,13 +88,28 @@ function updateHeroProgress() {
 onMounted(() => {
     updateHeroProgress()
 
+    if (startupAlreadyFinished) prepareHeroVideo(heroVideoUrl)
+
+    window.addEventListener(HERO_VIDEO_READY_EVENT, receiveDownloadedHeroVideo)
+    window.addEventListener(STARTUP_FINISHED_EVENT, startHeroVideoPlayback)
+
+    // 若系統層級禁止自動播放，使用者第一次點擊或觸摸時無縫恢復。
+    document.addEventListener('pointerdown', playHeroVideo, { passive: true })
+    document.addEventListener('touchstart', playHeroVideo, { passive: true })
+
     window.addEventListener('scroll', updateHeroProgress, { passive: true })
     window.addEventListener('resize', updateHeroProgress)
 })
 
 onUnmounted(() => {
+    window.removeEventListener(HERO_VIDEO_READY_EVENT, receiveDownloadedHeroVideo)
+    window.removeEventListener(STARTUP_FINISHED_EVENT, startHeroVideoPlayback)
+    document.removeEventListener('pointerdown', playHeroVideo)
+    document.removeEventListener('touchstart', playHeroVideo)
     window.removeEventListener('scroll', updateHeroProgress)
     window.removeEventListener('resize', updateHeroProgress)
+
+    if (downloadedVideoUrl.startsWith('blob:')) URL.revokeObjectURL(downloadedVideoUrl)
 })
 </script>
 
@@ -46,7 +122,9 @@ onUnmounted(() => {
             <!-- <img class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片" /> -->
 
             <!-- 自動播放、靜音並循環的封面背景影片。 -->
-            <video class="hero-background" :src="heroVideoUrl" autoplay muted loop playsinline preload="auto"></video>
+            <video ref="heroVideo" class="hero-background"
+                autoplay muted loop playsinline preload="auto"
+                @canplay="notifyHeroVideoPlayable"></video>
 
             <!-- 深色漸層遮罩，提高文字可讀性。 -->
             <div class="hero-overlay"></div>

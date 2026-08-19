@@ -13,6 +13,7 @@ const isHomeRoute = computed(() => route.path === '/')
 function finishStartup() {
   startupFinished.value = true
   sessionStorage.setItem('startupFinished', true)
+  window.dispatchEvent(new CustomEvent('startup-animation-finished'))
 }
 
 const startup = sessionStorage.getItem('startupFinished')
@@ -22,7 +23,7 @@ if(startup){
 </script>
 
 <template>
-  <StartupAnimation v-if="!startupFinished" @finished="finishStartup" />
+  <StartupAnimation v-if="!startupFinished" :track-hero-video="isHomeRoute" @finished="finishStartup" />
 
   <div class="website" :class="{ visible: startupFinished }" >
     <RouterView />

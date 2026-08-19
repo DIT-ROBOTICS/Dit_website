@@ -1,12 +1,22 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import logoUrl from '@/assets/dit_logo.png'
+import heroVideoUrl from '@/assets/hero背景影片.m4v'
 
 const emit = defineEmits(['finished'])
+
+const props = defineProps({
+  trackHeroVideo: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const PROGRESS_UPDATE_INTERVAL_MS = 20
 const LAUNCH_DELAY_MS = 200
 const SCREEN_DISMISS_DELAY_MS = 1800
+const HERO_VIDEO_READY_EVENT = 'hero-video-download-ready'
+const HERO_VIDEO_PLAYABLE_EVENT = 'hero-video-playable'
 
 const loadingProgress = ref(0)
 const isLaunching = ref(false)
@@ -19,8 +29,12 @@ const shouldShowWelcome = computed(
 let progressIntervalId
 let launchTimeoutId
 let finishTimeoutId
+let launchStarted = false
+let videoDownloadController
 
 function startLaunchSequence() {
+  if (launchStarted) return
+  launchStarted = true
   window.clearInterval(progressIntervalId)
 
   // 短暫停留在 100%，再開始 Logo 起飛動畫。
@@ -31,7 +45,65 @@ function startLaunchSequence() {
   // 通知父元件移除啟動畫畫面。
   finishTimeoutId = window.setTimeout(() => {
     emit('finished')
-  }, SCREEN_DISMISS_DELAY_MS)
+  }, LAUNCH_DELAY_MS + SCREEN_DISMISS_DELAY_MS)
+}
+
+function handleHeroVideoPlayable() {
+  loadingProgress.value = 100
+  startLaunchSequence()
+}
+
+// 完整下載影片並建立 Blob URL，確保 Hero 不需要再次發出影片請求。
+async function downloadHeroVideo() {
+  videoDownloadController = new AbortController()
+
+  try {
+    const response = await fetch(heroVideoUrl, {
+      signal: videoDownloadController.signal,
+    })
+
+    if (!response.ok) throw new Error(`Hero video HTTP ${response.status}`)
+    if (!response.body) throw new Error('瀏覽器不支援串流下載影片')
+
+    const totalBytes = Number(response.headers.get('content-length'))
+    const contentType = response.headers.get('content-type') || 'video/mp4'
+    const reader = response.body.getReader()
+    const chunks = []
+    let loadedBytes = 0
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      chunks.push(value)
+      loadedBytes += value.byteLength
+
+      if (totalBytes > 0) {
+        // 保留最後 1%，直到 Blob 已建立且 video 元素確認 canplay。
+        loadingProgress.value = Math.min((loadedBytes / totalBytes) * 99, 99)
+      } else {
+        const estimateBase = 20 * 1024 * 1024
+        loadingProgress.value = Math.min(95 * (1 - Math.exp(-loadedBytes / estimateBase)), 95)
+      }
+    }
+
+    loadingProgress.value = 99
+    const videoBlob = new Blob(chunks, { type: contentType })
+    const videoObjectUrl = URL.createObjectURL(videoBlob)
+
+    window.dispatchEvent(new CustomEvent(HERO_VIDEO_READY_EVENT, {
+      detail: { url: videoObjectUrl },
+    }))
+  } catch (error) {
+    if (error?.name === 'AbortError') return
+
+    console.error('Hero 影片下載失敗：', error)
+
+    // 下載失敗時退回一般影片網址，等待 Hero 回報 canplay。
+    window.dispatchEvent(new CustomEvent(HERO_VIDEO_READY_EVENT, {
+      detail: { url: heroVideoUrl },
+    }))
+  }
 }
 
 function startLoadingProgress() {
@@ -49,11 +121,23 @@ function clearAnimationTimers() {
   window.clearInterval(progressIntervalId)
   window.clearTimeout(launchTimeoutId)
   window.clearTimeout(finishTimeoutId)
+  videoDownloadController?.abort()
 }
 
-onMounted(startLoadingProgress)
+onMounted(() => {
+  if (!props.trackHeroVideo) {
+    startLoadingProgress()
+    return
+  }
 
-onUnmounted(clearAnimationTimers)
+  window.addEventListener(HERO_VIDEO_PLAYABLE_EVENT, handleHeroVideoPlayable)
+  downloadHeroVideo()
+})
+
+onUnmounted(() => {
+  clearAnimationTimers()
+  window.removeEventListener(HERO_VIDEO_PLAYABLE_EVENT, handleHeroVideoPlayable)
+})
 </script>
 
 <template>
