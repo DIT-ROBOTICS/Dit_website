@@ -5,11 +5,13 @@ from fastapi.responses import FileResponse
 import uvicorn,socket,json
 import PyAPI.EurobotAPI as Eurobot
 import PyAPI.GetItemAPI as GIAPI
+from typing import Literal
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 MEMBER_IMAGE_DIR = BASE_DIR / "static" / "members"
 SPONSORS_LOGO_DIR = BASE_DIR / "static" / "Sponsor_Icon"
+HEROVIDEO_DIR = BASE_DIR / "static" / "HeroVideo"
 
 
 app = FastAPI()
@@ -126,6 +128,15 @@ async def get_Sponsors_Logo(filename:str):
     if not file_path.is_file():
         raise HTTPException(status_code=404,detail="File not found")
     return FileResponse(file_path)
+
+@app.get("/api/heroVideo/{platform}")
+async def get_hero_video(platform:Literal["Mobile","Desktop"]):
+    file_path = HEROVIDEO_DIR / "VideoInfo.json"
+    with open(file_path,"r",encoding="utf-8") as f:
+        data=json.load(f)
+    if data[platform]:
+        return FileResponse(HEROVIDEO_DIR / data[platform])
+    raise HTTPException(status_code=404,detail="File not found")
 
     
 

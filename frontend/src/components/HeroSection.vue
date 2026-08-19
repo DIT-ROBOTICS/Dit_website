@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import heroImageUrl from '@/assets/Hero_Image.png'
-import heroVideoUrl from '@/assets/hero背景影片.m4v'
+// import heroVideoUrl from '@/assets/hero背景影片.m4v'
 import TitleBar from '@/components/TitleBar.vue'
 
+const platform=window.innerWidth<=600?'Mobile':'Desktop'
+const heroVideoUrl=`/api/heroVideo/${platform}`
 const heroContainer = ref(null)
 const heroVideo = ref(null)
 const progress = defineModel('progress', { type: Number, default: 0 })
