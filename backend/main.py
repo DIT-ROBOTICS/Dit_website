@@ -113,19 +113,16 @@ async def get_eurobot_file(year:int,filename:str):
 
 @app.get("/api/Sponsors")
 async def get_Sponsors_Data():
-    file_path = DATA_DIR / "SponsorsData.json"
-    with open(file_path,"r",encoding="utf-8") as f:
-        data=json.load(f)
-    for d in data:
-        d["logo"] = f"/api/Sponsors/Logo/{d['logo']}"
-    return data
+    return GIAPI.build_api_data_from_json(SPONSORS_LOGO_DIR/"SponsorsData.json",{
+        "logo":"/api/Sponsors/Logo"
+    })
+
 
 @app.get("/api/Sponsors/Logo/{filename:path}")
 async def get_Sponsors_Logo(filename:str):
-    file_path=SPONSORS_LOGO_DIR/filename
-    if not file_path.is_file():
-        raise HTTPException(status_code=404,detail="File not found")
-    return FileResponse(file_path)
+    file_path=SPONSORS_LOGO_DIR/"icon"/filename
+    return GIAPI.get_file(file_path)
+
 
 @app.get("/api/heroVideo/{platform}")
 async def get_hero_video(platform:Literal["Mobile","Desktop"]):
