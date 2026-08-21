@@ -2,6 +2,10 @@
 
 這是 DIT 官方網站的 Vue 3 前端專案，使用 Vite 進行開發與建置。
 
+如果想要瀏覽此網頁，請前往 [DIT Official Website](https://jasonwu314159.github.io/Dit_Web_Link/)。
+
+如果網頁無法顯示請聯絡專案負責人。
+
 ## 開發環境
 
 - Node.js `22.18.0` 以上，或 `24.12.0` 以上
