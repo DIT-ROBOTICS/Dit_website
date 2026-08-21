@@ -11,7 +11,7 @@ SPONSORS_DIR = GIAPI.BASE_DIR / "SponsorSection"
 async def get_sponsors_data():
     return GIAPI.build_api_data_from_json(
         SPONSORS_DIR / "SponsorsData.json",
-        {"logo": "/api/Sponsors/Image"},
+        {"sponsors.logo": "/api/Sponsors/Image"},
     )
 
 

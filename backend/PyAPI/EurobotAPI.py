@@ -12,13 +12,12 @@ def get_latest_year():
         if item.is_dir() and item.name.isdigit() ]
     return max(years)
 
-def get_all_eurobot_api():
+def get_all_eurobot_data():
     years=[ int(item.name)
             for item in EUROBOT_DIR.iterdir()
             if item.is_dir() and item.name.isdigit() ]
     years.sort()
-    api = [ f"/api/Eurobot/{y}" for y in years ]
-    return api[:-1]
+    return [load_eurobot(year) for year in years[:-1]]
     
 
 

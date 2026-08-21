@@ -16,7 +16,7 @@ async def get_eurobot_introduction():
 
 @router.get("/History")
 async def get_eurobot_history():
-    return Eurobot.get_all_eurobot_api()
+    return Eurobot.get_all_eurobot_data()
 
 
 @router.get("/History/Background")
@@ -37,4 +37,3 @@ async def get_eurobot(year: Optional[int] = None):
     if year is not None:
         return Eurobot.load_eurobot(year)
     return Eurobot.load_eurobot(Eurobot.get_latest_year())
-
