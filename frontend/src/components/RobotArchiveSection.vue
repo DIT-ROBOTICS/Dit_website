@@ -25,6 +25,38 @@ const selectedRobot = ref(null)
 const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
 let mobileMediaQuery
 
+function normalizeRobot(robot = {}) {
+    return {
+        ...robot,
+        displayName: robot.displayName ?? robot.ShowOutName ?? robot.name ?? '',
+        themeColor: robot.themeColor ?? robot.ThemeColor ?? '#ffffff',
+        viewerPosition: robot.viewerPosition ?? robot.View3Dpos ?? 'right',
+        viewerBackground: robot.viewerBackground ?? robot.View3DBackground ?? '',
+        moreDetailsPath: robot.moreDetailsPath ?? robot.SeeMoreImagePath ?? '',
+        components: robot.components ?? robot.Componets ?? [],
+    }
+}
+
+// 將不同年度的新舊資料格式整理成歷史頁固定使用的形狀。
+function normalizeHistoryItem(item = {}) {
+    const rawTitle = item.bigTitle ?? item.BigTitle ?? ''
+    const bigTitle = Array.isArray(rawTitle)
+        ? rawTitle
+        : String(rawTitle).split(/\r?\n/).filter(Boolean)
+    const robots = item.robots ?? item.Robot_Data ?? []
+
+    return {
+        ...item,
+        year: item.year ?? item.Year,
+        background: item.background ?? item.Background ?? '',
+        bigTitle,
+        awards: Array.isArray(item.awards) ? item.awards : [],
+        awardsColor: item.awardsColor ?? '#ffffff',
+        description: item.description ?? '',
+        robots: Array.isArray(robots) ? robots.map(normalizeRobot) : [],
+    }
+}
+
 async function loadHistoryEurobotData(){
     try{
         const response = await fetch('/api/Eurobot/History')
@@ -34,16 +66,15 @@ async function loadHistoryEurobotData(){
         }
 
         const resj = await response.json()
-        robotHistory.value = []
-
-        for(const item of resj){
+        const history = await Promise.all(resj.map(async (item) => {
             const response = await fetch(item)
             if(!response.ok){
                 throw new Error(`HTTP ${response.status}`)
             }
-            robotHistory.value.push(await response.json())
-        }
-        robotHistory.value.sort((a,b)=>b.year-a.year)
+            return normalizeHistoryItem(await response.json())
+        }))
+
+        robotHistory.value = history.sort((a,b)=>b.year-a.year)
     }catch(error){
         console.error(error)
     }
