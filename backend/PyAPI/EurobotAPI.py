@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from fastapi import FastAPI,HTTPException
 from fastapi.responses import FileResponse
+import PyAPI.GetItemAPI as GIAPI
 
 app=FastAPI()
 BASE_DIR = Path("/Users/jason/Desktop/我的程式/web_page_2/Dit_Official_Website/database")
@@ -37,22 +38,19 @@ def load_eurobot(year:int):
     if not json_path.is_file():
         raise HTTPException(status_code=404,detail="Eurobot data not found")
 
-    with open(json_path,"r",encoding="utf-8") as f:
+    with open(json_path,encoding="utf-8") as f:
         data=json.load(f)
 
-    data["Background"]=f"/api/Eurobot/{year}/file/{data['Background']}"
-
-    venue_image=data.get("VenueImage")
-    if venue_image:
-        data["VenueImage"]=f"/api/Eurobot/{year}/file/{venue_image}"
-
-    for robot in data["Robot_Data"]:
+    for robot in data.get("Robot_Data",[]):
         glb_filename=robot.get("glbPath")
         glb_file=folder/glb_filename if glb_filename else None
         robot["glbSize"]=glb_file.stat().st_size if glb_file and glb_file.is_file() else 0
-        robot["glbPath"]=f"/api/Eurobot/{year}/file/{glb_filename}" if glb_filename else ""
-        robot["imagePath"]=f"/api/Eurobot/{year}/file/{robot['imagePath']}"
-        robot["View3DBackground"]=f"/api/Eurobot/{year}/file/{robot['View3DBackground']}"
-        robot["SeeMoreImagePath"]=f"/api/Eurobot/{year}/file/{robot['SeeMoreImagePath']}"
 
-    return data
+    return GIAPI.build_api_data(data,{
+        "Background":f"/api/Eurobot/{year}/file",
+        "VenueImage":f"/api/Eurobot/{year}/file",
+        "Robot_Data.glbPath":f"/api/Eurobot/{year}/file",
+        "Robot_Data.imagePath":f"/api/Eurobot/{year}/file",
+        "Robot_Data.View3DBackground":f"/api/Eurobot/{year}/file",
+        "Robot_Data.SeeMoreImagePath":f"/api/Eurobot/{year}/file"
+    })

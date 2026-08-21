@@ -73,37 +73,31 @@ async def get_pop_up_item(file:str):
     return GIAPI.get_pop_up_item(file)
     
 @app.get("/api/Eurobot")
-async def get_latest_eurobot():
+@app.get("/api/Eurobot/{year}")
+async def get_eurobot(year:Optional[int]=None):
+    if year: return Eurobot.load_eurobot(year)
     return Eurobot.load_eurobot(Eurobot.get_latest_year())
+
 @app.get("/api/Eurobot/Introduction")
 async def get_eurobot_introduction():
     file_path=Eurobot.EUROBOT_DIR/"EurobotIntroduction.txt"
-    if not file_path.is_file():
-        raise HTTPException(status_code=404,detail="File not found")
-    return FileResponse(file_path)
+    return GIAPI.get_file(file_path)
 
 @app.get("/api/Eurobot/History")
 async def get_eurobot_history():
     return Eurobot.get_all_eurobot_api()
 
 @app.get("/api/Eurobot/History/Background")
-async def get_eurobot_history():
+async def get_eurobot_Background():
     folder=Eurobot.EUROBOT_DIR/"ArchiveBackground"
     first_file=next((f for f in folder.iterdir() if f.is_file()),None)
-    if not first_file.is_file():
-        raise HTTPException(status_code=404,detail="File not found")
-    return FileResponse(first_file)
+    return GIAPI.get_file(first_file)
 
-@app.get("/api/Eurobot/{year}")
-async def get_eurobot(year:int):
-    return Eurobot.load_eurobot(year)
 
 @app.get("/api/Eurobot/{year}/file/{filename}")
 async def get_eurobot_file(year:int,filename:str):
     file_path=Eurobot.EUROBOT_DIR/str(year)/filename
-    if not file_path.is_file():
-        raise HTTPException(status_code=404,detail="File not found")
-    return FileResponse(file_path)
+    return GIAPI.get_file(file_path)
 
 @app.get("/api/Sponsors")
 async def get_Sponsors_Data():
