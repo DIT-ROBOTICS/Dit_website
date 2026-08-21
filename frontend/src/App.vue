@@ -38,13 +38,19 @@ if (startup) {
   <!-- 全路由共用，不受個別分頁的堆疊與裁切影響。 -->
   <FloatingRobot v-if="startupFinished" />
 
-  <!-- 首頁由 Hero 控制動畫；其他分頁固定顯示同一條導覽列。 -->
+  <!-- 首頁由 Hero 連續收合成 TitleBar；其他分頁直接使用固定 TitleBar。 -->
   <TitleBar v-if="startupFinished && !isHomeRoute" :progress="1" />
 </template>
 
 <style>
+:root {
+  --title-bar-height: 76px;
+  --page-content-height: calc(100vh - var(--title-bar-height));
+}
+
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--title-bar-height);
 }
 
 body {
@@ -76,16 +82,17 @@ textarea,
   transition: opacity 0.8s ease;
 }
 
-/*
- * 非首頁的 TitleBar 使用 fixed 定位，因此不會自行占據版面空間。
- * 在共用頁面容器預留相同高度，讓內容從導覽列下方開始。
- */
 .website.with-title-bar {
-  min-height: calc(100vh - 76px);
-  padding-top: 76px;
+  min-height: 100vh;
+  padding-top: var(--title-bar-height);
 }
 
 .website.visible {
   opacity: 1;
+}
+
+/* 一般 hash link 也會讓 section top 對齊 TitleBar bottom。 */
+section[id] {
+  scroll-margin-top: var(--title-bar-height);
 }
 </style>

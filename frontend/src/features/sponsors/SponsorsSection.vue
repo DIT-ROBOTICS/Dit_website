@@ -251,7 +251,7 @@ onUnmounted(() => {
 .sponsors-section {
     --Width: 130px;
 
-    min-height: 100vh;
+    min-height: var(--page-content-height);
     width: 100%;
     padding: 50px 7vw;
     background: #f9f9f9;

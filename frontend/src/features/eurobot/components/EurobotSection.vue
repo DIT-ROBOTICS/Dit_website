@@ -16,7 +16,7 @@ const mobileBreakpoint = '(max-width: 600px)'
 defineProps({
     achievementMarginTop: {
         type: String,
-        default: '400px',
+        default: '200px',
     },
     showHistoryButton: {
         type: Boolean,
@@ -213,6 +213,14 @@ loadThisYearEurobotData(eurobotApi.latest)
             </section>
         </div>
 
+        <!--
+            需要共享 Eurobot sticky 背景的後續內容。
+            slot 仍位於 robot-year-section 內，因此背景會固定到 slot 結束。
+        -->
+        <div v-if="$slots.afterContent" class="eurobot-after-content">
+            <slot name="afterContent" />
+        </div>
+
         <!-- 目前選取機器人的 3D 檢視視窗。 -->
         <Transition name="modal">
             <RobotViewer3D v-if="selectedRobot && !isMobile" :robot="selectedRobot"
@@ -230,9 +238,9 @@ loadThisYearEurobotData(eurobotApi.latest)
 
 .sticky-background {
     position: sticky;
-    top: 0;
+    top: var(--title-bar-height);
     width: 100%;
-    height: 100vh;
+    height: var(--page-content-height);
     overflow: hidden;
     z-index: 0;
 }
@@ -257,7 +265,12 @@ loadThisYearEurobotData(eurobotApi.latest)
 .robot-year-content {
     position: relative;
     z-index: 2;
-    margin-top: -100vh;
+    margin-top: calc(-100vh + var(--title-bar-height));
+}
+
+.eurobot-after-content {
+    position: relative;
+    z-index: 2;
 }
 
 .achievement-panel {

@@ -12,7 +12,7 @@ const heroProgress = ref(0)
 let observer
 
 onMounted(() => {
-    const sections = document.querySelectorAll('section[id]')
+    const sections = document.querySelectorAll('.about-wrapper section[id]')
 
     observer = new IntersectionObserver(
         (entries) => {
@@ -45,11 +45,15 @@ onUnmounted(() => {
 <template>
     <main class="home-page" :style="{ '--hero-progress': heroProgress }">
         <HeroSection v-model:progress="heroProgress" id="hero"/>
+        <div id="aboutSection" class="about-scroll-target" aria-hidden="true"></div>
 
         <div class="about-wrapper">
-            <AboutSection id="aboutSection" class="about-anchor" />
-            <EurobotSection id="EurobotSection" />
-            <AdvisorsSection id="advisors" />
+            <AboutSection />
+            <EurobotSection id="EurobotSection">
+                <template #afterContent>
+                    <AdvisorsSection />
+                </template>
+            </EurobotSection>
             <SponsorsSection id="sponsors" />
             <ContactSection id="contact" />
         </div>
@@ -57,24 +61,34 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.home-page {
+    position: relative;
+}
+
+/*
+ * Hero 完成收合時的固定座標：
+ * scroll target top (60vh) - TitleBar (76px) = Hero 動畫完整距離。
+ */
+.about-scroll-target {
+    position: absolute;
+    top: 60vh;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+    scroll-margin-top: var(--title-bar-height);
+}
+
 .about-wrapper {
     position: relative;
     z-index: 10;
-
-    /*
-   * Hero 從 100vh 縮成 76px，
-   * 將縮掉的空間補回來。
-   */
-    margin-top: calc(-60vh - (40vh * var(--hero-progress)) + 76px);
-
+    margin-top: calc(-60vh - (40vh * var(--hero-progress)) + var(--title-bar-height));
     background: #f5f5f3;
 }
 
-.about-anchor {
-    /*
-     * 補償 Hero 尚未收合時的剩餘位移，
-     * 讓 #aboutSection 總是停在 About 區塊頂端。
-     */
-    scroll-margin-top: calc((1 - var(--hero-progress)) * 40vh);
+@media (max-width: 900px) {
+    .about-scroll-target {
+        top: calc(155svh - 100vh);
+    }
 }
+
 </style>

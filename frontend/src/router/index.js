@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import EurobotView from '../views/EurobotView.vue'
 import CompetitionView from '../views/CompetitionView.vue'
 
+const TITLE_BAR_HEIGHT = 76
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior(to) {
@@ -14,7 +16,7 @@ const router = createRouter({
           if (finished) return
           finished = true
           window.removeEventListener('eurobot-rules-ready', finish)
-          resolve({ el: to.hash, behavior: 'smooth' })
+          resolve({ el: to.hash, top: TITLE_BAR_HEIGHT, behavior: 'smooth' })
         }
 
         window.addEventListener('eurobot-rules-ready', finish, { once: true })
@@ -25,6 +27,7 @@ const router = createRouter({
     if (to.hash) {
       return {
         el: to.hash,
+        top: TITLE_BAR_HEIGHT,
         behavior: 'smooth',
       }
     }

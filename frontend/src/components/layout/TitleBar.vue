@@ -63,7 +63,7 @@ defineProps({
     right: 0;
     z-index: 54;
     box-sizing: border-box;
-    height: 76px;
+    height: var(--title-bar-height);
     padding-inline: 5vw;
     opacity: var(--progress);
     color: white;

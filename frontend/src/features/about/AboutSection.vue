@@ -415,10 +415,6 @@ function getPhotoStyle(index, total) {
 
 /* About 上半部的手機排版；不改動照片堆疊邏輯與下方四張日常卡片。 */
 @media (max-width: 600px) {
-    .about-section {
-        padding-top: 76px;
-    }
-
     .about-heading {
         max-width: 100%;
     }

@@ -197,7 +197,7 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <!-- 隨封面收合而淡入的獨立頂部導覽。 -->
+        <!-- Hero 收合時同步淡入，完成後成為固定的 76px TitleBar。 -->
         <TitleBar :progress="progress" />
     </section>
 </template>
@@ -205,7 +205,7 @@ onUnmounted(() => {
 <style scoped>
 .hero-scroll-space {
     position: relative;
-    height: calc(160vh - 76px);
+    height: calc(160vh - var(--title-bar-height));
 }
 
 .hero-scroll-space,
@@ -217,7 +217,7 @@ onUnmounted(() => {
     position: sticky;
     top: 0;
     z-index: 20;
-    height: calc(100vh - var(--progress) * (100vh - 76px));
+    height: calc(100vh - var(--progress) * (100vh - var(--title-bar-height)));
     overflow: hidden;
     color: white;
     background: #111;
@@ -322,11 +322,11 @@ onUnmounted(() => {
 
 @media (max-width: 900px) {
     .hero-scroll-space {
-        height: calc(155svh - 76px);
+        height: calc(155svh - var(--title-bar-height));
     }
 
     .hero {
-        height: calc(100svh - var(--progress) * (100svh - 76px));
+        height: calc(100svh - var(--progress) * (100svh - var(--title-bar-height)));
     }
 
     .hero-background {
