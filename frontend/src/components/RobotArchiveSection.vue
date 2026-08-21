@@ -14,6 +14,7 @@ import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import ApiState from '@/components/common/ApiState.vue'
 import { useApiData } from '@/composables/useApiData'
+import { getRobotInitialViewSide } from '@/utils/robotLayout'
 import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 
 // 只在手機寬度停用 3D，平板與桌面版仍可預覽。
@@ -33,12 +34,12 @@ const selectedRobot = ref(null)
 const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
 let mobileMediaQuery
 
-function normalizeRobot(robot = {}) {
+function normalizeRobot(robot = {}, index, robots) {
     return {
         ...robot,
         displayName: robot.displayName ?? robot.ShowOutName ?? robot.name ?? '',
         themeColor: robot.themeColor ?? robot.ThemeColor ?? '#ffffff',
-        viewerPosition: robot.viewerPosition ?? robot.View3Dpos ?? 'right',
+        initialViewSide: getRobotInitialViewSide(index, robots.length),
         viewerBackground: robot.viewerBackground ?? robot.View3DBackground ?? '',
         moreDetailsPath: robot.moreDetailsPath ?? robot.SeeMoreImagePath ?? '',
         components: robot.components ?? robot.Componets ?? [],

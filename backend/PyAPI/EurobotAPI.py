@@ -1,6 +1,3 @@
-import json
-from pathlib import Path
-from fastapi import HTTPException
 import PyAPI.ResourceService as GIAPI
 
 EUROBOT_DIR=GIAPI.BASE_DIR/"Eurobot"
@@ -25,6 +22,9 @@ def load_eurobot(year:int):
     folder=EUROBOT_DIR/str(year)
     json_path=folder/"main_data.json"
     data=GIAPI.build_api_data_from_json(json_path,{})
+
+    # 年份以資料夾名稱／路由參數為唯一來源，不在 main_data.json 重複保存。
+    data["year"] = year
 
     for robot in data.get("robots",[]):
         glb_filename=robot.get("glbPath")

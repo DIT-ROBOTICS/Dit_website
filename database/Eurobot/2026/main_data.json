@@ -1,5 +1,4 @@
 {
-  "year": 2026,
   "background": "2026competition.jpg",
   "bigTitle": "THIS YEAR\nWe Made IT ",
   "awards": [
@@ -41,7 +40,6 @@
       "name": "白機",
       "displayName": "NTHU DIT",
       "themeColor": "#ffac70",
-      "viewerPosition": "left",
       "glbPath": "Eurobot2026白機.glb",
       "imagePath": "Eurobot2026白機.png",
       "viewerBackground": "DIT網站white.png",
@@ -101,7 +99,6 @@
       "name": "黑機",
       "displayName": "DIT Robotics",
       "themeColor": "#e58989",
-      "viewerPosition": "right",
       "glbPath": "Eurobot2026黑機.glb",
       "imagePath": "Eurobot2026黑機.png",
       "viewerBackground": "DIT網站black.png",

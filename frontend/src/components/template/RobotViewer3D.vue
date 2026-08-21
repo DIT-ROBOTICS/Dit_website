@@ -66,7 +66,7 @@ function init() {
         1000
     )
 
-    const dx = props.robot.viewerPosition === 'left' ? -1 : 1
+    const dx = props.robot.initialViewSide === 'left' ? -1 : 1
     camera.position.set(4 * dx, 2, 4)
 
     renderer = new THREE.WebGLRenderer({

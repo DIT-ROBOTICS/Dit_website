@@ -5,6 +5,7 @@ import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
 import ApiState from '@/components/common/ApiState.vue'
 import ArrowRight from '@/components/icons/FreeArrowRight.vue'
 import { useApiData } from '@/composables/useApiData'
+import { getRobotInitialViewSide } from '@/utils/robotLayout'
 import { ArrowUpRight } from 'lucide-vue-next'
 
 // 手機版統一使用 600px 斷點；平板仍保留 3D 預覽功能。
@@ -29,7 +30,13 @@ const {
     load: loadThisYearEurobotData,
     reload,
 } = useApiData({})
-const robots = computed(() => eurobotData.value.robots || [])
+const robots = computed(() => {
+    const robotData = eurobotData.value.robots || []
+    return robotData.map((robot, index) => ({
+        ...robot,
+        initialViewSide: getRobotInitialViewSide(index, robotData.length),
+    }))
+})
 const achievementPhoto = computed(() => eurobotData.value.background || '')
 const selectedRobot = ref(null)
 const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
