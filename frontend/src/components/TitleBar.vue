@@ -29,7 +29,7 @@ defineProps({
                 <a class="title-navigation-link mobile-hidden" :href="sectionHref('#aboutSection')">團隊</a>
                 <a class="title-navigation-link" href="/Eurobot">Eurobot</a>
                 <a class="title-navigation-link mobile-hidden" :href="sectionHref('Eurobot#RobotArchive')">歷年機器人</a>
-                <a class="title-navigation-link" :href="sectionHref('#competitions')">其他競賽</a>
+                <a class="title-navigation-link" :href="sectionHref('Competition')">其他競賽</a>
                 <a class="title-navigation-link" :href="sectionHref('#advisors')">指導教授</a>
                 <a class="title-navigation-link" :href="sectionHref('#sponsors')">贊助商</a>
                 <a class="title-navigation-link" :href="sectionHref('#contact')">聯絡我們</a>

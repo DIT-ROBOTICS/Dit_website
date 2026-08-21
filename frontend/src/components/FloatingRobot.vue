@@ -41,7 +41,7 @@ const navigationItems = [
   },
   {
     label: '其他競賽',
-    target: '/#competitions',
+    target: '/Competition',
   },
   {
     label: '指導教授',
