@@ -46,6 +46,18 @@ app.add_middleware(
 async def json_data_api(title:str):
     return GIAPI.get_json_data(title)
 
+@app.get("/api/Advisor/data")
+async def Advisor_data():
+    Advisor_dir = BASE_DIR/"AdvisorSection"
+    return GIAPI.build_api_data_from_json(Advisor_dir/"Advisors.json",{
+            "image":"/api/Advisor/Image",
+        })
+@app.get("/api/Advisor/Image/{name}")
+async def Advisor_Image(name:str):
+    Advisor_dir = BASE_DIR/"AdvisorSection"
+    return GIAPI.create_image_response(Advisor_dir/name,False)
+
+
 
 @app.get("/api/member_info/{member_type}")
 async def member_info_api(member_type:str):

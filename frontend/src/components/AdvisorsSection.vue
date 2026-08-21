@@ -13,7 +13,7 @@ let touchMediaQuery
 
 async function loadAdvisors() {
     try {
-        const response = await fetch('/api/member_info/Advisor')
+        const response = await fetch('/api/Advisor/data')
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         advisors.value = await response.json()
     } catch (error) {
@@ -89,7 +89,7 @@ onUnmounted(() => {
                 @mouseenter="activateFromHover(index)" @mouseleave="closeFromHover"
                 @focus="activateFromHover(index)" @blur="closeCard" @click="activateFromTouch(index)">
                 <div class="advisor-photo-wrap">
-                    <img class="advisor-photo" :src="`/api/member_images/advisor-image/${advisor.id}`" :alt="advisor.name" />
+                    <img class="advisor-photo" :src="advisor.image" :alt="advisor.name" />
                 </div>
 
                 <div class="advisor-summary">
