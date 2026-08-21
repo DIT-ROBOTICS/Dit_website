@@ -27,16 +27,16 @@ def load_eurobot(year:int):
     json_path=folder/"main_data.json"
     data=GIAPI.build_api_data_from_json(json_path,{})
 
-    for robot in data.get("Robot_Data",[]):
+    for robot in data.get("robots",[]):
         glb_filename=robot.get("glbPath")
         glb_file=folder/glb_filename if glb_filename else None
         robot["glbSize"]=glb_file.stat().st_size if glb_file and glb_file.is_file() else 0
 
     return GIAPI.build_api_data(data,{
-        "Background":f"/api/Eurobot/{year}/file",
-        "VenueImage":f"/api/Eurobot/{year}/file",
-        "Robot_Data.glbPath":f"/api/Eurobot/{year}/file",
-        "Robot_Data.imagePath":f"/api/Eurobot/{year}/file",
-        "Robot_Data.View3DBackground":f"/api/Eurobot/{year}/file",
-        "Robot_Data.SeeMoreImagePath":f"/api/Eurobot/{year}/file"
+        "background":f"/api/Eurobot/{year}/file",
+        "venueImage":f"/api/Eurobot/{year}/file",
+        "robots.glbPath":f"/api/Eurobot/{year}/file",
+        "robots.imagePath":f"/api/Eurobot/{year}/file",
+        "robots.viewerBackground":f"/api/Eurobot/{year}/file",
+        "robots.moreDetailsPath":f"/api/Eurobot/{year}/file"
     })

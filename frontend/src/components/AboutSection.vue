@@ -31,7 +31,7 @@ function getDailyCardStyle(index) {
     const purePhotoFactor = aspectRatio - gradientFactor
 
     return {
-        '--Theme-Color': aboutData.value.ThemeColor,
+        '--Theme-Color': aboutData.value.themeColor,
         '--daily-expanded-image-width': `calc(var(--daily-gallery-height) * ${aspectRatio})`,
         '--daily-overlap-width': `calc(var(--daily-gallery-height) * ${gradientFactor})`,
         '--daily-pure-photo-width': `calc(var(--daily-gallery-height) * ${purePhotoFactor})`,
@@ -50,7 +50,7 @@ async function loadAboutData() {
         }
 
         aboutData.value = await response.json()
-        photoUrls.value = aboutData.value.AboutPhoto
+        photoUrls.value = aboutData.value.aboutPhotos
     } catch (error) {
         console.error('團隊資料載入失敗：', error)
     }
@@ -121,9 +121,9 @@ function getPhotoStyle(index, total) {
         <!-- 團隊介紹標題。 -->
         <header class="about-heading">
             <!-- 團隊介紹小標。 -->
-            <p class="about-heading-label">{{ aboutData.SmallTitle }}</p>
+            <p class="about-heading-label">{{ aboutData.smallTitle }}</p>
             <!-- 團隊介紹主標題。 -->
-            <h2 class="about-heading-title">{{ aboutData.MainTitle }}</h2>
+            <h2 class="about-heading-title">{{ aboutData.mainTitle }}</h2>
         </header>
 
         <!-- 以 U 形堆疊排列的團隊照片。 -->
@@ -137,11 +137,11 @@ function getPhotoStyle(index, total) {
         <div class="about-description">{{ aboutData.description }}</div>
 
         <!-- 團隊日常內容標題。 -->
-        <h2 class="daily-title">{{ aboutData.daily_title }}</h2>
+        <h2 class="daily-title">{{ aboutData.dailyTitle }}</h2>
 
         <!-- 四張橫向鋪滿的日常照片；聚焦時展開該項目的介紹。 -->
         <div class="daily-gallery" :class="{ 'uses-touch': usesTouchInteraction }">
-            <article v-for="(detail, index) in (aboutData.MoreDetail || []).slice(0, 4)" :key="detail.title"
+            <article v-for="(detail, index) in (aboutData.moreDetails || []).slice(0, 4)" :key="detail.title"
                 class="daily-card" :class="{ 'is-touch-active': activeDailyCardIndex === index }" tabindex="0"
                 :style="getDailyCardStyle(index)" @click="activateDailyCard(index)">
                 <img v-if="photoUrls.length" class="daily-card-image" :src="photoUrls[index % photoUrls.length]"

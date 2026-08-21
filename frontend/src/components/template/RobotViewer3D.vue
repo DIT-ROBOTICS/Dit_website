@@ -32,9 +32,9 @@ const showControlPanel = ref(true)
 const selectedPart = ref(null)
 const guideParts = ref([])
 
-// 只有 Componets 存在且至少有一筆時，才建立左右零件導覽 UI。
+// 只有 components 存在且至少有一筆時，才建立左右零件導覽 UI。
 const hasComponents = computed(
-    () => Array.isArray(props.robot.Componets) && props.robot.Componets.length > 0
+    () => Array.isArray(props.robot.components) && props.robot.components.length > 0
 )
 
 // Three.js 場景物件與畫面生命週期資源。
@@ -66,7 +66,7 @@ function init() {
         1000
     )
 
-    const dx = props.robot.View3Dpos === 'left' ? -1 : 1
+    const dx = props.robot.viewerPosition === 'left' ? -1 : 1
     camera.position.set(4 * dx, 2, 4)
 
     renderer = new THREE.WebGLRenderer({
@@ -208,9 +208,9 @@ function centerModel(model) {
 function setupGuideParts() {
     if (!robot) return
 
-    // 零件標註與詳細資料統一由機器人資料的 Componets 陣列提供。
+    // 零件標註與詳細資料統一由機器人資料的 components 陣列提供。
     // 非陣列時使用空陣列，避免後端資料缺少時 map() 發生錯誤。
-    const parts = Array.isArray(props.robot.Componets) ? props.robot.Componets : []
+    const parts = Array.isArray(props.robot.components) ? props.robot.components : []
 
     robot.updateMatrixWorld(true)
 
@@ -339,7 +339,7 @@ function updateGuidePositions() {
         const startY = titleRect.top - containerRect.top + titleRect.height / 2
         const deltaX = part.screenX - startX
         const deltaY = part.screenY - startY
-        const color = part.color || props.robot.ThemeColor || '#ffffff'
+        const color = part.color || props.robot.themeColor || '#ffffff'
 
         // Three.js 每幀直接更新 DOM，避免將 Object3D 放入 Vue reactive 後沒有觸發樣式重繪。
         connector.style.left = `${startX}px`
@@ -363,7 +363,7 @@ function startPartHighlight(part) {
     clearPartHighlight()
     if (!part?.object) return
 
-    const highlightColor = new THREE.Color(part.color || props.robot.ThemeColor || '#ffffff')
+    const highlightColor = new THREE.Color(part.color || props.robot.themeColor || '#ffffff')
     const highlightedMeshSet = new Set()
 
     // 同一筆詳細資料可綁定多個 3D 節點，所有節點共用同一閃爍週期。
@@ -549,7 +549,7 @@ onUnmounted(() => {
                 <div ref="container" class="robot-viewer">
                     <!-- 後端資料指定的視覺背景與閱讀性遮罩。 -->
                     <div class="viewer-background"
-                        :style="{ '--background-api': `url(${props.robot.View3DBackground})` }"></div>
+                        :style="{ '--background-api': `url(${props.robot.viewerBackground})` }"></div>
 
                     <div class="viewer-overlay"></div>
 
@@ -557,9 +557,9 @@ onUnmounted(() => {
                     <div class="viewer-info"
                         :class="{ 'guide-is-open': hasComponents && showControlPanel && !modelLoading && !modelLoadError }"
                         :style="{
-                            color: props.robot.ThemeColor
+                            color: props.robot.themeColor
                         }">
-                        {{ props.robot.ShowOutName }}
+                        {{ props.robot.displayName }}
                     </div>
 
                     <!-- 左側零件檔案總管：選取後會 Focus、閃爍並顯示右側詳細資料。 -->

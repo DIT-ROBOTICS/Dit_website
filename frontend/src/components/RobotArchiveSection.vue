@@ -43,7 +43,7 @@ async function loadHistoryEurobotData(){
             }
             robotHistory.value.push(await response.json())
         }
-        robotHistory.value.sort((a,b)=>b.Year-a.Year)
+        robotHistory.value.sort((a,b)=>b.year-a.year)
     }catch(error){
         console.error(error)
     }
@@ -144,15 +144,15 @@ onUnmounted(() => {
                     <div class="year-overlay"></div>
 
                     <div class="background-year">
-                        {{ item.Year }}
+                        {{ item.year }}
                     </div>
 
                     <div class="year-info">
                         <p class="competition" :style="{ color: item.awardsColor }">
-                            Eurobot {{ item.Year }}
+                            Eurobot {{ item.year }}
                         </p>
 
-                        <h3><span v-for="value in item.BigTitle">{{ value }}<br></span></h3>
+                        <h3><span v-for="value in item.bigTitle">{{ value }}<br></span></h3>
 
                         <p class="year-description">
                             {{ item.description }}
@@ -165,8 +165,8 @@ onUnmounted(() => {
                         </div>
                     </div>
 
-                    <div class="robots-area" :class="{ single: item.Robot_Data.length === 1 }">
-                        <button v-for="robot in item.Robot_Data" :key="robot.id" class="robot-card"
+                    <div class="robots-area" :class="{ single: item.robots.length === 1 }">
+                        <button v-for="robot in item.robots" :key="robot.id" class="robot-card"
                             :class="{ clickable: robot.glbPath && !isMobile }" type="button"
                             :disabled="isMobile || !robot.glbPath" @click="openRobot(robot)">
                             <div class="robot-image-wrapper">
@@ -180,7 +180,7 @@ onUnmounted(() => {
                             <div class="robot-meta">
                                 <div>
                                     <p>{{ robot.name }}</p>
-                                    <h4 :style="{color:robot.ThemeColor}">{{ robot.ShowOutName }}</h4>
+                                    <h4 :style="{color:robot.themeColor}">{{ robot.displayName }}</h4>
                                 </div>
 
                                 <span v-if="robot.model" class="robot-arrow">
@@ -198,7 +198,7 @@ onUnmounted(() => {
                 <button v-for="(item, index) in robotHistory" :key="item.year" class="timeline-point"
                     :class="{ active: activeIndex === index }" type="button" @click="scrollToYear(index)">
                     <span class="timeline-dot"></span>
-                    <span class="timeline-year">{{ item.Year }}</span>
+                    <span class="timeline-year">{{ item.year }}</span>
                 </button>
             </div>
         </div>

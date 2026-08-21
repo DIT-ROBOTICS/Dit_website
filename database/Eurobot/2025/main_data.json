@@ -1,66 +1,112 @@
 {
-  "Year":2025,
-  "Background": "2026competition.jpg",
-  "BigTitle": ["THIS YEAR","We Made IT"],
-  "awards": ["World TOP 2","Team Choice Award"],
+  "year": 2025,
+  "background": "2026competition.jpg",
+  "bigTitle": "THIS YEAR\nWe Made IT ",
+  "awards": [
+    "World TOP 2",
+    "Team Choice Award"
+  ],
   "awardsColor": "#c75b5b",
   "description": "這裡放一些當年比賽的描述",
-  "Robot_Data": [
+  "venueRules": [
+    {
+      "id": 1,
+      "pointX": 2.7,
+      "pointY": 1.8,
+      "content": "機器人須從藍方或黃方出發"
+    },
+    {
+      "id": 2,
+      "pointX": 2.8,
+      "pointY": 1.2,
+      "content": "收集場邊四個一組的木塊，並將木塊正面翻至隊伍顏色\n再將翻好的木塊放至綠色格線內，有幾塊就算幾分"
+    },
+    {
+      "id": 3,
+      "pointX": 2.78,
+      "pointY": 0.05,
+      "content": "除此之外還要將場邊的溫度計推至10，即可得到最高分"
+    },
+    {
+      "id": 4,
+      "pointX": 0.15,
+      "pointY": 0.82,
+      "content": "比賽剩下最後15秒時，小機器人SIMA須從家中出發，並走至綠色格線內停下，並使制動器運轉，即可得分"
+    }
+  ],
+  "venueImage": "Eurobot場地.png",
+  "robots": [
     {
       "id": 1,
       "name": "白機",
-      "ShowOutName": "NTHU DIT",
-      "ThemeColor": "#ffac70",
-      "View3Dpos": "left",
+      "displayName": "NTHU DIT",
+      "themeColor": "#ffac70",
+      "viewerPosition": "left",
       "glbPath": "Eurobot2026白機.glb",
       "imagePath": "Eurobot2026白機.png",
-      "View3DBackground": "白機3DViewer.png",
-      "SeeMoreImagePath": "",
-      "description":[
+      "viewerBackground": "DIT網站white.png",
+      "moreDetailsPath": "",
+      "components": [
         {
-          "pointX":0.1, "pointY":0.1,
-          "title":"Lidar",
-          "content":""
+          "id": "lidar",
+          "objectName": "YDLIDAR_G6:1",
+          "title": "LiDAR",
+          "product": "YDLIDAR G6",
+          "category": "SENSOR",
+          "description": "LiDAR負責掃描機器周圍環境，提供定位、障礙物偵測以及場地資訊。",
+          "color": "#79dfff",
+          "details": [
+            {
+              "title": "用途",
+              "content": "環境掃描與機器定位"
+            },
+            {
+              "title": "型號",
+              "content": "YDLIDAR G6"
+            },
+            {
+              "title": "系統",
+              "content": "定位與導航系統"
+            }
+          ]
         },
         {
-          "pointX":0.1, "pointY":0.1,
-          "title":"Lidar",
-          "content":""
+          "id": "Camera",
+          "objectName": "D405_Solid:4",
+          "title": "Camera",
+          "product": "3010 Blower Fan",
+          "category": "SENSOR",
+          "description": "辨識木塊上的aruco tag",
+          "color": "#ffbd73",
+          "details": [
+            {
+              "title": "用途",
+              "content": "辨識木塊"
+            }
+          ]
         },
         {
-          "pointX":0.1, "pointY":0.1,
-          "title":"Lidar",
-          "content":""
+          "id": "battery",
+          "objectName": "Makita battery_18V_5Ah:1",
+          "title": "Battery",
+          "product": "3010 Blower Fan",
+          "category": "POWER",
+          "description": "機器人的主要電力來源。",
+          "color": "#9cff89"
         }
       ]
     },
     {
       "id": 2,
       "name": "黑機",
-      "ShowOutName": "DIT Robotics",
-      "ThemeColor": "#e58989",
-      "View3Dpos": "right",
+      "displayName": "DIT Robotics",
+      "themeColor": "#e58989",
+      "viewerPosition": "right",
       "glbPath": "Eurobot2026黑機.glb",
       "imagePath": "Eurobot2026黑機.png",
-      "View3DBackground": "黑機3DViewer.png",
-      "SeeMoreImagePath": "",
-      "description":[
-        {
-          "pointX":0.1, "pointY":0.1,
-          "title":"Lidar",
-          "content":""
-        },
-        {
-          "pointX":0.1, "pointY":0.1,
-          "title":"Lidar",
-          "content":""
-        },
-        {
-          "pointX":0.1, "pointY":0.1,
-          "title":"Lidar",
-          "content":""
-        }
-      ]
+      "viewerBackground": "DIT網站black.png",
+      "moreDetailsPath": "",
+      "components": []
     }
   ]
 }

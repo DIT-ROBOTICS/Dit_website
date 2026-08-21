@@ -52,7 +52,7 @@ async def get_pop_up_item(file:str):
 
 
 @app.get("/api/heroVideo/{platform}")
-async def get_hero_video(platform:Literal["Mobile","Desktop"]):
+async def get_hero_video(platform:Literal["mobile","desktop"]):
     HEROVIDEO_DIR = BASE_DIR / "HeroVideo"
     file_path = HEROVIDEO_DIR / "VideoInfo.json"
     data=GIAPI.build_api_data_from_json(file_path,{})

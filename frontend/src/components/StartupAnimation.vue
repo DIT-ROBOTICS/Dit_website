@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import logoUrl from '@/assets/dit_logo.png'
 
 const emit = defineEmits(['finished'])
-const platform=window.innerWidth<=600?'Mobile':'Desktop'
+const platform=window.innerWidth<=600?'mobile':'desktop'
 const heroVideoUrl=`/api/heroVideo/${platform}`
 const props = defineProps({
   trackHeroVideo: {

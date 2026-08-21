@@ -36,8 +36,8 @@ async function loadThisYearEurobotData() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
         eurobotData.value = await response.json()
-        robots.value = eurobotData.value.Robot_Data
-        achievementPhoto.value = eurobotData.value.Background
+        robots.value = eurobotData.value.robots
+        achievementPhoto.value = eurobotData.value.background
     } catch (error) {
         console.error(error)
     }
@@ -124,10 +124,10 @@ onUnmounted(() => {
                 <!-- 年份、主標題與獎項內容。 -->
                 <div class="achievement-content">
                     <!-- Eurobot 年份。 -->
-                    <p class="achievement-year">Eurobot {{ eurobotData.Year }}</p>
+                    <p class="achievement-year">Eurobot {{ eurobotData.year }}</p>
 
                     <!-- 當年主視覺標題。 -->
-                    <h2 class="achievement-title">{{ eurobotData.BigTitle }}</h2>
+                    <h2 class="achievement-title">{{ eurobotData.bigTitle }}</h2>
 
                     <!-- 當年競賽獎項。 -->
                     <div class="achievement-awards" :style="{ '--text-color': eurobotData.awardsColor }">
@@ -149,8 +149,8 @@ onUnmounted(() => {
                     <article v-for="robot in robots" :key="robot.id" class="robot-card">
                         <!-- 機器人展示名稱。 -->
                         <p class="robot-name" :style="{ '--text-align': getRobotNameAlignment(robot) }">
-                            <span class="robot-name-text" :style="{ color: robot.ThemeColor }">
-                                {{ robot.ShowOutName }}
+                            <span class="robot-name-text" :style="{ color: robot.themeColor }">
+                                {{ robot.displayName }}
                             </span>
                         </p>
 
@@ -185,7 +185,7 @@ onUnmounted(() => {
                         </div>
 
                         <!-- 開啟機器人詳細資料的檔案預覽視窗。 -->
-                        <FilePreviewModal v-slot="{ open: openPreview }" api="/api/PopUpItem/WhiteSeeMore"
+                        <FilePreviewModal v-slot="{ open: openPreview }" api="/api/PopUpItem/whiteSeeMore"
                             title="NTHU DIT">
                             <button class="detail-button" type="button" @click.stop="openPreview">
                                 <span>See more </span>

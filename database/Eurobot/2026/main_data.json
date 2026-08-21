@@ -1,14 +1,14 @@
 {
-  "Year": 2026,
-  "Background": "2026competition.jpg",
-  "BigTitle": "THIS YEAR\nWe Made IT ",
+  "year": 2026,
+  "background": "2026competition.jpg",
+  "bigTitle": "THIS YEAR\nWe Made IT ",
   "awards": [
     "World TOP 2",
     "Team Choice Award"
   ],
   "awardsColor": "#c75b5b",
   "description": "這裡放一些當年比賽的描述",
-  "VenueRules": [
+  "venueRules": [
     {
       "id": 1,
       "pointX": 2.7,
@@ -34,19 +34,19 @@
       "content": "比賽剩下最後15秒時，小機器人SIMA須從家中出發，並走至綠色格線內停下，並使制動器運轉，即可得分"
     }
   ],
-  "VenueImage": "Eurobot場地.png",
-  "Robot_Data": [
+  "venueImage": "Eurobot場地.png",
+  "robots": [
     {
       "id": 1,
       "name": "白機",
-      "ShowOutName": "NTHU DIT",
-      "ThemeColor": "#ffac70",
-      "View3Dpos": "left",
+      "displayName": "NTHU DIT",
+      "themeColor": "#ffac70",
+      "viewerPosition": "left",
       "glbPath": "Eurobot2026白機.glb",
       "imagePath": "Eurobot2026白機.png",
-      "View3DBackground": "DIT網站white.png",
-      "SeeMoreImagePath": "",
-      "Componets": [
+      "viewerBackground": "DIT網站white.png",
+      "moreDetailsPath": "",
+      "components": [
         {
           "id": "lidar",
           "objectName": "YDLIDAR_G6:1",
@@ -99,14 +99,14 @@
     {
       "id": 2,
       "name": "黑機",
-      "ShowOutName": "DIT Robotics",
-      "ThemeColor": "#e58989",
-      "View3Dpos": "right",
+      "displayName": "DIT Robotics",
+      "themeColor": "#e58989",
+      "viewerPosition": "right",
       "glbPath": "Eurobot2026黑機.glb",
       "imagePath": "Eurobot2026黑機.png",
-      "View3DBackground": "DIT網站black.png",
-      "SeeMoreImagePath": "",
-      "Componets": []
+      "viewerBackground": "DIT網站black.png",
+      "moreDetailsPath": "",
+      "components": []
     }
   ]
 }

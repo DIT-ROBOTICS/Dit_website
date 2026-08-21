@@ -66,7 +66,7 @@ onMounted(loadLinks)
                 </p>
 
                 <!-- 開啟贊助方法的檔案預覽視窗。 -->
-                <FilePreviewModal api="/api/PopUpItem/SponsorshipMethods" title="贊助方法">
+                <FilePreviewModal api="/api/PopUpItem/sponsorshipMethods" title="贊助方法">
                     <button class="contact-button" type="button">
                         SUPPORT US
                         <span class="contact-button-icon">

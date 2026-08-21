@@ -37,7 +37,7 @@ async function notifyLayoutReady() {
 }
 
 /*
- * 將 main_data.json 的 VenueRules 轉成畫面所需的標註資訊。
+ * 將 main_data.json 的 venueRules 轉成畫面所需的標註資訊。
  *
  * 座標轉換分成四步：
  * 1. 在原圖中央找出最大的 3:2 矩形。
@@ -61,7 +61,7 @@ const annotations = computed(() => {
     const cropTop = (1 - cropHeight) / 2
 
     // 先依 id 由小到大排序；非數字 id 則使用文字排序。
-    const sortedRules = [...(eurobotData.value.VenueRules || [])].sort((a, b) => {
+    const sortedRules = [...(eurobotData.value.venueRules || [])].sort((a, b) => {
         const numberA = Number(a.id)
         const numberB = Number(b.id)
 
@@ -161,7 +161,7 @@ async function loadRules() {
         loadError.value = '規則資料暫時無法載入'
     } finally {
         loading.value = false
-        if (!eurobotData.value.VenueImage) notifyLayoutReady()
+        if (!eurobotData.value.venueImage) notifyLayoutReady()
     }
 }
 
@@ -184,17 +184,17 @@ onMounted(loadRules)
                 <!-- 最新年度的場地圖片與規則標註。 -->
                 <section v-if="!loading && !loadError" class="venue-section">
                     <header class="venue-heading">
-                        <h3 class="venue-heading-title">{{ eurobotData.Year }}EUROBOT規則介紹</h3>
+                        <h3 class="venue-heading-title">{{ eurobotData.year }}EUROBOT規則介紹</h3>
                         <p class="venue-heading-description">Eurobot是一場100秒的計時比賽，兩邊隊伍分數高者勝利</p>
                     </header>
 
                     <!-- 三欄舞台：左側說明、中央圖片、右側說明。 -->
-                    <div v-if="eurobotData.VenueImage" class="venue-stage">
+                    <div v-if="eurobotData.venueImage" class="venue-stage">
                         <!-- 圖片定位容器讓手機版 point 能使用純圖片座標，不受桌面左右欄影響。 -->
                         <div class="venue-image-area">
                             <!-- 載入事件會取得圖片真實比例，並觸發 annotations 重新計算。 -->
-                            <img class="venue-image" :src="eurobotData.VenueImage"
-                                :alt="`Eurobot ${eurobotData.Year} 場地`" @load="saveVenueImageAspect" />
+                            <img class="venue-image" :src="eurobotData.venueImage"
+                                :alt="`Eurobot ${eurobotData.year} 場地`" @load="saveVenueImageAspect" />
 
                             <!-- 手機版：讓規則 id 徽章中心直接對齊圖片目標點。 -->
                             <span v-for="rule in annotations" :key="`mobile-point-${rule.index}`"
@@ -241,10 +241,10 @@ onMounted(loadRules)
                         </div>
                     </div>
 
-                    <!-- VenueImage 尚未設定時保留清楚的資料提示。 -->
+                    <!-- venueImage 尚未設定時保留清楚的資料提示。 -->
                     <p v-else class="venue-empty">
                         請在當年度的 <code class="venue-empty-code">main_data.json</code>
-                        填入 <code class="venue-empty-code">VenueImage</code> 圖片檔名。
+                        填入 <code class="venue-empty-code">venueImage</code> 圖片檔名。
                     </p>
                 </section>
             </div>

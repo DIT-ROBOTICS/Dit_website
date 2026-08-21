@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import heroImageUrl from '@/assets/Hero_Image.png'
 import TitleBar from '@/components/TitleBar.vue'
 
-const platform=window.innerWidth<=600?'Mobile':'Desktop'
+const platform=window.innerWidth<=600?'mobile':'desktop'
 const heroVideoUrl=`/api/heroVideo/${platform}`
 const heroContainer = ref(null)
 const heroVideo = ref(null)

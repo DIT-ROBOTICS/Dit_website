@@ -12,8 +12,8 @@ async def get_about_page_data():
     return GIAPI.build_api_data_from_json(
         ABOUT_SECTION_DIR / "AboutSectionData.json",
         {
-            "AboutPhoto": "/api/aboutPage/Image",
-            "MoreDetail.image": "/api/aboutPage/Image",
+            "aboutPhotos": "/api/aboutPage/Image",
+            "moreDetails.image": "/api/aboutPage/Image",
         },
     )
 
@@ -21,4 +21,3 @@ async def get_about_page_data():
 @router.get("/Image/{name}")
 async def get_about_page_image(name: str):
     return GIAPI.create_image_response(ABOUT_SECTION_DIR / name, False)
-

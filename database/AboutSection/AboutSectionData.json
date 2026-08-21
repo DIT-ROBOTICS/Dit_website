@@ -1,11 +1,11 @@
 {
-    "SmallTitle": "DIT 將我們聚集在此，讓我們有了逐夢的動力",
-    "MainTitle": "我們打造的不僅是機器人，更是一群能一起追夢的人",
-    "AboutPhoto":["Photo1.JPG","Photo2.jpg","Photo3.JPG"],
+    "smallTitle": "DIT 將我們聚集在此，讓我們有了逐夢的動力",
+    "mainTitle": "我們打造的不僅是機器人，更是一群能一起追夢的人",
+    "aboutPhotos":["Photo1.JPG","Photo2.jpg","Photo3.JPG"],
     "description": "成立於2013年，DIT由來自清大各系的大學生所組成，致力於發展機器人機械、電控及 ROS2 的相關技術。我們團隊以比賽為導向的學習，在動手挑戰與解決實際問題的過程中，持續精進其技術實力。",
-    "daily_title":"不只競賽，請收看我們的日常",
-    "ThemeColor": "#100d40",
-    "MoreDetail":[
+    "dailyTitle":"不只競賽，請收看我們的日常",
+    "themeColor": "#100d40",
+    "moreDetails":[
         {
             "title": "參與競賽",
             "detail":"我們積極參與各項比賽，如ASME、TDK、Eurobot，並透過比賽，有目標性的學習",
