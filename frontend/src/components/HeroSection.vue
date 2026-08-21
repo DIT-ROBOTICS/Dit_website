@@ -17,6 +17,23 @@ const startupAlreadyFinished = Boolean(sessionStorage.getItem('startupFinished')
 const heroVideoFailed = ref(false)
 let downloadedVideoUrl = ''
 let heroVideoPlayableReported = false
+let heroAudioEnabled = false
+
+// Hero 收合進度 0~1 對應音量 1~0；尚未有使用者操作前維持靜音。
+function syncHeroVideoVolume() {
+    const video = heroVideo.value
+    if (!video) return
+
+    const volume = Math.min(Math.max(1 - progress.value, 0), 1)
+    video.volume = volume
+    video.muted = !heroAudioEnabled || volume <= 0.01
+
+    if (video.muted) {
+        video.setAttribute('muted', '')
+    } else {
+        video.removeAttribute('muted')
+    }
+}
 
 // Safari 對動態換入的影片來源較嚴格：必須先設定靜音屬性，再設定 src。
 function prepareHeroVideo(source) {
@@ -68,10 +85,21 @@ function notifyHeroVideoError() {
 
 function playHeroVideo() {
     const video = heroVideo.value
-    if (!video || !video.paused) return
+    if (!video) return
 
-    video.muted = true
-    video.play().catch(() => {})
+    syncHeroVideoVolume()
+    if (video.paused) video.play().catch(() => {})
+}
+
+// 每次點擊都在有聲與靜音之間切換；第一次點擊同時滿足瀏覽器的有聲播放限制。
+function toggleHeroAudio() {
+    const video = heroVideo.value
+    if (!video?.src) return
+
+    heroAudioEnabled = !heroAudioEnabled
+    syncHeroVideoVolume()
+
+    if (heroAudioEnabled) playHeroVideo()
 }
 
 // 啟動畫面結束後才從頭播放，避免動畫期間消耗剛緩衝好的內容。
@@ -96,11 +124,13 @@ function updateHeroProgress() {
 
     if (animationDistance <= 0) {
         progress.value = 0
+        syncHeroVideoVolume()
         return
     }
 
     const rawProgress = -rect.top / animationDistance
     progress.value = Math.min(Math.max(rawProgress, 0), 1)
+    syncHeroVideoVolume()
 }
 
 onMounted(() => {
@@ -112,10 +142,6 @@ onMounted(() => {
     window.addEventListener(HERO_VIDEO_FAILED_EVENT, handleHeroVideoFailed)
     window.addEventListener(STARTUP_FINISHED_EVENT, startHeroVideoPlayback)
 
-    // 若系統層級禁止自動播放，使用者第一次點擊或觸摸時無縫恢復。
-    document.addEventListener('pointerdown', playHeroVideo, { passive: true })
-    document.addEventListener('touchstart', playHeroVideo, { passive: true })
-
     window.addEventListener('scroll', updateHeroProgress, { passive: true })
     window.addEventListener('resize', updateHeroProgress)
 })
@@ -124,8 +150,6 @@ onUnmounted(() => {
     window.removeEventListener(HERO_VIDEO_READY_EVENT, receiveDownloadedHeroVideo)
     window.removeEventListener(HERO_VIDEO_FAILED_EVENT, handleHeroVideoFailed)
     window.removeEventListener(STARTUP_FINISHED_EVENT, startHeroVideoPlayback)
-    document.removeEventListener('pointerdown', playHeroVideo)
-    document.removeEventListener('touchstart', playHeroVideo)
     window.removeEventListener('scroll', updateHeroProgress)
     window.removeEventListener('resize', updateHeroProgress)
 
@@ -137,7 +161,7 @@ onUnmounted(() => {
     <!-- 提供捲動動畫所需的垂直空間。 -->
     <section ref="heroContainer" class="hero-scroll-space">
         <!-- 會隨捲動進度收合的首頁封面。 -->
-        <div class="hero" :style="{ '--progress': progress }">
+        <div class="hero" :style="{ '--progress': progress }" @click="toggleHeroAudio">
             <!-- 影片取得或解碼失敗時顯示預設封面。 -->
             <img v-if="heroVideoFailed" class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片" />
 
