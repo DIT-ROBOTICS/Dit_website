@@ -5,13 +5,13 @@ from fastapi.responses import FileResponse
 import uvicorn,socket,json
 import PyAPI.EurobotAPI as Eurobot
 import PyAPI.GetItemAPI as GIAPI
-from typing import Literal
+from typing import Literal,Optional
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path("/Users/jason/Desktop/我的程式/web_page_2/Dit_Official_Website/database")
 DATA_DIR = BASE_DIR / "data"
-MEMBER_IMAGE_DIR = BASE_DIR / "static" / "members"
-SPONSORS_LOGO_DIR = BASE_DIR / "static" / "Sponsor_Icon"
-HEROVIDEO_DIR = BASE_DIR / "static" / "HeroVideo"
+MEMBER_IMAGE_DIR = BASE_DIR / "MemberSection/members"
+SPONSORS_LOGO_DIR = BASE_DIR / "SponsorSection"
+HEROVIDEO_DIR = BASE_DIR / "HeroVideo"
 
 
 app = FastAPI()
@@ -53,21 +53,13 @@ async def member_info_api(member_type:str):
 
 
 @app.get("/api/member_images/{image_type}/{member_id}")
-async def member_image_api(
-    image_type:str,
-    member_id:int,
-    full:bool=Query(False)
-):
+async def member_image_api(image_type:str, member_id:int, full:bool=Query(False)):
     image_path=GIAPI.get_member_image_path(image_type,member_id)
     return GIAPI.create_image_response(image_path,full)
 
 
 @app.get("/api/other_images/{image_type}/{path:path}")
-async def other_image_api(
-    image_type:str,
-    path:str,
-    full:bool=Query(False)
-):
+async def other_image_api(image_type:str, path:str, full:bool=Query(False)):
     image_path=GIAPI.get_other_image_path(image_type,path)
     return GIAPI.create_image_response(image_path,full)
 

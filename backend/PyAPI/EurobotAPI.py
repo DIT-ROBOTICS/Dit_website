@@ -4,8 +4,8 @@ from fastapi import FastAPI,HTTPException
 from fastapi.responses import FileResponse
 
 app=FastAPI()
-BASE_DIR=Path(__file__).resolve().parent.parent
-EUROBOT_DIR=BASE_DIR/"data"/"Eurobot"
+BASE_DIR = Path("/Users/jason/Desktop/我的程式/web_page_2/Dit_Official_Website/database")
+EUROBOT_DIR=BASE_DIR/"Eurobot"
 
 def get_latest_year():
     years=[
