@@ -76,14 +76,24 @@ async def other_image_api(image_type:str, path:str, full:bool=Query(False)):
     return GIAPI.create_image_response(image_path,full)
 
 
-@app.get("/api/aboutPageImages")
-async def about_page_images_api():
-    return GIAPI.get_about_page_images()
+@app.get("/api/aboutPage/data")
+async def about_page_data():
+    about_dir = BASE_DIR/"AboutSection"
+    return GIAPI.build_api_data_from_json(about_dir/"AboutSectionData.json",{
+            "AboutPhoto":"/api/aboutPage/Image",
+            "MoreDetail.image":"/api/aboutPage/Image",
+        })
+@app.get("/api/aboutPage/Image/{name}")
+async def about_page_Image(name:str):
+    about_dir = BASE_DIR/"AboutSection"
+    return GIAPI.create_image_response(about_dir/name,False)
+
 
 @app.get("/api/PopUpItem/{file}")
 async def get_pop_up_item(file:str):
     return GIAPI.get_pop_up_item(file)
-    
+
+
 @app.get("/api/Eurobot")
 @app.get("/api/Eurobot/{year}")
 async def get_eurobot(year:Optional[int]=None):
