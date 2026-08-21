@@ -1,32 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import { ArrowUp, ArrowUpRight, RotateCw } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { ArrowUp, ArrowUpRight } from 'lucide-vue-next'
+import ApiState from '@/components/common/ApiState.vue'
 import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
+import { useApiData } from '@/composables/useApiData'
 
-// 聯絡方式、其他連結與載入錯誤狀態。
-const contacts = ref([])
-const linkGroups = ref([])
-const errorMessage = ref('')
+const { data: linkData, loading, error, load, reload } = useApiData({ contacts: [], linkGroups: [] })
+const contacts = computed(() => linkData.value.contacts || [])
+const linkGroups = computed(() => linkData.value.linkGroups || [])
 
-// 從後端取得聯絡資料與分類連結。
-async function loadLinks() {
-    errorMessage.value = ''
-
-    try {
-        const response = await fetch('/api/jsonData/Links')
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`)
-        }
-
-        const linkData = await response.json()
-        contacts.value = linkData.contacts
-        linkGroups.value = linkData.linkGroups
-    } catch (error) {
-        console.error(error)
-        errorMessage.value = '連結資料載入失敗'
-    }
-}
+// 資料不依賴 DOM，setup 時立即請求，並立刻顯示 loading 狀態。
+load('/api/jsonData/Links')
 
 // Footer 版權文字使用的當前年份。
 const currentYear = new Date().getFullYear()
@@ -39,8 +23,6 @@ function backToTop() {
     })
 }
 
-// 元件掛載後載入聯絡資料。
-onMounted(loadLinks)
 </script>
 
 <template>
@@ -78,22 +60,7 @@ onMounted(loadLinks)
 
             <!-- 右側聯絡方式與其他連結。 -->
             <div class="contact-list">
-                <!-- 資料載入失敗狀態。 -->
-                <div v-if="errorMessage" class="contact-error">
-                    <p class="contact-error-title">CONNECTION ERROR</p>
-                    <p class="contact-error-message">{{ errorMessage }}</p>
-
-                    <!-- 重新載入聯絡資料。 -->
-                    <button class="retry-button" type="button" @click="loadLinks">
-                        RETRY
-                        <span class="retry-button-icon">
-                            <RotateCw />
-                        </span>
-                    </button>
-                </div>
-
-                <!-- 資料載入成功後的聯絡內容。 -->
-                <template v-else>
+                <ApiState :loading="loading" :error="error" :empty="contacts.length === 0" @retry="reload">
                     <!-- 單筆聯絡方式。 -->
                     <a v-for="contact in contacts" :key="contact.label" :href="contact.href" target="_blank"
                         rel="noopener noreferrer" class="contact-item">
@@ -129,7 +96,7 @@ onMounted(loadLinks)
                             </div>
                         </div>
                     </div>
-                </template>
+                </ApiState>
             </div>
         </div>
 

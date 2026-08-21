@@ -1,11 +1,18 @@
 <script setup>
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
+import { useApiData } from '@/composables/useApiData'
 
 // API 載入狀態：介紹文字來自 txt，年度與場地資料來自當年 main_data.json。
-const introduction = ref('')
-const eurobotData = ref({})
-const loading = ref(true)
-const loadError = ref('')
+const {
+    data: rulesData,
+    loading,
+    error,
+    run,
+    reload,
+} = useApiData({ introduction: '', eurobotData: {} })
+const introduction = computed(() => rulesData.value.introduction)
+const eurobotData = computed(() => rulesData.value.eurobotData)
+const loadError = computed(() => error.value ? '規則資料暫時無法載入' : '')
 
 // 場地圖片尚未載入時先假設為 3:2；載入後會替換成圖片的真實寬高比。
 const venueImageAspect = ref(1.5)
@@ -142,30 +149,26 @@ const annotations = computed(() => {
 
 // 同時載入共用介紹文字與最新年度資料，兩者皆完成後才呈現場地區塊。
 async function loadRules() {
-    loading.value = true
-    loadError.value = ''
-
-    try {
+    const result = await run(async (signal) => {
         const [introductionResponse, dataResponse] = await Promise.all([
-            fetch('/api/Eurobot/Introduction'),
-            fetch('/api/Eurobot'),
+            fetch('/api/Eurobot/Introduction', { signal }),
+            fetch('/api/Eurobot', { signal }),
         ])
 
         if (!introductionResponse.ok) throw new Error(`Introduction HTTP ${introductionResponse.status}`)
         if (!dataResponse.ok) throw new Error(`Eurobot HTTP ${dataResponse.status}`)
 
-        introduction.value = await introductionResponse.text()
-        eurobotData.value = await dataResponse.json()
-    } catch (error) {
-        console.error('Eurobot 規則載入失敗：', error)
-        loadError.value = '規則資料暫時無法載入'
-    } finally {
-        loading.value = false
-        if (!eurobotData.value.venueImage) notifyLayoutReady()
-    }
+        return {
+            introduction: await introductionResponse.text(),
+            eurobotData: await dataResponse.json(),
+        }
+    })
+
+    if (!result?.eurobotData?.venueImage) notifyLayoutReady()
 }
 
-onMounted(loadRules)
+// 資料不依賴 DOM，setup 時立即開始文字與年度資料的組合請求。
+loadRules()
 </script>
 
 <template>
@@ -178,7 +181,10 @@ onMounted(loadRules)
                 <h2 class="eurobot-rules-title">關於 Eurobot</h2>
 
                 <p v-if="loading" class="eurobot-rules-state">內容載入中⋯</p>
-                <p v-else-if="loadError" class="eurobot-rules-state">{{ loadError }}</p>
+                <div v-else-if="loadError" class="eurobot-rules-state">
+                    <p>{{ loadError }}</p>
+                    <button type="button" @click="reload">重新載入</button>
+                </div>
                 <p v-else class="eurobot-rules-description">{{ introduction }}</p>
 
                 <!-- 最新年度的場地圖片與規則標註。 -->

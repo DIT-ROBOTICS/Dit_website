@@ -10,14 +10,22 @@
 -->
 
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
+import ApiState from '@/components/common/ApiState.vue'
+import { useApiData } from '@/composables/useApiData'
 import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 
 // 只在手機寬度停用 3D，平板與桌面版仍可預覽。
 const mobileBreakpoint = '(max-width: 600px)'
 const BackgroundImage = ref("/api/Eurobot/History/Background")
-const robotHistory = ref([])
+const {
+    data: robotHistory,
+    loading,
+    error,
+    load: loadHistory,
+    reload,
+} = useApiData([])
 
 const trackElement = ref(null)
 const activeIndex = ref(0)
@@ -58,27 +66,35 @@ function normalizeHistoryItem(item = {}) {
 }
 
 async function loadHistoryEurobotData(){
-    try{
-        const response = await fetch('/api/Eurobot/History')
+    return loadHistory('/api/Eurobot/History', {
+        transform: async (history, { signal }) => {
+            const resolvedHistory = await Promise.all(history.map(async (item) => {
+                // 兼容舊後端：History 回傳年度 API URL 陣列。
+                if (typeof item === 'string') {
+                    const response = await fetch(item, { signal })
+                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${item}`)
+                    return response.json()
+                }
 
-        if(!response.ok){
-            throw new Error(`HTTP ${response.status}`)
-        }
+                // 新後端會直接回傳完整年度資料。
+                return item
+            }))
 
-        const resj = await response.json()
-        const history = await Promise.all(resj.map(async (item) => {
-            const response = await fetch(item)
-            if(!response.ok){
-                throw new Error(`HTTP ${response.status}`)
-            }
-            return normalizeHistoryItem(await response.json())
-        }))
-
-        robotHistory.value = history.sort((a,b)=>b.year-a.year)
-    }catch(error){
-        console.error(error)
-    }
+            return resolvedHistory
+                .map(normalizeHistoryItem)
+                .sort((a,b) => b.year - a.year)
+        },
+    })
 }
+
+// 與 Sponsors、Contact 相同：資料不依賴 DOM，setup 時立即發出單一 API 請求。
+loadHistoryEurobotData()
+
+// 初次載入與手動 reload 完成後，等 DOM 更新再校正目前年份。
+watch(robotHistory, async () => {
+    await nextTick()
+    updateActiveYear()
+})
 
 function openRobot(robot) {
     if (isMobile.value || !robot.glbPath) return
@@ -130,14 +146,10 @@ function updateActiveYear() {
     activeIndex.value = nearestIndex
 }
 
-onMounted(async () => {
+onMounted(() => {
     mobileMediaQuery = window.matchMedia(mobileBreakpoint)
     isMobile.value = mobileMediaQuery.matches
     mobileMediaQuery.addEventListener('change', updateMobileState)
-
-    await loadHistoryEurobotData()
-    await nextTick()
-    updateActiveYear()
 })
 
 onUnmounted(() => {
@@ -151,6 +163,7 @@ onUnmounted(() => {
         <div class="sticky-background">
             <img :src="BackgroundImage" alt="DIT Robotics 2026 Team" class="background-image">
         </div>
+        <ApiState :loading="loading" :error="error" :empty="robotHistory.length === 0" @retry="reload">
         <div class="archive-container">
             <header class="archive-header">
                 <div>
@@ -233,6 +246,7 @@ onUnmounted(() => {
                 </button>
             </div>
         </div>
+        </ApiState>
         <Transition name="modal">
             <RobotViewer3D v-if="selectedRobot && !isMobile" :robot="selectedRobot"
                 :closeRobot3D="closeRobot"/>

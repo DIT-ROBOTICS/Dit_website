@@ -5,21 +5,23 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
+import ApiState from '@/components/common/ApiState.vue'
+import { useApiData } from '@/composables/useApiData'
 
-const advisors = ref([])
+const {
+    data: advisors,
+    loading,
+    error,
+    load: loadAdvisors,
+    reload,
+} = useApiData([])
+
+// 資料不依賴 DOM，setup 時立即請求，避免等待 mounted 才開始載入。
+loadAdvisors('/api/Advisor/data')
+
 const activeIndex = ref(null)
 const usesTouchInteraction = ref(window.matchMedia('(hover: none), (pointer: coarse)').matches)
 let touchMediaQuery
-
-async function loadAdvisors() {
-    try {
-        const response = await fetch('/api/Advisor/data')
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        advisors.value = await response.json()
-    } catch (error) {
-        console.error('顧問資料載入失敗：', error)
-    }
-}
 
 function cardState(index) {
     if (activeIndex.value === null) return 'is-idle'
@@ -62,7 +64,6 @@ function updateInteractionMode(event) {
 }
 
 onMounted(() => {
-    loadAdvisors()
     touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
     usesTouchInteraction.value = touchMediaQuery.matches
     touchMediaQuery.addEventListener('change', updateInteractionMode)
@@ -78,6 +79,7 @@ onUnmounted(() => {
 <template>
     <Teleport defer to="#Advisors_teleport">
     <section id="advisors" class="advisors-section" @mouseleave="closeFromHover">
+        <ApiState :loading="loading" :error="error" :empty="advisors.length === 0" @retry="reload">
         <div class="advisors-stage">
             <header class="advisors-heading">
                 <p class="advisors-eyebrow">ADVISORS</p>
@@ -112,6 +114,7 @@ onUnmounted(() => {
                 </div>
             </article>
         </div>
+        </ApiState>
     </section>
     </Teleport>
 </template>

@@ -1,9 +1,23 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ditLogoUrl from '@/assets/dit_logo_text.png'
+import ApiState from '@/components/common/ApiState.vue'
+import { useApiData } from '@/composables/useApiData'
 
 // 贊助商資料與環繞動畫狀態。
-const sponsors = ref([])
+const {
+    data: sponsorData,
+    loading,
+    error,
+    load: loadSponsorsData,
+    reload,
+} = useApiData({ sponsors: [], title: '' })
+const sponsors = computed(() => sponsorData.value.sponsors || [])
+const title = computed(() => sponsorData.value.title || '')
+
+// 資料不依賴 DOM，setup 時立即請求，避免等待 mounted 才進入 loading 狀態。
+loadSponsorsData('/api/Sponsors')
+
 const angle = ref(0)
 const activeIndex = ref(0)
 const hoveredIndex = ref(null)
@@ -19,17 +33,6 @@ let animationId = null
 let lastTime = 0
 let activeTimer = null
 let touchMediaQuery
-
-// 從後端取得贊助商名稱、Logo、簡介與官網連結。
-async function loadSponsorsData() {
-    try {
-        const response = await fetch('/api/Sponsors')
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        sponsors.value = await response.json()
-    } catch (error) {
-        console.error(error)
-    }
-}
 
 // 依贊助商數量分配各圈容量與橢圓半徑。
 const ringConfig = computed(() => {
@@ -186,7 +189,6 @@ function updateInteractionMode(event) {
 
 // 元件掛載後載入資料並啟動兩種動畫。
 onMounted(() => {
-    loadSponsorsData()
     animationId = requestAnimationFrame(animate)
     startActiveTimer()
 
@@ -208,12 +210,13 @@ onUnmounted(() => {
 <template>
     <!-- 贊助商展示區塊。 -->
     <section class="sponsors-section" :class="{ 'uses-touch': usesTouchInteraction }">
+        <ApiState :loading="loading" :error="error" :empty="sponsors.length === 0" @retry="reload">
         <!-- 區塊標題。 -->
         <div class="heading">
             <!-- 英文小標。 -->
             <p class="heading-label">SPONSORS</p>
             <!-- 區塊主標題。 -->
-            <h2 class="heading-title">與我們一起讓想法成為現實</h2>
+            <h2 class="heading-title">{{ title }}</h2>
         </div>
 
         <!-- Logo 環繞動畫的展示區。 -->
@@ -248,6 +251,7 @@ onUnmounted(() => {
                 </Transition>
             </div>
         </div>
+        </ApiState>
     </section>
 </template>
 

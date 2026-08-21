@@ -1,9 +1,17 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import ApiState from '@/components/common/ApiState.vue'
+import { useApiData } from '@/composables/useApiData'
 
 // About 區塊的團隊照片與文字資料。
-const photoUrls = ref([])
-const aboutData = ref({})
+const {
+    data: aboutData,
+    loading,
+    error,
+    load: loadAboutData,
+    reload,
+} = useApiData({})
+const photoUrls = computed(() => aboutData.value.aboutPhotos || [])
 const activeDailyCardIndex = ref(null)
 const usesTouchInteraction = ref(window.matchMedia('(hover: none), (pointer: coarse)').matches)
 let touchMediaQuery
@@ -40,25 +48,8 @@ function getDailyCardStyle(index) {
     }
 }
 
-// 從後端取得 About 區塊的標題與團隊簡介。
-async function loadAboutData() {
-    try {
-        const response = await fetch('/api/aboutPage/data')
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`)
-        }
-
-        aboutData.value = await response.json()
-        photoUrls.value = aboutData.value.aboutPhotos
-    } catch (error) {
-        console.error('團隊資料載入失敗：', error)
-    }
-}
-
 // 元件掛載後同時載入照片與文字資料。
 onMounted(() => {
-    loadAboutData()
 
     touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
     usesTouchInteraction.value = touchMediaQuery.matches
@@ -70,6 +61,7 @@ onUnmounted(() => {
     touchMediaQuery?.removeEventListener('change', updateInteractionMode)
     document.removeEventListener('pointerdown', closeDailyCardFromOutside)
 })
+loadAboutData('/api/aboutPage/data')
 
 // 平板或觸控裝置點擊卡片後保持展開；再次點同一張不負責收合，方便未來加入跳轉。
 function activateDailyCard(index) {
@@ -118,6 +110,7 @@ function getPhotoStyle(index, total) {
 <template>
     <!-- DIT Robotics 團隊介紹區塊。 -->
     <section class="about-section">
+        <ApiState :loading="loading" :error="error" :empty="!aboutData.smallTitle" @retry="reload">
         <!-- 團隊介紹標題。 -->
         <header class="about-heading">
             <!-- 團隊介紹小標。 -->
@@ -153,6 +146,7 @@ function getPhotoStyle(index, total) {
                 </div>
             </article>
         </div>
+        </ApiState>
     </section>
 </template>
 

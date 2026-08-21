@@ -1,8 +1,10 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
 import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
+import ApiState from '@/components/common/ApiState.vue'
 import ArrowRight from '@/components/icons/FreeArrowRight.vue'
+import { useApiData } from '@/composables/useApiData'
 import { ArrowUpRight } from 'lucide-vue-next'
 
 // 手機版統一使用 600px 斷點；平板仍保留 3D 預覽功能。
@@ -20,28 +22,20 @@ defineProps({
 })
 
 // 當年 Eurobot 資料、機器人清單與 3D 檢視狀態。
-const eurobotData = ref({})
-const robots = ref([])
-const achievementPhoto = ref('')
+const {
+    data: eurobotData,
+    loading,
+    error,
+    load: loadThisYearEurobotData,
+    reload,
+} = useApiData({})
+const robots = computed(() => eurobotData.value.robots || [])
+const achievementPhoto = computed(() => eurobotData.value.background || '')
 const selectedRobot = ref(null)
 const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
 const mobilePreviewNoticeId = ref(null)
 let mobileMediaQuery
 let mobileNoticeTimer
-
-// 從後端載入當年戰績、背景與機器人資料。
-async function loadThisYearEurobotData() {
-    try {
-        const response = await fetch('/api/Eurobot')
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-
-        eurobotData.value = await response.json()
-        robots.value = eurobotData.value.robots
-        achievementPhoto.value = eurobotData.value.background
-    } catch (error) {
-        console.error(error)
-    }
-}
 
 // 開啟指定機器人的 3D 檢視器，並鎖定背景捲動。
 function openRobot3D(robot) {
@@ -91,7 +85,6 @@ function getRobotNameAlignment(robot) {
 
 // 元件掛載後載入資料，並監聽桌面／手機斷點變化。
 onMounted(() => {
-    loadThisYearEurobotData()
     mobileMediaQuery = window.matchMedia(mobileBreakpoint)
     isMobile.value = mobileMediaQuery.matches
     mobileMediaQuery.addEventListener('change', updateMobileState)
@@ -103,14 +96,18 @@ onUnmounted(() => {
     clearTimeout(mobileNoticeTimer)
     document.body.style.overflow = ''
 })
+loadThisYearEurobotData('/api/Eurobot')
 </script>
 
 <template>
     <!-- 當年 Eurobot 戰績與機器人展示區。 -->
     <section id="featured-robot" class="robot-year-section"
         :style="{ '--achievement-margin-top': achievementMarginTop }">
+        <ApiState v-if="loading || error || robots.length === 0"
+            :loading="loading" :error="error" :empty="robots.length === 0" @retry="reload" />
+
         <!-- 捲動時固定在畫面後方的團隊照片。 -->
-        <div class="sticky-background">
+        <div v-show="!loading && !error && robots.length > 0" class="sticky-background">
             <!-- 當年 Eurobot 團隊背景圖。 -->
             <img class="background-image" :src="achievementPhoto" alt="DIT Robotics Team" />
             <!-- 提高前景文字可讀性的深色遮罩。 -->
@@ -118,7 +115,7 @@ onUnmounted(() => {
         </div>
 
         <!-- 戰績與機器人卡片的前景內容。 -->
-        <div class="robot-year-content">
+        <div v-show="!loading && !error && robots.length > 0" class="robot-year-content">
             <!-- 當年 Eurobot 戰績區塊。 -->
             <section class="achievement-panel">
                 <!-- 年份、主標題與獎項內容。 -->
@@ -138,7 +135,7 @@ onUnmounted(() => {
                 </div>
             </section>
 
-            <!-- EurobotRules 會透過 Teleport 掛載到此處。 -->
+            <!-- 永遠建立 Teleport 目標；v-show 只隱藏，不會移除 DOM。 -->
             <section id="Eurobot_rules"></section>
 
             <!-- 當年機器人展示區。 -->
@@ -203,9 +200,10 @@ onUnmounted(() => {
                 </RouterLink>
 
             </section>
-            <div id="Advisors_teleport" style="z-index: 300;"></div>
-
         </div>
+
+        <!-- Advisor 的 Teleport 目標不依賴 Eurobot API 狀態，必須永遠存在。 -->
+        <div id="Advisors_teleport" class="advisors-teleport-target"></div>
 
         <!-- 目前選取機器人的 3D 檢視視窗。 -->
         <Transition name="modal">
@@ -220,6 +218,11 @@ onUnmounted(() => {
     position: relative;
     background: #050505;
     color: white;
+}
+
+.advisors-teleport-target {
+    position: relative;
+    z-index: 300;
 }
 
 .sticky-background {
