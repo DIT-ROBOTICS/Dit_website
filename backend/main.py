@@ -1,13 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pathlib import Path
 import uvicorn,socket
 import PyAPI.ResourceService as GIAPI
 from routers import *
 from typing import Literal
-
-BASE_DIR = Path("/Users/jason/Desktop/我的程式/web_page_2/Dit_Official_Website/database")
-
 
 app = FastAPI()
 
@@ -53,7 +49,7 @@ async def get_pop_up_item(file:str):
 
 @app.get("/api/heroVideo/{platform}")
 async def get_hero_video(platform:Literal["mobile","desktop"]):
-    HEROVIDEO_DIR = BASE_DIR / "HeroVideo"
+    HEROVIDEO_DIR = GIAPI.BASE_DIR / "HeroVideo"
     file_path = HEROVIDEO_DIR / "VideoInfo.json"
     data=GIAPI.build_api_data_from_json(file_path,{})
     return GIAPI.get_file(HEROVIDEO_DIR/data[platform])
