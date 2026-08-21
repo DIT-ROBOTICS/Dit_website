@@ -1,10 +1,11 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import logoUrl from '@/assets/dit_logo.png'
+import { heroApi } from '@/features/hero/heroApi'
 
 const emit = defineEmits(['finished'])
 const platform=window.innerWidth<=600?'mobile':'desktop'
-const heroVideoUrl=`/api/heroVideo/${platform}`
+const heroVideoUrl = heroApi.video(platform)
 const props = defineProps({
   trackHeroVideo: {
     type: Boolean,

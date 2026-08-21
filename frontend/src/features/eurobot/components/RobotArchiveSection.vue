@@ -11,15 +11,17 @@
 
 <script setup>
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
+import RobotViewer3D from '@/features/eurobot/components/RobotViewer3D.vue'
 import ApiState from '@/components/common/ApiState.vue'
 import { useApiData } from '@/composables/useApiData'
-import { getRobotInitialViewSide } from '@/utils/robotLayout'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
+import { getRobotInitialViewSide } from '@/features/eurobot/robotLayout'
+import { eurobotApi } from '@/features/eurobot/eurobotApi'
 import{RotateCw,ArrowRight,ArrowLeft,ArrowUpRight,X,Plus,ArrowUp}from'lucide-vue-next'
 
 // 只在手機寬度停用 3D，平板與桌面版仍可預覽。
 const mobileBreakpoint = '(max-width: 600px)'
-const BackgroundImage = ref("/api/Eurobot/History/Background")
+const backgroundImage = eurobotApi.historyBackground
 const {
     data: robotHistory,
     loading,
@@ -32,6 +34,7 @@ const trackElement = ref(null)
 const activeIndex = ref(0)
 const selectedRobot = ref(null)
 const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
+const { lockBodyScroll, unlockBodyScroll } = useBodyScrollLock()
 let mobileMediaQuery
 
 function normalizeRobot(robot = {}, index, robots) {
@@ -67,7 +70,7 @@ function normalizeHistoryItem(item = {}) {
 }
 
 async function loadHistoryEurobotData(){
-    return loadHistory('/api/Eurobot/History', {
+    return loadHistory(eurobotApi.history, {
         transform: async (history, { signal }) => {
             const resolvedHistory = await Promise.all(history.map(async (item) => {
                 // 兼容舊後端：History 回傳年度 API URL 陣列。
@@ -101,12 +104,12 @@ function openRobot(robot) {
     if (isMobile.value || !robot.glbPath) return
 
     selectedRobot.value = robot
-    document.body.style.overflow = 'hidden'
+    lockBodyScroll()
 }
 
 function closeRobot() {
     selectedRobot.value = null
-    document.body.style.overflow = ''
+    unlockBodyScroll()
 }
 
 // 切換到手機寬度時，關閉可能已開啟的 3D 視窗。
@@ -155,14 +158,14 @@ onMounted(() => {
 
 onUnmounted(() => {
     mobileMediaQuery?.removeEventListener('change', updateMobileState)
-    document.body.style.overflow = ''
+    unlockBodyScroll()
 })
 </script>
 
 <template>
     <section id="robots" class="robot-archive">
         <div class="sticky-background">
-            <img :src="BackgroundImage" alt="DIT Robotics 2026 Team" class="background-image">
+            <img :src="backgroundImage" alt="DIT Robotics 2026 Team" class="background-image">
         </div>
         <ApiState :loading="loading" :error="error" :empty="robotHistory.length === 0" @retry="reload">
         <div class="archive-container">

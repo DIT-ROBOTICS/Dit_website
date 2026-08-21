@@ -1,11 +1,13 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import RobotViewer3D from '@/components/template/RobotViewer3D.vue'
-import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
+import RobotViewer3D from '@/features/eurobot/components/RobotViewer3D.vue'
+import FilePreviewModal from '@/components/common/FilePreviewModal.vue'
 import ApiState from '@/components/common/ApiState.vue'
 import ArrowRight from '@/components/icons/FreeArrowRight.vue'
 import { useApiData } from '@/composables/useApiData'
-import { getRobotInitialViewSide } from '@/utils/robotLayout'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
+import { getRobotInitialViewSide } from '@/features/eurobot/robotLayout'
+import { eurobotApi } from '@/features/eurobot/eurobotApi'
 import { ArrowUpRight } from 'lucide-vue-next'
 
 // 手機版統一使用 600px 斷點；平板仍保留 3D 預覽功能。
@@ -41,6 +43,7 @@ const achievementPhoto = computed(() => eurobotData.value.background || '')
 const selectedRobot = ref(null)
 const isMobile = ref(window.matchMedia(mobileBreakpoint).matches)
 const mobilePreviewNoticeId = ref(null)
+const { lockBodyScroll, unlockBodyScroll } = useBodyScrollLock()
 let mobileMediaQuery
 let mobileNoticeTimer
 
@@ -49,7 +52,7 @@ function openRobot3D(robot) {
     if (isMobile.value) return
 
     selectedRobot.value = robot
-    document.body.style.overflow = 'hidden'
+    lockBodyScroll()
 }
 
 // 手機版以提示取代 3D 視窗；桌面和平板維持原本預覽功能。
@@ -69,7 +72,7 @@ function handleRobotPreview(robot) {
 // 關閉 3D 檢視器並恢復頁面捲動。
 function closeRobot3D() {
     selectedRobot.value = null
-    document.body.style.overflow = ''
+    unlockBodyScroll()
 }
 
 // 螢幕切換成手機寬度時立即關閉 3D 視窗，並停用所有預覽入口。
@@ -101,9 +104,9 @@ onMounted(() => {
 onUnmounted(() => {
     mobileMediaQuery?.removeEventListener('change', updateMobileState)
     clearTimeout(mobileNoticeTimer)
-    document.body.style.overflow = ''
+    unlockBodyScroll()
 })
-loadThisYearEurobotData('/api/Eurobot')
+loadThisYearEurobotData(eurobotApi.latest)
 </script>
 
 <template>
@@ -142,8 +145,9 @@ loadThisYearEurobotData('/api/Eurobot')
                 </div>
             </section>
 
-            <!-- 永遠建立 Teleport 目標；v-show 只隱藏，不會移除 DOM。 -->
-            <section id="Eurobot_rules"></section>
+            <section id="Eurobot_rules">
+                <slot name="rules" />
+            </section>
 
             <!-- 當年機器人展示區。 -->
             <section class="robots-showcase">
@@ -189,7 +193,7 @@ loadThisYearEurobotData('/api/Eurobot')
                         </div>
 
                         <!-- 開啟機器人詳細資料的檔案預覽視窗。 -->
-                        <FilePreviewModal v-slot="{ open: openPreview }" api="/api/PopUpItem/whiteSeeMore"
+                        <FilePreviewModal v-slot="{ open: openPreview }" :api="eurobotApi.whiteRobotDetails"
                             title="NTHU DIT">
                             <button class="detail-button" type="button" @click.stop="openPreview">
                                 <span>See more </span>
@@ -209,9 +213,6 @@ loadThisYearEurobotData('/api/Eurobot')
             </section>
         </div>
 
-        <!-- Advisor 的 Teleport 目標不依賴 Eurobot API 狀態，必須永遠存在。 -->
-        <div id="Advisors_teleport" class="advisors-teleport-target"></div>
-
         <!-- 目前選取機器人的 3D 檢視視窗。 -->
         <Transition name="modal">
             <RobotViewer3D v-if="selectedRobot && !isMobile" :robot="selectedRobot"
@@ -225,11 +226,6 @@ loadThisYearEurobotData('/api/Eurobot')
     position: relative;
     background: #050505;
     color: white;
-}
-
-.advisors-teleport-target {
-    position: relative;
-    z-index: 300;
 }
 
 .sticky-background {

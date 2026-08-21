@@ -2,9 +2,9 @@
 import { computed, ref } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 
-import StartupAnimation from '@/components/StartupAnimation.vue'
-import FloatingRobot from '@/components/FloatingRobot.vue'
-import TitleBar from '@/components/TitleBar.vue'
+import StartupAnimation from '@/components/layout/StartupAnimation.vue'
+import FloatingRobot from '@/components/layout/FloatingRobot.vue'
+import TitleBar from '@/components/layout/TitleBar.vue'
 
 const startupFinished = ref(false)
 const route = useRoute()
@@ -25,8 +25,13 @@ if (startup) {
 <template>
   <StartupAnimation v-if="!startupFinished" :track-hero-video="isHomeRoute" @finished="finishStartup" />
 
-  <div class="website" :class="{
-    visible: startupFinished, 'with-title-bar': startupFinished && !isHomeRoute,}">
+  <div
+    class="website"
+    :class="{
+      visible: startupFinished,
+      'with-title-bar': startupFinished && !isHomeRoute,
+    }"
+  >
     <RouterView />
   </div>
 

@@ -2,15 +2,16 @@
 import { computed } from 'vue'
 import { ArrowUp, ArrowUpRight } from 'lucide-vue-next'
 import ApiState from '@/components/common/ApiState.vue'
-import FilePreviewModal from '@/components/template/FilePreviewModal.vue'
+import FilePreviewModal from '@/components/common/FilePreviewModal.vue'
 import { useApiData } from '@/composables/useApiData'
+import { contactApi } from '@/features/contact/contactApi'
 
 const { data: linkData, loading, error, load, reload } = useApiData({ contacts: [], linkGroups: [] })
 const contacts = computed(() => linkData.value.contacts || [])
 const linkGroups = computed(() => linkData.value.linkGroups || [])
 
 // 資料不依賴 DOM，setup 時立即請求，並立刻顯示 loading 狀態。
-load('/api/jsonData/Links')
+load(contactApi.data)
 
 // Footer 版權文字使用的當前年份。
 const currentYear = new Date().getFullYear()
@@ -48,7 +49,7 @@ function backToTop() {
                 </p>
 
                 <!-- 開啟贊助方法的檔案預覽視窗。 -->
-                <FilePreviewModal api="/api/PopUpItem/sponsorshipMethods" title="贊助方法">
+                <FilePreviewModal :api="contactApi.sponsorshipMethods" title="贊助方法">
                     <button class="contact-button" type="button">
                         SUPPORT US
                         <span class="contact-button-icon">

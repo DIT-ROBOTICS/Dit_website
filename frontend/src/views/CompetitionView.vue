@@ -1,5 +1,5 @@
 <script setup>
-import CompetitionsSection from '@/components/CompetitionsSection.vue'
+import CompetitionsSection from '@/features/competition/CompetitionsSection.vue'
 </script>
 
 <template>

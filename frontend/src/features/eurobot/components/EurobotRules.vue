@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue'
 import { useApiData } from '@/composables/useApiData'
+import { eurobotApi } from '@/features/eurobot/eurobotApi'
 
 // API 載入狀態：介紹文字來自 txt，年度與場地資料來自當年 main_data.json。
 const {
@@ -151,8 +152,8 @@ const annotations = computed(() => {
 async function loadRules() {
     const result = await run(async (signal) => {
         const [introductionResponse, dataResponse] = await Promise.all([
-            fetch('/api/Eurobot/Introduction', { signal }),
-            fetch('/api/Eurobot', { signal }),
+            fetch(eurobotApi.introduction, { signal }),
+            fetch(eurobotApi.latest, { signal }),
         ])
 
         if (!introductionResponse.ok) throw new Error(`Introduction HTTP ${introductionResponse.status}`)
@@ -172,9 +173,7 @@ loadRules()
 </script>
 
 <template>
-    <!-- 等 EurobotSection 建立 #Eurobot_rules 後，將整個規則內容傳送至該位置。 -->
-    <Teleport defer to="#Eurobot_rules">
-        <article class="eurobot-rules">
+    <article class="eurobot-rules">
             <div class="eurobot-rules-content">
                 <!-- Eurobot 共用介紹。 -->
                 <p class="eurobot-rules-label">EUROBOT INTRODUCTION</p>
@@ -254,8 +253,7 @@ loadRules()
                     </p>
                 </section>
             </div>
-        </article>
-    </Teleport>
+    </article>
 </template>
 
 <style scoped>

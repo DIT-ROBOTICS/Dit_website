@@ -2,6 +2,7 @@
 import { nextTick, onUnmounted, ref } from 'vue'
 import *as pdfjsLib from 'pdfjs-dist'
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker
 
@@ -25,6 +26,7 @@ const loading = ref(false)
 const error = ref('')
 const fileType = ref('')
 const pdfContainer = ref(null)
+const { lockBodyScroll, unlockBodyScroll } = useBodyScrollLock()
 let pdfDocument = null
 
 function isMobile() {
@@ -38,7 +40,7 @@ async function open() {
     }
 
     show.value = true
-    lockBody()
+    lockBodyScroll()
     await loadFileType()
 
     if (isPDF()) {
@@ -142,7 +144,7 @@ async function renderPDF() {
 
 function close() {
     show.value = false
-    unlockBody()
+    unlockBodyScroll()
 
     if (pdfContainer.value) {
         pdfContainer.value.innerHTML = ''
@@ -150,14 +152,6 @@ function close() {
 
     pdfDocument?.destroy()
     pdfDocument = null
-}
-
-function lockBody() {
-    document.body.style.overflow = 'hidden'
-}
-
-function unlockBody() {
-    document.body.style.overflow = ''
 }
 
 function isImage() {
@@ -194,7 +188,7 @@ window.addEventListener('keydown', handleKeydown)
 
 onUnmounted(() => {
     if (show.value) {
-        unlockBody()
+        unlockBodyScroll()
     }
 
     pdfDocument?.destroy()

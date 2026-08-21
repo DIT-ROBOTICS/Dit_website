@@ -3,6 +3,8 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ditLogoUrl from '@/assets/dit_logo_text.png'
 import ApiState from '@/components/common/ApiState.vue'
 import { useApiData } from '@/composables/useApiData'
+import { useInteractionMode } from '@/composables/useInteractionMode'
+import { sponsorsApi } from '@/features/sponsors/sponsorsApi'
 
 // 贊助商資料與環繞動畫狀態。
 const {
@@ -16,13 +18,13 @@ const sponsors = computed(() => sponsorData.value.sponsors || [])
 const title = computed(() => sponsorData.value.title || '')
 
 // 資料不依賴 DOM，setup 時立即請求，避免等待 mounted 才進入 loading 狀態。
-loadSponsorsData('/api/Sponsors')
+loadSponsorsData(sponsorsApi.data)
 
 const angle = ref(0)
 const activeIndex = ref(0)
 const hoveredIndex = ref(null)
 const paused = ref(false)
-const usesTouchInteraction = ref(window.matchMedia('(hover: none), (pointer: coarse)').matches)
+const { usesTouchInteraction } = useInteractionMode({ onChange: resetSponsorSelection })
 
 // 將 JS 的橢圓半徑單位換算成容器尺寸。
 const ORBIT_WIDTH_PER_RADIUS_UNIT = 30
@@ -32,7 +34,6 @@ const ORBIT_HEIGHT_PER_RADIUS_UNIT = 20
 let animationId = null
 let lastTime = 0
 let activeTimer = null
-let touchMediaQuery
 
 // 依贊助商數量分配各圈容量與橢圓半徑。
 const ringConfig = computed(() => {
@@ -182,19 +183,11 @@ function closeSponsorFromOutside(event) {
     resetSponsorSelection()
 }
 
-function updateInteractionMode(event) {
-    usesTouchInteraction.value = event.matches
-    resetSponsorSelection()
-}
-
 // 元件掛載後載入資料並啟動兩種動畫。
 onMounted(() => {
     animationId = requestAnimationFrame(animate)
     startActiveTimer()
 
-    touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
-    usesTouchInteraction.value = touchMediaQuery.matches
-    touchMediaQuery.addEventListener('change', updateInteractionMode)
     document.addEventListener('pointerdown', closeSponsorFromOutside)
 })
 
@@ -202,7 +195,6 @@ onMounted(() => {
 onUnmounted(() => {
     cancelAnimationFrame(animationId)
     clearInterval(activeTimer)
-    touchMediaQuery?.removeEventListener('change', updateInteractionMode)
     document.removeEventListener('pointerdown', closeSponsorFromOutside)
 })
 </script>

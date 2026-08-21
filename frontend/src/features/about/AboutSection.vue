@@ -2,6 +2,8 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ApiState from '@/components/common/ApiState.vue'
 import { useApiData } from '@/composables/useApiData'
+import { useInteractionMode } from '@/composables/useInteractionMode'
+import { aboutApi } from '@/features/about/aboutApi'
 
 // About 區塊的團隊照片與文字資料。
 const {
@@ -13,8 +15,9 @@ const {
 } = useApiData({})
 const photoUrls = computed(() => aboutData.value.aboutPhotos || [])
 const activeDailyCardIndex = ref(null)
-const usesTouchInteraction = ref(window.matchMedia('(hover: none), (pointer: coarse)').matches)
-let touchMediaQuery
+const { usesTouchInteraction } = useInteractionMode({
+    onChange: () => { activeDailyCardIndex.value = null },
+})
 
 // 展開版面參數：漸層占圖片寬度的比例，以及文字在整個相簿中的起點。
 const dailyLayout = {
@@ -50,18 +53,13 @@ function getDailyCardStyle(index) {
 
 // 元件掛載後同時載入照片與文字資料。
 onMounted(() => {
-
-    touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
-    usesTouchInteraction.value = touchMediaQuery.matches
-    touchMediaQuery.addEventListener('change', updateInteractionMode)
     document.addEventListener('pointerdown', closeDailyCardFromOutside)
 })
 
 onUnmounted(() => {
-    touchMediaQuery?.removeEventListener('change', updateInteractionMode)
     document.removeEventListener('pointerdown', closeDailyCardFromOutside)
 })
-loadAboutData('/api/aboutPage/data')
+loadAboutData(aboutApi.data)
 
 // 平板或觸控裝置點擊卡片後保持展開；再次點同一張不負責收合，方便未來加入跳轉。
 function activateDailyCard(index) {
@@ -73,11 +71,6 @@ function activateDailyCard(index) {
 function closeDailyCardFromOutside(event) {
     if (!usesTouchInteraction.value || activeDailyCardIndex.value === null) return
     if (event.target.closest('.daily-card')) return
-    activeDailyCardIndex.value = null
-}
-
-function updateInteractionMode(event) {
-    usesTouchInteraction.value = event.matches
     activeDailyCardIndex.value = null
 }
 

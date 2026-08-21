@@ -7,6 +7,8 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import ApiState from '@/components/common/ApiState.vue'
 import { useApiData } from '@/composables/useApiData'
+import { useInteractionMode } from '@/composables/useInteractionMode'
+import { advisorsApi } from '@/features/advisors/advisorsApi'
 
 const {
     data: advisors,
@@ -17,11 +19,12 @@ const {
 } = useApiData([])
 
 // 資料不依賴 DOM，setup 時立即請求，避免等待 mounted 才開始載入。
-loadAdvisors('/api/Advisor/data')
+loadAdvisors(advisorsApi.data)
 
 const activeIndex = ref(null)
-const usesTouchInteraction = ref(window.matchMedia('(hover: none), (pointer: coarse)').matches)
-let touchMediaQuery
+const { usesTouchInteraction } = useInteractionMode({
+    onChange: () => { activeIndex.value = null },
+})
 
 function cardState(index) {
     if (activeIndex.value === null) return 'is-idle'
@@ -58,26 +61,16 @@ function closeFromOutside(event) {
     activeIndex.value = null
 }
 
-function updateInteractionMode(event) {
-    usesTouchInteraction.value = event.matches
-    activeIndex.value = null
-}
-
 onMounted(() => {
-    touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
-    usesTouchInteraction.value = touchMediaQuery.matches
-    touchMediaQuery.addEventListener('change', updateInteractionMode)
     document.addEventListener('pointerdown', closeFromOutside)
 })
 
 onUnmounted(() => {
-    touchMediaQuery?.removeEventListener('change', updateInteractionMode)
     document.removeEventListener('pointerdown', closeFromOutside)
 })
 </script>
 
 <template>
-    <Teleport defer to="#Advisors_teleport">
     <section id="advisors" class="advisors-section" @mouseleave="closeFromHover">
         <ApiState :loading="loading" :error="error" :empty="advisors.length === 0" @retry="reload">
         <div class="advisors-stage">
@@ -116,7 +109,6 @@ onUnmounted(() => {
         </div>
         </ApiState>
     </section>
-    </Teleport>
 </template>
 
 <style scoped>

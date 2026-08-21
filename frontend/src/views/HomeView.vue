@@ -1,11 +1,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import HeroSection from '@/components/HeroSection.vue'
-import AboutSection from '@/components/AboutSection.vue'
-import AdvisorsSection from '@/components/AdvisorsSection.vue'
-import EurobotSection from '@/components/EurobotSection.vue'
-import SponsorsSection from '@/components/SponsorsSection.vue'
-import ContactSection from '@/components/ContactSection.vue'
+import HeroSection from '@/features/hero/HeroSection.vue'
+import AboutSection from '@/features/about/AboutSection.vue'
+import AdvisorsSection from '@/features/advisors/AdvisorsSection.vue'
+import EurobotSection from '@/features/eurobot/components/EurobotSection.vue'
+import SponsorsSection from '@/features/sponsors/SponsorsSection.vue'
+import ContactSection from '@/features/contact/ContactSection.vue'
 
 const heroProgress = ref(0)
 
