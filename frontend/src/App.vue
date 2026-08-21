@@ -17,7 +17,7 @@ function finishStartup() {
 }
 
 const startup = sessionStorage.getItem('startupFinished')
-if(startup){
+if (startup) {
   startupFinished.value = true
 }
 </script>
@@ -25,7 +25,8 @@ if(startup){
 <template>
   <StartupAnimation v-if="!startupFinished" :track-hero-video="isHomeRoute" @finished="finishStartup" />
 
-  <div class="website" :class="{ visible: startupFinished }" >
+  <div class="website" :class="{
+    visible: startupFinished, 'with-title-bar': startupFinished && !isHomeRoute,}">
     <RouterView />
   </div>
 
@@ -68,6 +69,15 @@ textarea,
 .website {
   opacity: 0;
   transition: opacity 0.8s ease;
+}
+
+/*
+ * 非首頁的 TitleBar 使用 fixed 定位，因此不會自行占據版面空間。
+ * 在共用頁面容器預留相同高度，讓內容從導覽列下方開始。
+ */
+.website.with-title-bar {
+  min-height: calc(100vh - 76px);
+  padding-top: 76px;
 }
 
 .website.visible {
