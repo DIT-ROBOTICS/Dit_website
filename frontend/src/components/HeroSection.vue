@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import heroImageUrl from '@/assets/Hero_Image.png'
 import TitleBar from '@/components/TitleBar.vue'
 
@@ -55,8 +55,12 @@ function prepareHeroVideo(source) {
 }
 
 // StartupAnimation 完整下載影片後，將 Blob URL 交給真正的 video 元素解析。
-function receiveDownloadedHeroVideo(event) {
+async function receiveDownloadedHeroVideo(event) {
     downloadedVideoUrl = event.detail?.url || ''
+
+    // 10 秒逾時時可能正顯示圖片；下載完成後先重建 video，再交付 Blob URL。
+    heroVideoFailed.value = false
+    await nextTick()
     prepareHeroVideo(downloadedVideoUrl)
 }
 
@@ -162,7 +166,7 @@ onUnmounted(() => {
     <section ref="heroContainer" class="hero-scroll-space">
         <!-- 會隨捲動進度收合的首頁封面。 -->
         <div class="hero" :style="{ '--progress': progress }" @click="toggleHeroAudio">
-            <!-- 影片取得或解碼失敗時顯示預設封面。 -->
+            <!-- 影片超過 10 秒或解碼失敗時，在預設啟動畫後方載入圖片封面。 -->
             <img v-if="heroVideoFailed" class="hero-background" :src="heroImageUrl" alt="DIT 團隊封面照片" />
 
             <!-- 自動播放、靜音並循環的封面背景影片。 -->

@@ -15,6 +15,8 @@ const props = defineProps({
 const PROGRESS_UPDATE_INTERVAL_MS = 20
 const LAUNCH_DELAY_MS = 200
 const SCREEN_DISMISS_DELAY_MS = 1800
+// Hero 影片從開始請求到完整下載最多等待 15 秒，超時就改用圖片版。
+const HERO_VIDEO_DOWNLOAD_TIMEOUT_MS = 15000
 const HERO_VIDEO_VALIDATION_TIMEOUT_MS = 8000
 const HERO_VIDEO_READY_EVENT = 'hero-video-download-ready'
 const HERO_VIDEO_PLAYABLE_EVENT = 'hero-video-playable'
@@ -31,10 +33,12 @@ const shouldShowWelcome = computed(
 let progressIntervalId
 let launchTimeoutId
 let finishTimeoutId
+let videoDownloadTimeoutId
 let videoValidationTimeoutId
 let launchStarted = false
 let videoDownloadController
 let defaultAnimationStarted = false
+let keepVideoDownloadAfterUnmount = false
 
 function startLaunchSequence() {
   if (launchStarted) return
@@ -53,31 +57,43 @@ function startLaunchSequence() {
 }
 
 function handleHeroVideoPlayable() {
-  if (defaultAnimationStarted) return
   window.clearTimeout(videoValidationTimeoutId)
+  if (defaultAnimationStarted) return
   loadingProgress.value = 100
   startLaunchSequence()
 }
 
 // 影片取得失敗或 Hero 無法解碼時，不再等待影片事件，改播一般啟動動畫。
-function startDefaultAnimation() {
+function startDefaultAnimation({ abortDownload = true } = {}) {
   if (defaultAnimationStarted || launchStarted) return
 
   defaultAnimationStarted = true
-  videoDownloadController?.abort()
+  if (abortDownload) videoDownloadController?.abort()
+  window.clearTimeout(videoDownloadTimeoutId)
   window.clearTimeout(videoValidationTimeoutId)
   window.removeEventListener(HERO_VIDEO_PLAYABLE_EVENT, handleHeroVideoPlayable)
   loadingProgress.value = 0
   startLoadingProgress()
 }
 
-function handleHeroVideoFailed() {
-  startDefaultAnimation()
+function handleHeroVideoFailed(event) {
+  const isRecoverableTimeout = event.detail?.reason === 'download-timeout'
+  startDefaultAnimation({ abortDownload: !isRecoverableTimeout })
 }
 
 // 完整下載影片並建立 Blob URL，確保 Hero 不需要再次發出影片請求。
 async function downloadHeroVideo() {
   videoDownloadController = new AbortController()
+
+  // 此計時涵蓋連線、伺服器回應及完整串流下載時間。
+  videoDownloadTimeoutId = window.setTimeout(() => {
+    console.warn('Hero 影片下載超過 15 秒，切換為圖片版本。')
+    // 逾時只解除啟動畫等待；影片繼續在背景下載，完成後仍會交給 Hero。
+    keepVideoDownloadAfterUnmount = true
+    window.dispatchEvent(new CustomEvent(HERO_VIDEO_FAILED_EVENT, {
+      detail: { reason: 'download-timeout' },
+    }))
+  }, HERO_VIDEO_DOWNLOAD_TIMEOUT_MS)
 
   try {
     const response = await fetch(heroVideoUrl, {
@@ -111,6 +127,8 @@ async function downloadHeroVideo() {
 
     if (loadedBytes === 0) throw new Error('Hero video file is empty')
 
+    // 只有完整下載才算通過 10 秒傳輸期限；接著交由 video 驗證能否播放。
+    window.clearTimeout(videoDownloadTimeoutId)
     loadingProgress.value = 99
     const videoBlob = new Blob(chunks, { type: contentType })
     const videoObjectUrl = URL.createObjectURL(videoBlob)
@@ -118,6 +136,9 @@ async function downloadHeroVideo() {
     window.dispatchEvent(new CustomEvent(HERO_VIDEO_READY_EVENT, {
       detail: { url: videoObjectUrl },
     }))
+
+    // 已因 10 秒逾時進站時，不再讓 Startup 管理播放驗證；改由 Hero 自己接手。
+    if (defaultAnimationStarted) return
 
     // 某些損毀檔案不會立即觸發 video error，以逾時避免進度永遠停在 99%。
     videoValidationTimeoutId = window.setTimeout(() => {
@@ -148,8 +169,9 @@ function clearAnimationTimers() {
   window.clearInterval(progressIntervalId)
   window.clearTimeout(launchTimeoutId)
   window.clearTimeout(finishTimeoutId)
+  window.clearTimeout(videoDownloadTimeoutId)
   window.clearTimeout(videoValidationTimeoutId)
-  videoDownloadController?.abort()
+  if (!keepVideoDownloadAfterUnmount) videoDownloadController?.abort()
 }
 
 onMounted(() => {
