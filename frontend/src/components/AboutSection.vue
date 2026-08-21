@@ -40,31 +40,17 @@ function getDailyCardStyle(index) {
     }
 }
 
-// 從後端取得團隊照片清單。
-async function loadImages() {
-    try {
-        const response = await fetch('/api/aboutPageImages')
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`)
-        }
-
-        photoUrls.value = await response.json()
-    } catch (error) {
-        console.error('圖片載入失敗：', error)
-    }
-}
-
 // 從後端取得 About 區塊的標題與團隊簡介。
 async function loadAboutData() {
     try {
-        const response = await fetch('/api/jsonData/AboutData')
+        const response = await fetch('/api/aboutPage/data')
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`)
         }
 
         aboutData.value = await response.json()
+        photoUrls.value = aboutData.value.AboutPhoto
     } catch (error) {
         console.error('團隊資料載入失敗：', error)
     }
@@ -72,7 +58,6 @@ async function loadAboutData() {
 
 // 元件掛載後同時載入照片與文字資料。
 onMounted(() => {
-    loadImages()
     loadAboutData()
 
     touchMediaQuery = window.matchMedia('(hover: none), (pointer: coarse)')
